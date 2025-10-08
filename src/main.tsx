@@ -227,7 +227,8 @@ const KeyboardBlocker = () => {
     filter,
     (e, key) => {
       switch (key) {
-        case 'ctrl.a' || 'meta.a':
+        case 'ctrl.a':
+        case 'meta.a':
           // ctrl+a is allowed on input and textarea
           if (e.target instanceof Element) {
             const tagName = e.target?.tagName.toLowerCase();

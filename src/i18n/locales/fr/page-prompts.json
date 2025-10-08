@@ -15,8 +15,7 @@
         "no-prompt": "Vous n'avez pas encore de prompts",
         "no-model": "Vous n'avez pas encore de modèles",
         "create-prompt-success": "Le prompt a été créé",
-        "create-prompt-tips": "Vous pouvez utiliser des variables dans votre prompt, encadrez-les avec des accolades, par ex. {variable_name}. 
-_Utilisez maximum 20 caractères alphanumériques ou underscore pour le nom de variable._",
+        "create-prompt-tips": "Vous pouvez utiliser des variables dans votre prompt, encadrez-les avec des accolades, par ex. {variable_name}. \n_Utilisez maximum 20 caractères alphanumériques ou underscore pour le nom de variable._",
         "update-prompt-success": "Le prompt a été mis à jour",
         "delete-prompt-success": "Le prompt a été supprimé",
         "use-prompt-tips": "Remplacez les variables de votre modèle de prompt par des valeurs réelles, puis choisissez un modèle pour démarrer une nouvelle conversation.",

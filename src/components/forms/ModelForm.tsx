@@ -43,31 +43,31 @@ type EditFormProps = Omit<HTMLAttributes<HTMLFormElement>, 'onSubmit'> & {
   onSubmit: (model: Model) => void;
 };
 
-type GenericFormProps<T extends NewModel | Model> = Omit<
+type GenericFormProps = Omit<
   HTMLAttributes<HTMLFormElement>,
   'onSubmit'
 > & {
-  form: UseFormReturn<T, any, undefined>;
-  onSubmit: (model: T) => void;
+  form: UseFormReturn<any, any, undefined>;
+  onSubmit: (model: any) => void;
   loadModelsOnInit?: boolean;
 };
 
-type FormFieldProps<T extends NewModel | Model> = {
-  control: Control<T>;
-  name: FieldPath<T>;
+type FormFieldProps = {
+  control: Control<any>;
+  name: FieldPath<any>;
   label: string;
   placeholder?: string;
   tips?: string;
 };
 
 // ModelForm's input component
-const InputField = <T extends NewModel | Model>({
+const InputField = ({
   control,
   name,
   label,
   placeholder,
   tips,
-}: FormFieldProps<T>) => {
+}: FormFieldProps) => {
   return (
     <FormField
       control={control}
@@ -94,10 +94,10 @@ const InputField = <T extends NewModel | Model>({
 };
 
 // ModelForm's hidden input component
-const HiddenInputField = <T extends NewModel | Model>({
+const HiddenInputField = ({
   control,
   name,
-}: Omit<FormFieldProps<T>, 'label' | 'placeholder'>) => {
+}: Omit<FormFieldProps, 'label' | 'placeholder'>) => {
   return (
     <FormField
       control={control}
@@ -121,14 +121,14 @@ const HiddenInputField = <T extends NewModel | Model>({
 };
 
 // ModelForm's input for model
-const ModelField = <T extends NewModel | Model>({
+const ModelField = ({
   control,
   name,
   label,
   tips,
   config,
   loadOnInit = false,
-}: Omit<FormFieldProps<T>, 'placeholder'> & {
+}: Omit<FormFieldProps, 'placeholder'> & {
   config: RawConfig;
   loadOnInit: boolean;
 }) => {
@@ -159,7 +159,7 @@ const GenericOllamaModelForm = ({
   onSubmit,
   loadModelsOnInit,
   ...props
-}: GenericFormProps<NewOllamaModel | OllamaModel>) => {
+}: GenericFormProps) => {
   const { t } = useTranslation(['page-models']);
   const isEdit = !!form.getValues('id');
   const endpoint = useWatch({ name: 'endpoint', control: form.control });
@@ -221,7 +221,7 @@ const NewOllamaModelForm = forwardRef<ModelFormHandler, NewFormProps>(
 
     return (
       <GenericOllamaModelForm
-        form={form as UseFormReturn<NewOllamaModel, any, undefined>}
+        form={form}
         onSubmit={onSubmit}
         {...props}
       />
@@ -244,8 +244,8 @@ const EditOllamaModelForm = forwardRef<ModelFormHandler, EditFormProps>(
 
     return (
       <GenericOllamaModelForm
-        form={form as UseFormReturn<OllamaModel, any, undefined>}
-        onSubmit={onSubmit as (model: OllamaModel) => void}
+        form={form}
+        onSubmit={onSubmit}
         loadModelsOnInit
         {...props}
       />

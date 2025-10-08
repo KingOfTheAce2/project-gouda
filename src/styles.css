@@ -200,7 +200,7 @@ Copyright (c) 2024-present Frank Zhang
     --gray-track: #6e6e68;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;

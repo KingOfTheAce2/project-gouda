@@ -1,9 +1,9 @@
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 
-import type { AllProviders, DialogHandler, Model, NewModel } from '@/lib/types';
+import { PROVIDER_OLLAMA } from '@/lib/constants';
+import type { DialogHandler, Model, NewModel } from '@/lib/types';
 
 import ModelFormDialogContent from './Models/ModelFormDialogContent';
-import ProvidersGridDialogContent from './Models/ProvidersGridDialogContent';
 import { Dialog, DialogContent } from './ui/dialog';
 
 type NewModelDialogProps = {
@@ -20,30 +20,12 @@ const NewModelFormDialogInner = ({
 }: {
   onFormSubmit: (model: NewModel) => void;
 }) => {
-  const [provider, setProvider] = useState<AllProviders>();
-
-  const onCloseAutoFocus = useCallback(() => {
-    setProvider(undefined);
-  }, []);
-
-  const render = () => {
-    return provider ? (
+  return (
+    <DialogContent className="flex max-h-screen flex-col">
       <ModelFormDialogContent.New
-        provider={provider as AllProviders}
-        onResetClick={() => setProvider(undefined)}
+        provider={PROVIDER_OLLAMA}
         onFormSubmit={onFormSubmit}
       />
-    ) : (
-      <ProvidersGridDialogContent onClick={setProvider} />
-    );
-  };
-
-  return (
-    <DialogContent
-      className="flex max-h-screen flex-col"
-      onCloseAutoFocus={onCloseAutoFocus}
-    >
-      {render()}
     </DialogContent>
   );
 };

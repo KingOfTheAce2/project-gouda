@@ -15,13 +15,11 @@
         "no-prompt": "你还没有创建提示词",
         "no-model": "你还没有创建模型",
         "create-prompt-success": "已创建提示词模板",
-        "create-prompt-tips": "你可以在提示词模板中使用变量，用花括号标记，例如 {variable_name}。 
-_变量名称可以包含不超过20个英文字母、数字或下划线_",
+        "create-prompt-tips": "你可以在提示词模板中使用变量，用花括号标记，例如 {variable_name}。 \n_变量名称可以包含不超过20个英文字母、数字或下划线_",
         "update-prompt-success": "已更新提示词模板",
         "delete-prompt-success": "已删除提示词模板",
         "use-prompt-tips": "将模板中的变量替换为真实值，然后选择一个模型开始新对话。",
-        "delete-prompt-warning": "提示词模板删除后无法恢复
-你确定要继续吗？",
+        "delete-prompt-warning": "提示词模板删除后无法恢复\n你确定要继续吗？",
         "fill-the-template": "填充模板",
         "pick-a-model": "选择模型",
         "start-conversation": "开始对话"

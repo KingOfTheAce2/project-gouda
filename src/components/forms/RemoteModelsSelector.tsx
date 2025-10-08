@@ -4,15 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
-import {
-  PROVIDER_CLAUDE,
-  PROVIDER_DEEPSEEK,
-  PROVIDER_GOOGLE,
-  PROVIDER_OLLAMA,
-  PROVIDER_OPENAI,
-  PROVIDER_OPENROUTER,
-  PROVIDER_XAI,
-} from '@/lib/constants';
+import { PROVIDER_OLLAMA } from '@/lib/constants';
 import { LIST_REMOTE_MODELS_KEY, useListRemoteModelsQuery } from '@/lib/hooks';
 import type { RawConfig } from '@/lib/types';
 
@@ -47,25 +39,7 @@ export function RemoteModelsSelector({ config, enabledByDefault }: Props) {
   const queryClient = useQueryClient();
 
   const onClick = useCallback(() => {
-    if (
-      config.provider === PROVIDER_OPENAI ||
-      config.provider === PROVIDER_CLAUDE ||
-      config.provider === PROVIDER_OPENROUTER ||
-      config.provider === PROVIDER_DEEPSEEK ||
-      config.provider === PROVIDER_XAI ||
-      config.provider === PROVIDER_GOOGLE
-    ) {
-      // check api key when user is using OpenAI or OpenRouter
-      const apiKey = form.getValues('apiKey');
-      if (!apiKey || apiKey.length === 0) {
-        form.setError('apiKey', {
-          type: 'custom',
-          message: t('error:validation:empty-api-key'),
-        });
-      } else {
-        setEnabled(true);
-      }
-    } else if (config.provider === PROVIDER_OLLAMA) {
+    if (config.provider === PROVIDER_OLLAMA) {
       // check endpoint when user is using Ollama
       const endpoint = form.getValues('endpoint');
       if (!endpoint || endpoint.length === 0) {

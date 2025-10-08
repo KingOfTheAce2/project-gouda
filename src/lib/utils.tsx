@@ -75,12 +75,8 @@ export function getModelAlias(model: Model): string {
   let alias = '';
   if (model.alias && model.alias.length > 0) {
     alias = model.alias;
-  } else if ('model' in model) {
-    alias = `${model.provider} | ${model.model}`;
-  } else if ('deploymentId' in model) {
-    alias = `${model.provider} | ${model.deploymentId}`;
   } else {
-    alias = `${(model as Model).provider} | {${(model as Model).id}`;
+    alias = `${model.provider} | ${model.model}`;
   }
   return alias;
 }
