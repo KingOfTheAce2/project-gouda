@@ -25,7 +25,7 @@
         "max-tokens-desc": "Anzahl der vorherigen Nachrichten, die in jeder Modellanforderung enthalten sind. Kann durch die Optionen des Gesprächs überschrieben werden.",
         "proxy-server-desc": "Die Adresse Ihres Proxyservers.",
         "traffic-type-desc": "Welche Art von Verkehr soll über den Proxy laufen?",
-        "aboutus": "Über Kaas",
+        "aboutus": "Über BEAR LLM AI",
         "version": "Version",
         "commit": "Commit"
     },

@@ -14,7 +14,7 @@ export default function CommonLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-screen overflow-hidden font-kaas">
+    <div className="relative flex min-h-screen overflow-hidden font-bear-llm-ai">
       <ErrorBoundary FallbackComponent={Fallback}>
         <TwoColumns>
           <TwoColumns.Left>

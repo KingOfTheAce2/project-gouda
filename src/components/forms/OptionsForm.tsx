@@ -7,21 +7,11 @@ import { useTranslation } from 'react-i18next';
 
 import {
   DEFAULT_CONTEXT_LENGTH,
-  DEFAULT_MAX_TOKENS,
   SETTING_MODELS_CONTEXT_LENGTH,
-  SETTING_MODELS_MAX_TOKENS,
 } from '@/lib/constants';
-import {
-  ollamaOptionsFormSchema,
-  openAIOptionsFormSchema,
-} from '@/lib/schemas';
+import { ollamaOptionsFormSchema } from '@/lib/schemas';
 import { useAppStateStore } from '@/lib/store';
-import type {
-  FormHandler,
-  OllamaOptions,
-  OpenAIOptions,
-  Options,
-} from '@/lib/types';
+import type { FormHandler, OllamaOptions, Options } from '@/lib/types';
 
 import { InputWithMenu } from '../InputWithMenu';
 import {
@@ -139,89 +129,6 @@ const SwitchField = <T extends Options>({
   );
 };
 
-const CustomOptionsForm = forwardRef<FormHandler, FormProps<OpenAIOptions>>(
-  (
-    { onSubmit, defaultValues, ...props }: FormProps<OpenAIOptions>,
-    ref: ForwardedRef<FormHandler>
-  ) => {
-    const form = useForm<OpenAIOptions>({
-      resolver: zodResolver(openAIOptionsFormSchema),
-      defaultValues: {
-        ...defaultValues,
-      },
-    });
-    const [ctxLength, maxTokens] = useAppStateStore((state) => [
-      state.settings[SETTING_MODELS_CONTEXT_LENGTH] ?? DEFAULT_CONTEXT_LENGTH,
-      state.settings[SETTING_MODELS_MAX_TOKENS] ?? DEFAULT_MAX_TOKENS,
-    ]);
-    const { t } = useTranslation();
-
-    // Hooks
-    useImperativeHandle(ref, () => {
-      return {
-        reset: () => form.reset(),
-      };
-    }, [form]);
-
-    return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} {...props}>
-          <div className="grid grid-cols-1 gap-4 py-8 sm:grid-cols-2">
-            <InputField
-              control={form.control}
-              name="contextLength"
-              label={t('page-conversation:label:context-length')}
-              placeholder={ctxLength}
-            />
-            <InputField
-              control={form.control}
-              name="frequencyPenalty"
-              label={t('page-conversation:label:frequency-penalty')}
-            />
-            <InputField
-              control={form.control}
-              name="maxTokens"
-              label={t('page-conversation:label:max-tokens')}
-              placeholder={maxTokens}
-            />
-            <InputField
-              control={form.control}
-              name="presencePenalty"
-              label={t('page-conversation:label:presence-penalty')}
-            />
-            <SwitchField
-              control={form.control}
-              name="stream"
-              label={t('page-conversation:label:stream')}
-            />
-            <SwitchField
-              control={form.control}
-              name="showReasoning"
-              label={t('page-conversation:label:show-reasoning')}
-            />
-            <InputField
-              control={form.control}
-              name="temperature"
-              label={t('page-conversation:label:temperature')}
-            />
-            <InputField
-              control={form.control}
-              name="topP"
-              label={t('page-conversation:label:top-p')}
-            />
-            <InputField
-              control={form.control}
-              name="user"
-              label={t('page-conversation:label:user')}
-            />
-            <HiddenInputField control={form.control} name="provider" />
-          </div>
-        </form>
-      </Form>
-    );
-  }
-);
-
 const OllamaOptionsForm = forwardRef<FormHandler, FormProps<OllamaOptions>>(
   (
     { onSubmit, defaultValues, ...props }: FormProps<OllamaOptions>,
@@ -294,5 +201,4 @@ const OllamaOptionsForm = forwardRef<FormHandler, FormProps<OllamaOptions>>(
 
 export default {
   Ollama: OllamaOptionsForm,
-  CUSTOM: CustomOptionsForm,
 };

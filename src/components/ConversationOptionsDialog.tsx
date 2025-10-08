@@ -3,9 +3,6 @@ import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-import {
-  PROVIDER_OLLAMA,
-} from '@/lib/constants';
 import { AppError, ERROR_TYPE_APP_STATE } from '@/lib/error';
 import { useGetOptionsQuery, useUpdateOptionsMutation } from '@/lib/hooks';
 import { useAppStateStore } from '@/lib/store';
@@ -13,7 +10,6 @@ import type {
   ConversationDetails,
   DialogHandler,
   OllamaOptions,
-  OpenAIOptions,
   Options,
 } from '@/lib/types';
 
@@ -95,27 +91,14 @@ export const ConversationOptionsDialog = forwardRef<DialogHandler<void>, Props>(
     };
 
     const renderForm = () => {
-      switch (model.provider) {
-        case PROVIDER_OLLAMA:
-          return (
-            <OptionsForm.Ollama
-              id="optionsForm"
-              ref={formRef}
-              onSubmit={onFormSubmit}
-              defaultValues={options as OllamaOptions}
-            />
-          );
-        default:
-          // handle CUSTOM models here
-          return (
-            <OptionsForm.CUSTOM
-              id="optionsForm"
-              ref={formRef}
-              onSubmit={onFormSubmit}
-              defaultValues={options as OpenAIOptions}
-            />
-          );
-      }
+      return (
+        <OptionsForm.Ollama
+          id="optionsForm"
+          ref={formRef}
+          onSubmit={onFormSubmit}
+          defaultValues={options as OllamaOptions}
+        />
+      );
     };
 
     return isSuccess && options ? (

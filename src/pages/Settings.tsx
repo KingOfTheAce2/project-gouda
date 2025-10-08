@@ -1,3 +1,7 @@
+/*
+ * This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
+ * See LICENSE and THIRD_PARTY_LICENSES.txt for details.
+ */
 import { zodResolver } from '@hookform/resolvers/zod';
 import { open } from '@tauri-apps/plugin-shell';
 import { Github, Heart, Smile, Tag } from 'lucide-react';
@@ -739,8 +743,7 @@ function AboutUs() {
             <TwitterIcon className="size-[14px]" />
             <Button
               variant="link"
-              onClick={() => open('https://x.com/thekaasapp')}
-              className="mx-1 inline h-fit p-0 leading-6"
+                                onClick={() => open('https://x.com/thebearllmai')}              className="mx-1 inline h-fit p-0 leading-6"
             >
               X / Twitter
             </Button>

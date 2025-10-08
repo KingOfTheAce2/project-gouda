@@ -23,7 +23,6 @@ impl ActiveModelBehavior for ActiveModel {}
 #[strum(serialize_all = "lowercase")]
 pub enum Providers {
     Ollama,
-    Custom,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -38,10 +37,6 @@ impl Provider {
             Provider {
                 id: "ollama".to_string(),
                 name: "Ollama".to_string(),
-            },
-            Provider {
-                id: "custom".to_string(),
-                name: "Custom".to_string(),
             },
         ]
     }

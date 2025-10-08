@@ -1,7 +1,11 @@
+/*
+ * This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
+ * See LICENSE and THIRD_PARTY_LICENSES.txt for details.
+ */
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import logoTxt from '@/assets/images/kaas.svg';
+import logoTxt from '@/assets/images/bear-llm-ai.svg';
 import logoImg from '@/assets/images/logo.svg';
 import { cn } from '@/lib/utils';
 
@@ -18,8 +22,8 @@ export function Logo({ expanded = false }: Props) {
       )}
     >
       <Link to="/" className="flex h-6 w-full gap-2">
-        <img src={logoImg} alt="Kaas" />
-        <img src={logoTxt} alt="Kaas" />
+        <img src={logoImg} alt="BEAR LLM AI" />
+        <img src={logoTxt} alt="BEAR LLM AI" />
       </Link>
     </div>
   );

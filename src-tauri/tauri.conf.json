@@ -10,7 +10,7 @@
     "active": true,
     "category": "DeveloperTool",
     "copyright": "© 2024 Frank Zhang All Rights Reserved",
-    "targets": "all",
+    "targets": ["nsis", "msi", "appimage", "dmg"],
     "externalBin": [],
     "icon": [
       "icons/32x32.png",
@@ -22,7 +22,13 @@
     "windows": {
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
-      "timestampUrl": ""
+      "timestampUrl": "",
+      "nsis": {
+        "installMode": "currentUser"
+      },
+      "wix": {
+        "language": "en-US"
+      }
     },
     "longDescription": "",
     "macOS": {
@@ -43,16 +49,16 @@
     },
     "createUpdaterArtifacts": "v1Compatible"
   },
-  "productName": "Kaas",
-  "mainBinaryName": "Kaas",
-  "version": "1.0.9",
-  "identifier": "kassapp.com",
+  "productName": "BEAR LLM AI",
+  "mainBinaryName": "BEAR LLM AI",
+  "version": "0.0.1",
+  "identifier": "com.bearllmai",
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDU1QUJDMzk1OENERTcyMkMKUldRc2N0Nk1sY09yVlpjZ1ZGWUdTS3c1NlNFVWtNVTFzbG1aMDN3dHJ0a1I5cWROcE9xbnlBR2QK",
       "endpoints": [
-        "https://mirror.ghproxy.com/https://gist.githubusercontent.com/0xfrankz/2d501b9e229cb9bf3d24b5946a727b8d/raw/kaas-updater.json",
-        "https://gist.githubusercontent.com/0xfrankz/2d501b9e229cb9bf3d24b5946a727b8d/raw/kaas-updater.json"
+        "https://mirror.ghproxy.com/https://gist.githubusercontent.com/0xfrankz/2d501b9e229cb9bf3d24b5946a727b8d/raw/bear-llm-ai-updater.json",
+        "https://gist.githubusercontent.com/0xfrankz/2d501b9e229cb9bf3d24b5946a727b8d/raw/bear-llm-ai-updater.json"
       ]
     }
   },
@@ -67,7 +73,7 @@
         "width": 1440,
         "dragDropEnabled": false,
         "center": true,
-        "title": "Kaas"
+        "title": "BEAR LLM AI"
       }
     ],
     "security": {

@@ -36,18 +36,6 @@ pub struct GenericOptions {
     pub options: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct OpenAIOptions { // Kept for Custom provider
-    pub stream: Option<bool>,
-    pub temperature: Option<f32>,
-    pub top_p: Option<f32>,
-    pub max_tokens: Option<u32>,
-    pub presence_penalty: Option<f32>,
-    pub frequency_penalty: Option<f32>,
-    pub user: Option<String>,
-    pub reasoning_effort: Option<f32>,
-}
-
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub struct OllamaOptions {
     pub stream: Option<bool>,

@@ -6,26 +6,20 @@ import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import {
-  PROVIDER_CUSTOM,
   PROVIDER_OLLAMA,
 } from '@/lib/constants';
 import {
   editOllamaModelFormSchema,
-  editOpenAIModelFormSchema,
   newOllamaModelFormSchema,
-  newOpenAIModelFormSchema,
 } from '@/lib/schemas';
 import type {
   Model,
   ModelFormHandler,
   NewModel,
   NewOllamaModel,
-  NewOpenAIModel,
   OllamaModel,
-  OpenAIModel,
   RawConfig,
   RawOllamaConfig,
-  RawOpenAIConfig,
 } from '@/lib/types';
 
 import { InputWithMenu } from '../InputWithMenu';
@@ -38,7 +32,6 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
-import { Input } from '../ui/input';
 import { RemoteModelsSelector } from './RemoteModelsSelector';
 
 type NewFormProps = Omit<HTMLAttributes<HTMLFormElement>, 'onSubmit'> & {
@@ -161,108 +154,12 @@ const ModelField = <T extends NewModel | Model>({
   );
 };
 
-const GenericOpenAIModelForm = ({
-  form,
-  onSubmit,
-  loadModelsOnInit,
-  allowEndpointEdit = false,
-  allowModelSelection = false,
-  ...props
-}: GenericFormProps<NewOpenAIModel | OpenAIModel> & {
-  allowEndpointEdit?: boolean;
-  allowModelSelection?: boolean;
-}) => {
-  const { t } = useTranslation(['page-models']);
-  const isEdit = !!form.getValues('id');
-  const provider = form.getValues('provider');
-  const apiKey = useWatch({ name: 'apiKey', control: form.control });
-  const config: RawOpenAIConfig = {
-    provider,
-    apiKey,
-  };
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} {...props}>
-        <div className="grid gap-4 py-8">
-          <InputField
-            control={form.control}
-            name="alias"
-            label={t('page-models:label:alias')}
-            tips={t('page-models:message:alias-tips')}
-          />
-          <InputField
-            control={form.control}
-            name="apiKey"
-            label={t('page-models:label:api-key')}
-            tips={t('page-models:message:api-key-tips')}
-          />
-          {allowEndpointEdit ? (
-            <InputField
-              control={form.control}
-              name="endpoint"
-              label={t('page-models:label:endpoint')}
-              tips={t('page-models:message:endpoint-tips')}
-            />
-          ) : null}
-          {allowModelSelection ? (
-            <ModelField
-              control={form.control}
-              name="model"
-              label={t('page-models:label:model')}
-              tips={t('page-models:message:model-tips')}
-              config={config}
-              loadOnInit={!!loadModelsOnInit}
-            />
-          ) : (
-            <InputField
-              control={form.control}
-              name="model"
-              label={t('page-models:label:model')}
-              tips={t('page-models:message:model-tips')}
-            />
-          )}
-          <FormField
-            control={form.control}
-            name="provider"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="hidden" {...field} />
-                </FormControl>
-                <div className="col-span-3 col-start-2">
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-          {isEdit ? (
-            <FormField
-              control={form.control}
-              name="id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input type="hidden" {...field} />
-                  </FormControl>
-                  <div className="col-span-3 col-start-2">
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-          ) : null}
-        </div>
-      </form>
-    </Form>
-  );
-};
-
 const GenericOllamaModelForm = ({
   form,
   onSubmit,
   loadModelsOnInit,
   ...props
-}: GenericFormProps<NewModel | Model>) => {
+}: GenericFormProps<NewOllamaModel | OllamaModel>) => {
   const { t } = useTranslation(['page-models']);
   const isEdit = !!form.getValues('id');
   const endpoint = useWatch({ name: 'endpoint', control: form.control });
@@ -324,7 +221,7 @@ const NewOllamaModelForm = forwardRef<ModelFormHandler, NewFormProps>(
 
     return (
       <GenericOllamaModelForm
-        form={form as UseFormReturn<NewModel, any, undefined>}
+        form={form as UseFormReturn<NewOllamaModel, any, undefined>}
         onSubmit={onSubmit}
         {...props}
       />
@@ -347,65 +244,9 @@ const EditOllamaModelForm = forwardRef<ModelFormHandler, EditFormProps>(
 
     return (
       <GenericOllamaModelForm
-        form={form as UseFormReturn<NewModel | Model, any, undefined>}
-        onSubmit={onSubmit as (model: NewModel | Model) => void}
+        form={form as UseFormReturn<OllamaModel, any, undefined>}
+        onSubmit={onSubmit as (model: OllamaModel) => void}
         loadModelsOnInit
-        {...props}
-      />
-    );
-  }
-);
-
-const NewCustomModelForm = forwardRef<ModelFormHandler, NewFormProps>(
-  ({ onSubmit, ...props }, ref) => {
-    const form = useForm<NewOpenAIModel>({
-      resolver: zodResolver(newOpenAIModelFormSchema),
-      defaultValues: {
-        provider: PROVIDER_CUSTOM,
-        alias: '',
-        apiKey: '',
-        model: '',
-        endpoint: '',
-      },
-    });
-
-    useImperativeHandle(ref, () => ({
-      reset: () => {
-        form.reset();
-      },
-    }));
-
-    return (
-      <GenericOpenAIModelForm
-        form={form as UseFormReturn<NewOpenAIModel, any, undefined>}
-        onSubmit={onSubmit}
-        allowEndpointEdit
-        {...props}
-      />
-    );
-  }
-);
-
-const EditCustomModelForm = forwardRef<ModelFormHandler, EditFormProps>(
-  ({ model, onSubmit, ...props }, ref) => {
-    const form = useForm<OpenAIModel>({
-      resolver: zodResolver(editOpenAIModelFormSchema),
-      defaultValues: model as OpenAIModel,
-    });
-
-    useImperativeHandle(ref, () => ({
-      reset: () => {
-        form.reset();
-      },
-    }));
-
-    return (
-      <GenericOpenAIModelForm
-        form={
-          form as UseFormReturn<NewOpenAIModel | OpenAIModel, any, undefined>
-        }
-        onSubmit={onSubmit as (model: NewModel | Model) => void}
-        allowEndpointEdit
         {...props}
       />
     );
@@ -416,9 +257,5 @@ export default {
   Ollama: {
     New: NewOllamaModelForm,
     Edit: EditOllamaModelForm,
-  },
-  CUSTOM: {
-    New: NewCustomModelForm,
-    Edit: EditCustomModelForm,
   },
 };

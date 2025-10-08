@@ -4,7 +4,6 @@ export const PROVIDER_CUSTOM = 'CUSTOM';
 export const PROVIDER_UNKNOWN = 'Unknown';
 export const SUPPORTED_PROVIDERS = [
   PROVIDER_OLLAMA,
-  PROVIDER_CUSTOM,
 ] as const;
 export const ALL_PROVIDERS = [
   ...SUPPORTED_PROVIDERS,

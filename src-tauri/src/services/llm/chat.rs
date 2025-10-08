@@ -4,13 +4,11 @@ use std::pin::Pin;
 
 use crate::log_utils::warn;
 use async_openai::{
-    config::Config,
     error::OpenAIError,
     Client,
-    types::{CreateChatCompletionRequest, ChatMessage},
 };
 use entity::entities::{
-    conversations::{GenericOptions, OllamaOptions, OpenAIOptions},
+    conversations::{GenericOptions, OllamaOptions},
     messages::MessageDTO,
 };
 use serde::Serialize;
@@ -56,7 +54,6 @@ pub struct GlobalSettings {
 
 pub enum ChatRequestExecutor<'c> {
     OllamaChatRequestExecutor(&'c Client<OllamaConfig>, OllamaChatCompletionRequest),
-    CustomChatRequestExecutor(&'c Client<Config>, CreateChatCompletionRequest),
 }
 
 impl<'c> ChatRequestExecutor<'c> {
@@ -90,41 +87,6 @@ impl<'c> ChatRequestExecutor<'c> {
             ..Default::default()
         };
         Ok(ChatRequestExecutor::OllamaChatRequestExecutor(
-            client, request,
-        ))
-    }
-
-    pub fn custom(
-        client: &'c Client<Config>,
-        messages: Vec<MessageDTO>,
-        options: GenericOptions,
-        global_settings: GlobalSettings,
-        model: String,
-    ) -> Result<ChatRequestExecutor, String> {
-        let request: CreateChatCompletionRequest;
-        // set messages
-        let req_messages: Vec<ChatMessage> = messages
-            .into_iter()
-            .map(Into::<ChatMessage>::into)
-            .collect();
-        // set options
-        let options: OpenAIOptions = serde_json::from_str(&options.options)
-            .map_err(|_| format!("Failed to parse conversation options: {}", &options.options))?;
-        // build request
-        let stream = options.stream.clone().unwrap_or(false);
-        request = CreateChatCompletionRequest {
-            model: model.to_string(),
-            messages: req_messages,
-            stream: Some(stream),
-            temperature: options.temperature,
-            top_p: options.top_p,
-            max_tokens: options.max_tokens,
-            presence_penalty: options.presence_penalty,
-            frequency_penalty: options.frequency_penalty,
-            user: options.user,
-            ..Default::default()
-        };
-        Ok(ChatRequestExecutor::CustomChatRequestExecutor(
             client, request,
         ))
     }
@@ -164,24 +126,6 @@ impl<'c> ChatRequestExecutor<'c> {
                     completion_token: response.eval_count,
                     reasoning_token: None,
                     total_token: sum_option(response.prompt_eval_count, response.eval_count),
-                })
-            }
-            ChatRequestExecutor::CustomChatRequestExecutor(client, request) => {
-                let response = client.chat().create(request.clone()).await.map_err(|err| {
-                    log::error!("execute ChatRequest::CustomChatRequest: {:?}", err);
-                    format!("Failed to get chat completion response: {}", err)
-                })?;
-                let message = response.choices[0].message.content.clone().unwrap_or_default();
-                let prompt_token = response.usage.clone().map(|u| u.prompt_tokens);
-                let completion_token = response.usage.clone().map(|u| u.completion_tokens);
-                let total_token = response.usage.map(|u| u.total_tokens);
-                Ok(BotReply {
-                    message,
-                    reasoning: None,
-                    prompt_token,
-                    completion_token,
-                    reasoning_token: None,
-                    total_token,
                 })
             }
         }
@@ -245,26 +189,6 @@ impl<'c> ChatRequestExecutor<'c> {
                                 response.prompt_eval_count,
                                 response.eval_count,
                             ),
-                        }
-                    })
-                });
-                Ok(Box::pin(result))
-            }
-            ChatRequestExecutor::CustomChatRequestExecutor(client, request) => {
-                let stream = client.chat().create_stream(request.clone()).await.map_err(|err| {
-                    log::error!("execute_stream ChatRequest::CustomChatRequest: {:?}", err);
-                    format!("Error creating stream: {}", err.to_string())
-                })?;
-                let result = stream.map(|item| {
-                    item.map(|response| {
-                        let content = response.choices[0].delta.content.clone().unwrap_or_default();
-                        BotReply {
-                            message: content,
-                            reasoning: None,
-                            prompt_token: None,
-                            completion_token: None,
-                            reasoning_token: None,
-                            total_token: None,
                         }
                     })
                 });

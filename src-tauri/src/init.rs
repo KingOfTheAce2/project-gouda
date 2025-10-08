@@ -1,8 +1,5 @@
 // MIT License Copyright (c) 2024-present Frank Zhang
-use crate::{
-    core::handle::KaasHandle,
-    services::db::Db,
-};
+use crate::core::handle::BearLlmAiHandle;
 use tauri::{
     App,
     Manager,
@@ -18,6 +15,6 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
             .expect("failed to resolve app data dir");
         Db::new(&app_data_dir).await
     });
-    handle.manage(KaasHandle { db });
+    handle.manage(BearLlmAiHandle { db });
     Ok(())
 }

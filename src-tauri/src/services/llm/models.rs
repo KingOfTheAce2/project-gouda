@@ -1,7 +1,7 @@
 /* This change is Copyright BEAR LLM AI project, which is proprietory. */
 // MIT License Copyright (c) 2024-present Frank Zhang
 use super::providers::ollama::{config::OllamaConfig, models::OllamaModels};
-use async_openai::{Client, config::Config};
+use async_openai::{Client};
 use serde::Serialize;
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize)]
@@ -12,16 +12,11 @@ pub struct RemoteModel {
 
 pub enum ListModelsRequestExecutor<'c> {
     OllamaListModelsRequestExecutor(&'c Client<OllamaConfig>),
-    CustomListModelsRequestExecutor(&'c Client<Config>),
 }
 
 impl<'c> ListModelsRequestExecutor<'c> {
     pub fn ollama(client: &'c Client<OllamaConfig>) -> Self {
         return ListModelsRequestExecutor::OllamaListModelsRequestExecutor(client);
-    }
-
-    pub fn custom(client: &'c Client<Config>) -> Self {
-        return ListModelsRequestExecutor::CustomListModelsRequestExecutor(client);
     }
 
     pub async fn execute(&self) -> Result<Vec<RemoteModel>, String> {
@@ -35,18 +30,6 @@ impl<'c> ListModelsRequestExecutor<'c> {
                     .models
                     .iter()
                     .map(|m| RemoteModel { id: m.name.clone() })
-                    .collect();
-                Ok(result)
-            }
-            ListModelsRequestExecutor::CustomListModelsRequestExecutor(client) => {
-                let response = client.models().list().await.map_err(|err| {
-                    log::error!("CustomListModelsRequestExecutor: {}", err);
-                    String::from("Failed to list models")
-                })?;
-                let result = response
-                    .data
-                    .iter()
-                    .map(|m| RemoteModel { id: m.id.clone() })
                     .collect();
                 Ok(result)
             }

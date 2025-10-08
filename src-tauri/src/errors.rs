@@ -4,7 +4,7 @@ use serde::{ser::Serializer, Serialize};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum KaasError {
+pub enum BearLlmAiError {
     #[error("Database error: {0}")]
     DbErr(#[from] DbErr),
     #[error("Tauri error: {0}")]
@@ -12,7 +12,7 @@ pub enum KaasError {
 }
 
 // we must manually implement serde::Serialize
-impl Serialize for KaasError {
+impl Serialize for BearLlmAiError {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,

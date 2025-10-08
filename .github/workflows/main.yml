@@ -5,6 +5,7 @@
 name: "publish"
 
 on:
+  workflow_dispatch: # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT. See LICENSE and THIRD_PARTY_LICENSES.txt for details.
   push:
     branches:
       - release
@@ -67,8 +68,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           includeUpdaterJson: true
-          tagName: kaas-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: "Kaas v__VERSION__"
+          tagName: bear-llm-ai-v__VERSION__ # Changed under BEAR AI a proprietory license. the action automatically replaces \_\_VERSION\_\_ with the app version.
+          releaseName: "BEAR LLM AI v__VERSION__" # Changed under BEAR AI a proprietory license.
           releaseBody: "See the assets to download this version and install."
           releaseDraft: true
           prerelease: false

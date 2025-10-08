@@ -25,7 +25,7 @@
         "max-tokens-desc": "每次请求模型时包含的最大词元（token）数量。可以在对话选项中覆盖此设置",
         "proxy-server-desc": "代理服务器的地址。",
         "traffic-type-desc": "哪种类型的流量应经过代理？",
-        "aboutus": "关于Kaas",
+        "aboutus": "关于 BEAR LLM AI",
         "version": "版本",
         "commit": "Commit"
     },

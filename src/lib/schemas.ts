@@ -1,19 +1,8 @@
 import { z } from 'zod';
 
 import {
-  PROVIDER_CUSTOM,
   PROVIDER_OLLAMA,
 } from '@/lib/constants';
-
-export const newOpenAIModelFormSchema = z.object({
-  alias: z.string(),
-  provider: z.enum([
-    PROVIDER_CUSTOM,
-  ] as const),
-  apiKey: z.string().min(1, 'API Key is required'),
-  model: z.string().min(1, 'Model is required'),
-  endpoint: z.string().url().optional(),
-});
 
 export const newOllamaModelFormSchema = z.object({
   alias: z.string(),
@@ -23,10 +12,6 @@ export const newOllamaModelFormSchema = z.object({
 });
 
 export const editOllamaModelFormSchema = newOllamaModelFormSchema.extend({
-  id: z.number(),
-});
-
-export const editOpenAIModelFormSchema = newOpenAIModelFormSchema.extend({
   id: z.number(),
 });
 
@@ -111,12 +96,6 @@ const commonOptionsFormSchema = z.object({
     .transform((v) => (v === '' ? undefined : v)),
 });
 
-export const openAIOptionsFormSchema = commonOptionsFormSchema.extend({
-  provider: z.enum([
-    PROVIDER_CUSTOM,
-  ] as const),
-});
-
 export const ollamaOptionsFormSchema = commonOptionsFormSchema
   .omit({
     frequencyPenalty: true,
@@ -131,7 +110,6 @@ export const ollamaOptionsFormSchema = commonOptionsFormSchema
   });
 
 export const optionsFormSchema = z.discriminatedUnion('provider', [
-  openAIOptionsFormSchema,
   ollamaOptionsFormSchema,
 ]);
 

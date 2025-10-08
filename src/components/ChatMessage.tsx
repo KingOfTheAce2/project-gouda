@@ -177,8 +177,7 @@ const CodeHighlighter = ({
       />
     </div>
   ) : (
-    <code {...props} className={cn('text-wrap font-kaas italic', className)}>
-      {children}
+    <code {...props} className={cn('text-wrap font-bear-llm-ai italic', className)}>      {children}
     </code>
   );
 };

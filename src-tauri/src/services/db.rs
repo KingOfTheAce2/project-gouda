@@ -2,7 +2,7 @@
 use sea_orm::{Database, DatabaseConnection, EntityTrait, Set};
 use std::path::Path;
 
-use crate::errors::KaasError;
+use crate::errors::BearLlmAiError;
 use entity::entities::{
     conversations,
     messages,
@@ -12,7 +12,7 @@ use entity::entities::{
 };
 use migration::{Migrator, MigratorTrait};
 
-const DB_NAME: &str = "kaas.db";
+const DB_NAME: &str = "bear-llm-ai.db";
 
 #[derive(Debug, Clone)]
 pub struct Db(DatabaseConnection);
@@ -31,7 +31,7 @@ impl Db {
     }
 
     // --- Settings
-    pub async fn get_settings(db: &DatabaseConnection) -> Result<serde_json::Value, KaasError> {
+    pub async fn get_settings(db: &DatabaseConnection) -> Result<serde_json::Value, BearLlmAiError> {
         let settings = settings::Entity::find().all(db).await?;
         let mut res = serde_json::Map::new();
         for setting in settings {
@@ -46,7 +46,7 @@ impl Db {
     pub async fn update_settings(
         db: &DatabaseConnection,
         payload: Vec<Setting>,
-    ) -> Result<(), KaasError> {
+    ) -> Result<(), BearLlmAiError> {
         for setting in payload {
             let s = settings::Entity::find_by_id(setting.key.clone())
                 .one(db)
@@ -69,11 +69,11 @@ impl Db {
     pub async fn get_setting(
         db: &DatabaseConnection,
         key: SettingKey,
-    ) -> Result<Setting, KaasError> {
+    ) -> Result<Setting, BearLlmAiError> {
         let setting = settings::Entity::find_by_id(key).one(db).await?;
         match setting {
             Some(s) => Ok(s.into()),
-            None => Err(KaasError::DbErr(sea_orm::DbErr::RecordNotFound(
+            None => Err(BearLlmAiError::DbErr(sea_orm::DbErr::RecordNotFound(
                 "Setting not found".to_string(),
             ))),
         }
@@ -81,12 +81,12 @@ impl Db {
 
     pub async fn get_proxy_setting(
         db: &DatabaseConnection,
-    ) -> Result<Option<settings::ProxySetting>, KaasError> {
+    ) -> Result<Option<settings::ProxySetting>, BearLlmAiError> {
         let setting = settings::Entity::find_by_id(SettingKey::Proxy).one(db).await?;
         match setting {
             Some(s) => {
                 let proxy_setting: settings::ProxySetting = serde_json::from_str(&s.value)
-                    .map_err(|_| KaasError::DbErr(sea_orm::DbErr::Json("Failed to parse proxy setting".to_string())))?;
+                    .map_err(|_| BearLlmAiError::DbErr(sea_orm::DbErr::Json("Failed to parse proxy setting".to_string())))?;
                 Ok(Some(proxy_setting))
             }
             None => Ok(None),
@@ -94,16 +94,16 @@ impl Db {
     }
 
     // --- Models
-    pub async fn get_models(db: &DatabaseConnection) -> Result<Vec<models::Model>, KaasError> {
+    pub async fn get_models(db: &DatabaseConnection) -> Result<Vec<models::Model>, BearLlmAiError> {
         let res = models::Entity::find().all(db).await?;
         Ok(res)
     }
 
-    pub async fn get_model(db: &DatabaseConnection, id: i32) -> Result<models::Model, KaasError> {
+    pub async fn get_model(db: &DatabaseConnection, id: i32) -> Result<models::Model, BearLlmAiError> {
         let res = models::Entity::find_by_id(id).one(db).await?;
         match res {
             Some(m) => Ok(m),
-            None => Err(KaasError::DbErr(sea_orm::DbErr::RecordNotFound(
+            None => Err(BearLlmAiError::DbErr(sea_orm::DbErr::RecordNotFound(
                 "Model not found".to_string(),
             ))),
         }
@@ -112,7 +112,7 @@ impl Db {
     pub async fn create_model(
         db: &DatabaseConnection,
         payload: models::Model,
-    ) -> Result<models::Model, KaasError> {
+    ) -> Result<models::Model, BearLlmAiError> {
         let new_model = models::ActiveModel {
             provider: Set(payload.provider.to_owned()),
             name: Set(payload.name.to_owned()),
@@ -127,7 +127,7 @@ impl Db {
         db: &DatabaseConnection,
         id: i32,
         payload: models::Model,
-    ) -> Result<models::Model, KaasError> {
+    ) -> Result<models::Model, BearLlmAiError> {
         let model = models::Entity::find_by_id(id).one(db).await?;
         if let Some(m) = model {
             let mut active_model: models::ActiveModel = m.into();
@@ -137,20 +137,20 @@ impl Db {
             let res = active_model.update(db).await?;
             Ok(res)
         } else {
-            Err(KaasError::DbErr(sea_orm::DbErr::RecordNotFound(
+            Err(BearLlmAiError::DbErr(sea_orm::DbErr::RecordNotFound(
                 "Model not found".to_string(),
             )))
         }
     }
 
-    pub async fn delete_model(db: &DatabaseConnection, id: i32) -> Result<(), KaasError> {
+    pub async fn delete_model(db: &DatabaseConnection, id: i32) -> Result<(), BearLlmAiError> {
         models::Entity::delete_by_id(id).exec(db).await?;
         Ok(())
     }
 
     pub async fn get_providers(
         db: &DatabaseConnection,
-    ) -> Result<Vec<models::Provider>, KaasError> {
+    ) -> Result<Vec<models::Provider>, BearLlmAiError> {
         let res = models::Provider::all();
         Ok(res)
     }
@@ -158,7 +158,7 @@ impl Db {
     // --- Conversations
     pub async fn get_conversations(
         db: &DatabaseConnection,
-    ) -> Result<Vec<conversations::Model>, KaasError> {
+    ) -> Result<Vec<conversations::Model>, BearLlmAiError> {
         let res = conversations::Entity::find().all(db).await?;
         Ok(res)
     }
@@ -166,7 +166,7 @@ impl Db {
     pub async fn create_conversation(
         db: &DatabaseConnection,
         payload: conversations::Model,
-    ) -> Result<conversations::Model, KaasError> {
+    ) -> Result<conversations::Model, BearLlmAiError> {
         let new_conversation = conversations::ActiveModel {
             name: Set(payload.name.to_owned()),
             model_id: Set(payload.model_id.to_owned()),
@@ -182,7 +182,7 @@ impl Db {
         db: &DatabaseConnection,
         id: i32,
         payload: conversations::Model,
-    ) -> Result<conversations::Model, KaasError> {
+    ) -> Result<conversations::Model, BearLlmAiError> {
         let conversation = conversations::Entity::find_by_id(id).one(db).await?;
         if let Some(c) = conversation {
             let mut active_model: conversations::ActiveModel = c.into();
@@ -193,13 +193,13 @@ impl Db {
             let res = active_model.update(db).await?;
             Ok(res)
         } else {
-            Err(KaasError::DbErr(sea_orm::DbErr::RecordNotFound(
+            Err(BearLlmAiError::DbErr(sea_orm::DbErr::RecordNotFound(
                 "Conversation not found".to_string(),
             )))
         }
     }
 
-    pub async fn delete_conversation(db: &DatabaseConnection, id: i32) -> Result<(), KaasError> {
+    pub async fn delete_conversation(db: &DatabaseConnection, id: i32) -> Result<(), BearLlmAiError> {
         conversations::Entity::delete_by_id(id).exec(db).await?;
         Ok(())
     }
@@ -208,7 +208,7 @@ impl Db {
     pub async fn get_conversation_messages(
         db: &DatabaseConnection,
         conversation_id: i32,
-    ) -> Result<Vec<messages::Model>, KaasError> {
+    ) -> Result<Vec<messages::Model>, BearLlmAiError> {
         let res = messages::Entity::find()
             .filter(messages::Column::ConversationId.eq(conversation_id))
             .all(db)
@@ -219,7 +219,7 @@ impl Db {
     pub async fn create_messages(
         db: &DatabaseConnection,
         payload: Vec<messages::Model>,
-    ) -> Result<Vec<messages::Model>, KaasError> {
+    ) -> Result<Vec<messages::Model>, BearLlmAiError> {
         let new_messages = payload
             .into_iter()
             .map(|m| messages::ActiveModel {
@@ -241,7 +241,7 @@ impl Db {
     }
 
     // --- Prompts
-    pub async fn get_prompts(db: &DatabaseConnection) -> Result<Vec<prompts::Model>, KaasError> {
+    pub async fn get_prompts(db: &DatabaseConnection) -> Result<Vec<prompts::Model>, BearLlmAiError> {
         let res = prompts::Entity::find().all(db).await?;
         Ok(res)
     }
@@ -249,7 +249,7 @@ impl Db {
     pub async fn create_prompt(
         db: &DatabaseConnection,
         payload: prompts::Model,
-    ) -> Result<prompts::Model, KaasError> {
+    ) -> Result<prompts::Model, BearLlmAiError> {
         let new_prompt = prompts::ActiveModel {
             name: Set(payload.name.to_owned()),
             content: Set(payload.content.to_owned()),
@@ -263,7 +263,7 @@ impl Db {
         db: &DatabaseConnection,
         id: i32,
         payload: prompts::Model,
-    ) -> Result<prompts::Model, KaasError> {
+    ) -> Result<prompts::Model, BearLlmAiError> {
         let prompt = prompts::Entity::find_by_id(id).one(db).await?;
         if let Some(p) = prompt {
             let mut active_model: prompts::ActiveModel = p.into();
@@ -272,13 +272,13 @@ impl Db {
             let res = active_model.update(db).await?;
             Ok(res)
         } else {
-            Err(KaasError::DbErr(sea_orm::DbErr::RecordNotFound(
+            Err(BearLlmAiError::DbErr(sea_orm::DbErr::RecordNotFound(
                 "Prompt not found".to_string(),
             )))
         }
     }
 
-    pub async fn delete_prompt(db: &DatabaseConnection, id: i32) -> Result<(), KaasError> {
+    pub async fn delete_prompt(db: &DatabaseConnection, id: i32) -> Result<(), BearLlmAiError> {
         prompts::Entity::delete_by_id(id).exec(db).await?;
         Ok(())
     }

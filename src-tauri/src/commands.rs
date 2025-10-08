@@ -8,8 +8,8 @@ use tauri::{
 };
 
 use crate::{
-    core::handle::KaasHandle,
-    errors::KaasError,
+    core::handle::BearLlmAiHandle,
+    errors::BearLlmAiError,
     services::{
         db::Db,
         llm::{
@@ -31,8 +31,8 @@ use entity::entities::{
 
 // --- Settings
 #[tauri::command]
-pub async fn get_settings(handle: AppHandle) -> Result<Value, KaasError> {
-    let res = Db::get_settings(&handle.state::<KaasHandle>().db).await?;
+pub async fn get_settings(handle: AppHandle) -> Result<Value, BearLlmAiError> {
+    let res = Db::get_settings(&handle.state::<BearLlmAiHandle>().db).await?;
     Ok(res)
 }
 
@@ -40,8 +40,8 @@ pub async fn get_settings(handle: AppHandle) -> Result<Value, KaasError> {
 pub async fn update_settings(
     payload: Vec<Setting>,
     handle: AppHandle,
-) -> Result<(), KaasError> {
-    Db::update_settings(&handle.state::<KaasHandle>().db, payload).await?;
+) -> Result<(), BearLlmAiError> {
+    Db::update_settings(&handle.state::<BearLlmAiHandle>().db, payload).await?;
     Ok(())
 }
 
@@ -49,21 +49,21 @@ pub async fn update_settings(
 pub async fn get_setting(
     key: SettingKey,
     handle: AppHandle,
-) -> Result<Setting, KaasError> {
-    let res = Db::get_setting(&handle.state::<KaasHandle>().db, key).await?;
+) -> Result<Setting, BearLlmAiError> {
+    let res = Db::get_setting(&handle.state::<BearLlmAiHandle>().db, key).await?;
     Ok(res)
 }
 
 // --- Models
 #[tauri::command]
-pub async fn get_models(handle: AppHandle) -> Result<Vec<Model>, KaasError> {
-    let res = Db::get_models(&handle.state::<KaasHandle>().db).await?;
+pub async fn get_models(handle: AppHandle) -> Result<Vec<Model>, BearLlmAiError> {
+    let res = Db::get_models(&handle.state::<BearLlmAiHandle>().db).await?;
     Ok(res)
 }
 
 #[tauri::command]
-pub async fn create_model(payload: models::Model, handle: AppHandle) -> Result<Model, KaasError> {
-    let res = Db::create_model(&handle.state::<KaasHandle>().db, payload).await?;
+pub async fn create_model(payload: models::Model, handle: AppHandle) -> Result<Model, BearLlmAiError> {
+    let res = Db::create_model(&handle.state::<BearLlmAiHandle>().db, payload).await?;
     Ok(res)
 }
 
@@ -72,20 +72,20 @@ pub async fn update_model(
     id: i32,
     payload: models::Model,
     handle: AppHandle,
-) -> Result<Model, KaasError> {
-    let res = Db::update_model(&handle.state::<KaasHandle>().db, id, payload).await?;
+) -> Result<Model, BearLlmAiError> {
+    let res = Db::update_model(&handle.state::<BearLlmAiHandle>().db, id, payload).await?;
     Ok(res)
 }
 
 #[tauri::command]
-pub async fn delete_model(id: i32, handle: AppHandle) -> Result<(), KaasError> {
-    Db::delete_model(&handle.state::<KaasHandle>().db, id).await?;
+pub async fn delete_model(id: i32, handle: AppHandle) -> Result<(), BearLlmAiError> {
+    Db::delete_model(&handle.state::<BearLlmAiHandle>().db, id).await?;
     Ok(())
 }
 
 #[tauri::command]
-pub async fn get_providers(handle: AppHandle) -> Result<Vec<Provider>, KaasError> {
-    let res = Db::get_providers(&handle.state::<KaasHandle>().db).await?;
+pub async fn get_providers(handle: AppHandle) -> Result<Vec<Provider>, BearLlmAiError> {
+    let res = Db::get_providers(&handle.state::<BearLlmAiHandle>().db).await?;
     Ok(res)
 }
 
@@ -94,11 +94,11 @@ pub async fn list_remote_models(
     model_id: i32,
     handle: AppHandle,
 ) -> Result<Vec<RemoteModel>, String> {
-    let kaas_handle = handle.state::<KaasHandle>();
-    let model = Db::get_model(&kaas_handle.db, model_id)
+    let bear_llm_ai_handle = handle.state::<BearLlmAiHandle>();
+    let model = Db::get_model(&bear_llm_ai_handle.db, model_id)
         .await
         .map_err(|err| err.to_string())?;
-    let proxy_setting = Db::get_proxy_setting(&kaas_handle.db)
+    let proxy_setting = Db::get_proxy_setting(&bear_llm_ai_handle.db)
         .await
         .map_err(|err| err.to_string())?;
     let client = LLMClient::new(model.into(), proxy_setting)?;
@@ -108,8 +108,8 @@ pub async fn list_remote_models(
 
 // --- Conversations
 #[tauri::command]
-pub async fn get_conversations(handle: AppHandle) -> Result<Vec<Conversation>, KaasError> {
-    let res = Db::get_conversations(&handle.state::<KaasHandle>().db).await?;
+pub async fn get_conversations(handle: AppHandle) -> Result<Vec<Conversation>, BearLlmAiError> {
+    let res = Db::get_conversations(&handle.state::<BearLlmAiHandle>().db).await?;
     Ok(res)
 }
 
@@ -117,8 +117,8 @@ pub async fn get_conversations(handle: AppHandle) -> Result<Vec<Conversation>, K
 pub async fn create_conversation(
     payload: conversations::Model,
     handle: AppHandle,
-) -> Result<Conversation, KaasError> {
-    let res = Db::create_conversation(&handle.state::<KaasHandle>().db, payload).await?;
+) -> Result<Conversation, BearLlmAiError> {
+    let res = Db::create_conversation(&handle.state::<BearLlmAiHandle>().db, payload).await?;
     Ok(res)
 }
 
@@ -127,14 +127,14 @@ pub async fn update_conversation(
     id: i32,
     payload: conversations::Model,
     handle: AppHandle,
-) -> Result<Conversation, KaasError> {
-    let res = Db::update_conversation(&handle.state::<KaasHandle>().db, id, payload).await?;
+) -> Result<Conversation, BearLlmAiError> {
+    let res = Db::update_conversation(&handle.state::<BearLlmAiHandle>().db, id, payload).await?;
     Ok(res)
 }
 
 #[tauri::command]
-pub async fn delete_conversation(id: i32, handle: AppHandle) -> Result<(), KaasError> {
-    Db::delete_conversation(&handle.state::<KaasHandle>().db, id).await?;
+pub async fn delete_conversation(id: i32, handle: AppHandle) -> Result<(), BearLlmAiError> {
+    Db::delete_conversation(&handle.state::<BearLlmAiHandle>().db, id).await?;
     Ok(())
 }
 
@@ -142,8 +142,8 @@ pub async fn delete_conversation(id: i32, handle: AppHandle) -> Result<(), KaasE
 pub async fn get_conversation_messages(
     conversation_id: i32,
     handle: AppHandle,
-) -> Result<Vec<Message>, KaasError> {
-    let res = Db::get_conversation_messages(&handle.state::<KaasHandle>().db, conversation_id).await?;
+) -> Result<Vec<Message>, BearLlmAiError> {
+    let res = Db::get_conversation_messages(&handle.state::<BearLlmAiHandle>().db, conversation_id).await?;
     Ok(res)
 }
 
@@ -152,21 +152,21 @@ pub async fn get_conversation_messages(
 pub async fn create_messages(
     payload: Vec<messages::Model>,
     handle: AppHandle,
-) -> Result<Vec<Message>, KaasError> {
-    let res = Db::create_messages(&handle.state::<KaasHandle>().db, payload).await?;
+) -> Result<Vec<Message>, BearLlmAiError> {
+    let res = Db::create_messages(&handle.state::<BearLlmAiHandle>().db, payload).await?;
     Ok(res)
 }
 
 // --- Prompts
 #[tauri::command]
-pub async fn get_prompts(handle: AppHandle) -> Result<Vec<Prompt>, KaasError> {
-    let res = Db::get_prompts(&handle.state::<KaasHandle>().db).await?;
+pub async fn get_prompts(handle: AppHandle) -> Result<Vec<Prompt>, BearLlmAiError> {
+    let res = Db::get_prompts(&handle.state::<BearLlmAiHandle>().db).await?;
     Ok(res)
 }
 
 #[tauri::command]
-pub async fn create_prompt(payload: prompts::Model, handle: AppHandle) -> Result<Prompt, KaasError> {
-    let res = Db::create_prompt(&handle.state::<KaasHandle>().db, payload).await?;
+pub async fn create_prompt(payload: prompts::Model, handle: AppHandle) -> Result<Prompt, BearLlmAiError> {
+    let res = Db::create_prompt(&handle.state::<BearLlmAiHandle>().db, payload).await?;
     Ok(res)
 }
 
@@ -175,14 +175,14 @@ pub async fn update_prompt(
     id: i32,
     payload: prompts::Model,
     handle: AppHandle,
-) -> Result<Prompt, KaasError> {
-    let res = Db::update_prompt(&handle.state::<KaasHandle>().db, id, payload).await?;
+) -> Result<Prompt, BearLlmAiError> {
+    let res = Db::update_prompt(&handle.state::<BearLlmAiHandle>().db, id, payload).await?;
     Ok(res)
 }
 
 #[tauri::command]
-pub async fn delete_prompt(id: i32, handle: AppHandle) -> Result<(), KaasError> {
-    Db::delete_prompt(&handle.state::<KaasHandle>().db, id).await?;
+pub async fn delete_prompt(id: i32, handle: AppHandle) -> Result<(), BearLlmAiError> {
+    Db::delete_prompt(&handle.state::<BearLlmAiHandle>().db, id).await?;
     Ok(())
 }
 
@@ -194,16 +194,16 @@ pub async fn chat_completions(
     options: GenericOptions,
     handle: AppHandle,
 ) -> Result<BotReply, String> {
-    let kaas_handle = handle.state::<KaasHandle>();
-    let model = Db::get_model(&kaas_handle.db, model_id)
+    let bear_llm_ai_handle = handle.state::<BearLlmAiHandle>();
+    let model = Db::get_model(&bear_llm_ai_handle.db, model_id)
         .await
         .map_err(|err| err.to_string())?;
-    let proxy_setting = Db::get_proxy_setting(&kaas_handle.db)
+    let proxy_setting = Db::get_proxy_setting(&bear_llm_ai_handle.db)
         .await
         .map_err(|err| err.to_string())?;
     let client = LLMClient::new(model.into(), proxy_setting)?;
     let global_settings = GlobalSettings {
-        max_tokens: settings::get_max_tokens(&kaas_handle.db)
+        max_tokens: settings::get_max_tokens(&bear_llm_ai_handle.db)
             .await
             .map_err(|err| err.to_string())?,
     };
@@ -218,16 +218,16 @@ pub async fn chat_completions_stream(
     options: GenericOptions,
     handle: AppHandle,
 ) -> Result<BotReplyStream, String> {
-    let kaas_handle = handle.state::<KaasHandle>();
-    let model = Db::get_model(&kaas_handle.db, model_id)
+    let bear_llm_ai_handle = handle.state::<BearLlmAiHandle>();
+    let model = Db::get_model(&bear_llm_ai_handle.db, model_id)
         .await
         .map_err(|err| err.to_string())?;
-    let proxy_setting = Db::get_proxy_setting(&kaas_handle.db)
+    let proxy_setting = Db::get_proxy_setting(&bear_llm_ai_handle.db)
         .await
         .map_err(|err| err.to_string())?;
     let client = LLMClient::new(model.into(), proxy_setting)?;
     let global_settings = GlobalSettings {
-        max_tokens: settings::get_max_tokens(&kaas_handle.db)
+        max_tokens: settings::get_max_tokens(&bear_llm_ai_handle.db)
             .await
             .map_err(|err| err.to_string())?,
     };

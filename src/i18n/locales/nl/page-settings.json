@@ -25,7 +25,7 @@
         "max-tokens-desc": "Aantal vorige berichten opgenomen in elk modelverzoek. Kan worden overschreven door de opties van het gesprek.",
         "proxy-server-desc": "Het adres van uw proxyserver.",
         "traffic-type-desc": "Welk type verkeer moet via de proxy lopen?",
-        "aboutus": "Over Kaas",
+        "aboutus": "Over BEAR LLM AI",
         "version": "Versie",
         "commit": "Commit"
     },

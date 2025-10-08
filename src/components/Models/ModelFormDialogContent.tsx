@@ -1,9 +1,5 @@
 import { useTranslation } from 'react-i18next';
 
-import {
-  PROVIDER_CUSTOM,
-  PROVIDER_OLLAMA,
-} from '@/lib/constants';
 import type { AllProviders, Model, NewModel } from '@/lib/types';
 
 import { DeleteWithConfirmation } from '../DeleteWithConfirmation';
@@ -21,7 +17,6 @@ import { ScrollArea } from '../ui/scroll-area';
 
 type NewModelFormDialogContentProps = {
   provider: AllProviders;
-  onResetClick: () => void;
   onFormSubmit: (model: NewModel) => void;
 };
 
@@ -33,22 +28,11 @@ type EditModelFormDialogContentProps = {
 
 function NewModelFormDialogContent({
   provider,
-  onResetClick,
   onFormSubmit,
 }: NewModelFormDialogContentProps) {
   const { t } = useTranslation();
-  let form = null;
-  switch (provider) {
-    case PROVIDER_OLLAMA:
-      form = <ModelForm.Ollama.New id="modelForm" onSubmit={onFormSubmit} />;
-      break;
-    case PROVIDER_CUSTOM:
-      form = <ModelForm.CUSTOM.New id="modelForm" onSubmit={onFormSubmit} />;
-      break;
-    default:
-      // Should not happen
-      break;
-  }
+  const form = <ModelForm.Ollama.New id="modelForm" onSubmit={onFormSubmit} />;
+
   return (
     <ScrollArea className="grow">
       <DialogHeader>
@@ -66,9 +50,6 @@ function NewModelFormDialogContent({
       </DialogHeader>
       {form}
       <DialogFooter className="gap-4">
-        <Button variant="secondary" onClick={onResetClick}>
-          {t('generic:action:change-provider')}
-        </Button>
         <Button form="modelForm">{t('generic:action:save')}</Button>
       </DialogFooter>
     </ScrollArea>
@@ -81,30 +62,14 @@ function EditModelFormDialogContent({
   onDelete,
 }: EditModelFormDialogContentProps) {
   const { t } = useTranslation();
-  let form = null;
-  switch (model.provider) {
-    case PROVIDER_OLLAMA:
-      form = (
-        <ModelForm.Ollama.Edit
-          id="modelForm"
-          model={model}
-          onSubmit={onFormSubmit}
-        />
-      );
-      break;
-    case PROVIDER_CUSTOM:
-      form = (
-        <ModelForm.CUSTOM.Edit
-          id="modelForm"
-          model={model}
-          onSubmit={onFormSubmit}
-        />
-      );
-      break;
-    default:
-      // Should not happen
-      break;
-  }
+  const form = (
+    <ModelForm.Ollama.Edit
+      id="modelForm"
+      model={model}
+      onSubmit={onFormSubmit}
+    />
+  );
+
   return (
     <ScrollArea className="grow">
       <DialogHeader>

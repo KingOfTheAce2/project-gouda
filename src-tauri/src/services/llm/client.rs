@@ -13,7 +13,7 @@ use super::{
     chat::{BotReply, BotReplyStream, ChatRequestExecutor, GlobalSettings},
     models::{ListModelsRequestExecutor, RemoteModel},
     providers::ollama::config::OllamaConfig,
-    types::{RawOllamaConfig, RawOpenAIConfig},
+    types::RawOllamaConfig,
     utils::build_http_client,
 };
 
@@ -21,7 +21,6 @@ use super::{
 #[derive(Debug, Clone)]
 pub enum LLMClient {
     OllamaClient(Client<OllamaConfig>, Option<String>),
-    CustomClient(Client<Config>, Option<String>),
 }
 
 impl LLMClient {
@@ -39,13 +38,6 @@ impl LLMClient {
                 let client = Client::with_config(raw_config.into()).with_http_client(http_client);
                 Ok(LLMClient::OllamaClient(client, model))
             }
-            Providers::CUSTOM => {
-                let raw_config: RawOpenAIConfig = serde_json::from_str(&config.config)
-                    .map_err(|_| format!("Failed to parse model config: {}", &config.config))?;
-                let model = raw_config.model.clone();
-                let client = Client::with_config(raw_config.into()).with_http_client(http_client);
-                Ok(LLMClient::CustomClient(client, model))
-            }
             _ => Err("Unsupported provider".to_string()),
         }
     }
@@ -61,16 +53,6 @@ impl LLMClient {
                 Some(model_str) => {
                     let reply =
                         ChatRequestExecutor::ollama(client, messages, options, global_settings, model_str.to_string())?
-                            .execute()
-                            .await?;
-                    Ok(reply)
-                }
-                None => Err(format!("Model not set for chat")),
-            },
-            LLMClient::CustomClient(client, model) => match model {
-                Some(model_str) => {
-                    let reply =
-                        ChatRequestExecutor::custom(client, messages, options, global_settings, model_str.to_string())?
                             .execute()
                             .await?;
                     Ok(reply)
@@ -97,16 +79,6 @@ impl LLMClient {
                 }
                 None => Err(format!("Model not set for chat")),
             },
-            LLMClient::CustomClient(client, model) => match model {
-                Some(model_str) => {
-                    let stream =
-                        ChatRequestExecutor::custom(client, messages, options, global_settings, model_str.to_string())?
-                            .execute_stream()
-                            .await?;
-                    Ok(stream)
-                }
-                None => Err(format!("Model not set for chat")),
-            },
         }
     }
 
@@ -114,10 +86,6 @@ impl LLMClient {
         match self {
             LLMClient::OllamaClient(client, _) => {
                 let result = ListModelsRequestExecutor::ollama(client).execute().await?;
-                Ok(result)
-            }
-            LLMClient::CustomClient(client, _) => {
-                let result = ListModelsRequestExecutor::custom(client).execute().await?;
                 Ok(result)
             }
         }

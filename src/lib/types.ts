@@ -3,54 +3,22 @@ import type { z } from 'zod';
 import type {
   ALL_PROVIDERS,
   CONTENT_ITEM_TYPES,
-  PROVIDER_CLAUDE,
-  PROVIDER_CUSTOM,
-  PROVIDER_DEEPSEEK,
-  PROVIDER_GOOGLE,
   PROVIDER_OLLAMA,
-  PROVIDER_OPENAI,
-  PROVIDER_OPENROUTER,
-  PROVIDER_XAI,
   SUPPORTED_PROVIDERS,
 } from './constants';
 import type {
-  azureOptionsFormSchema,
-  claudeOptionsFormSchema,
   conversationFormSchema,
-  deepseekOptionsFormSchema,
-  editAzureModelFormSchema,
-  editClaudeModelFormSchema,
-  editGoogleModelFormSchema,
   editOllamaModelFormSchema,
-  editOpenAIModelFormSchema,
-  newAzureModelFormSchema,
-  newClaudeModelFormSchema,
-  newGoogleModelFormSchema,
   newOllamaModelFormSchema,
-  newOpenAIModelFormSchema,
   newPromptFormSchema,
   ollamaOptionsFormSchema,
-  openAIOptionsFormSchema,
   proxySchema,
   usePromptFormSchema,
 } from './schemas';
 
-export type NewAzureModel = z.infer<typeof newAzureModelFormSchema>;
-export type AzureModel = z.infer<typeof editAzureModelFormSchema>;
-export type NewOpenAIModel = z.infer<typeof newOpenAIModelFormSchema>;
-export type OpenAIModel = z.infer<typeof editOpenAIModelFormSchema>;
-export type NewClaudeModel = z.infer<typeof newClaudeModelFormSchema>;
-export type ClaudeModel = z.infer<typeof editClaudeModelFormSchema>;
 export type NewOllamaModel = z.infer<typeof newOllamaModelFormSchema>;
 export type OllamaModel = z.infer<typeof editOllamaModelFormSchema>;
-export type NewGoogleModel = z.infer<typeof newGoogleModelFormSchema>;
-export type GoogleModel = z.infer<typeof editGoogleModelFormSchema>;
-export type NewModel =
-  | NewAzureModel
-  | NewOpenAIModel
-  | NewClaudeModel
-  | NewOllamaModel
-  | NewGoogleModel;
+export type NewModel = NewOllamaModel;
 
 export type RemoteModel = {
   id: string;
@@ -75,42 +43,13 @@ export type GenericModel = {
   deletedAt?: string;
 };
 
-export type RawOpenAIConfig = {
-  provider:
-    | typeof PROVIDER_OPENAI
-    | typeof PROVIDER_OPENROUTER
-    | typeof PROVIDER_CUSTOM
-    | typeof PROVIDER_DEEPSEEK
-    | typeof PROVIDER_XAI;
-  apiKey: string;
-  model?: string;
-  endpoint?: string;
-  orgId?: string;
-};
-
 export type RawOllamaConfig = {
   provider: typeof PROVIDER_OLLAMA;
   endpoint: string;
   model?: string;
 };
 
-export type RawClaudeConfig = {
-  provider: typeof PROVIDER_CLAUDE;
-  apiKey: string;
-  apiVersion: string;
-  endpoint?: string;
-};
-
-export type RawGoogleConfig = {
-  provider: typeof PROVIDER_GOOGLE;
-  apiKey: string;
-};
-
-export type RawConfig =
-  | RawOpenAIConfig
-  | RawOllamaConfig
-  | RawClaudeConfig
-  | RawGoogleConfig;
+export type RawConfig = RawOllamaConfig;
 
 export type GenericConfig = {
   provider: AllProviders;
@@ -194,17 +133,8 @@ export type BotReply = {
   totalToken?: number;
 };
 
-export type AzureOptions = z.infer<typeof azureOptionsFormSchema>;
-export type OpenAIOptions = z.infer<typeof openAIOptionsFormSchema>;
-export type ClaudeOptions = z.infer<typeof claudeOptionsFormSchema>;
 export type OllamaOptions = z.infer<typeof ollamaOptionsFormSchema>;
-export type DeepseekOptions = z.infer<typeof deepseekOptionsFormSchema>;
-export type Options =
-  | AzureOptions
-  | OpenAIOptions
-  | ClaudeOptions
-  | OllamaOptions
-  | DeepseekOptions;
+export type Options = OllamaOptions;
 export type GenericOptions = {
   provider: AllProviders;
   options: string;

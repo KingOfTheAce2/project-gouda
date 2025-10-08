@@ -98,7 +98,7 @@ const config = {
         110: '1.1',
       },
       fontFamily: {
-        kaas: ['Inter', 'Noto Sans SC', 'sans-serif'],
+        bear-llm-ai: ['Inter', 'Noto Sans SC', 'sans-serif'],
       },
     },
     typography: {

@@ -1,3 +1,7 @@
+/*
+ * This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
+ * See LICENSE and THIRD_PARTY_LICENSES.txt for details.
+ */
 import './styles.css';
 import '@/i18n';
 
@@ -272,8 +276,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       </ContextMenuTrigger>
       <ContextMenuContent className="min-w-fit">
         <div className="p-1">
-          <img src={logoImg} alt="Kaas" width={16} height={16} />
-        </div>
+                        <img src={logoImg} alt="BEAR LLM AI" width={16} height={16} />        </div>
       </ContextMenuContent>
     </ContextMenu>
   </React.StrictMode>

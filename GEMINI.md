@@ -18,6 +18,7 @@ When a user reports an issue or requests a feature:
 2. ✅ Check **Rust backend** (src-tauri/src/)
 3. ✅ Verify **integration** between Tauri commands and UI
 4. ✅ Test **both layers** before declaring complete
+5. ✅ When writing code ALWAYS explictily mark the proprietory licensed parts with a propreitory license and MIT licence with MIT license
 
 **Example:** User says "download not working"
 - ❌ WRONG: Only check backend download_model function
@@ -372,6 +373,6 @@ Remember: **Gemini Flow coordinates, Gemini Code creates!**
 # important-instruction-reminders
 Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
-ALWAYS prefer editing an existing file to creating a new one.
+ALWAYS prefer editing an existing file to creating a new one (with commeting BEAR LLM AI addition for license).
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 Never save working files, text/mds and tests to the root folder.
