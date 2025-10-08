@@ -1,0 +1,12 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Debug",
+    "label": {
+        "be-invoker": "Backend-Aanroepers",
+        "provider": "Provider",
+        "api-key": "API-sleutel",
+        "sys-info": "Systeeminformatie",
+        "webview-info": "Webview-info",
+        "os-info": "Besturingssysteem-info"
+    }
+}

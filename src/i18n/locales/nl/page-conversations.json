@@ -1,0 +1,18 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Gesprekken",
+    "label": {
+        "quick-start": "Snel een nieuw gesprek starten",
+        "num-of-conversations": "{{num}} gesprekken"
+    },
+    "message": {
+        "no-model": "U moet eerst een model maken",
+        "no-conversation": "Nog geen gesprekken",
+        "delete-conversation-warning": "Verwijderd gesprek kan niet worden hersteld.\nWilt u toch doorgaan?",
+        "delete-conversation-success": "Gesprek is verwijderd",
+        "delete-conversation-error": "Kan gesprek niet verwijderen: {{errorMsg}}",
+        "create-conversation-error": "Kan gesprek niet maken: {{errorMsg}}",
+        "input-cant-be-empty": "Invoer mag niet leeg zijn. Typ iets om een nieuw gesprek te starten.",
+        "ask-anything": "Vraag alles..."
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Einstellungen",
+    "label": {
+        "display": "Anzeige",
+        "profile": "Profil",
+        "models": "Modelle",
+        "network": "Netzwerk",
+        "language": "Sprache",
+        "theme": "Thema",
+        "name": "Name",
+        "proxy": "Proxy",
+        "use-proxy": "Proxy verwenden",
+        "proxy-server": "Server",
+        "traffic-type": "Verkehrstyp",
+        "traffic-http": "HTTP",
+        "traffic-https": "HTTPS",
+        "proxy-username": "Benutzername (optional)",
+        "proxy-password": "Passwort (optional)",
+        "proxy-name-psw-tips": "Wenn Ihr Proxy erfordert",
+        "name-desc": "Wird in Gesprächen angezeigt.",
+        "context-length": "Standard-Kontextlänge",
+        "context-length-desc": "Anzahl der vorherigen Nachrichten, die in jeder Modellanforderung enthalten sind. Kann durch die Optionen des Gesprächs überschrieben werden.",
+        "max-tokens": "Standardmäßige maximale Token",
+        "max-tokens-desc": "Anzahl der vorherigen Nachrichten, die in jeder Modellanforderung enthalten sind. Kann durch die Optionen des Gesprächs überschrieben werden.",
+        "proxy-server-desc": "Die Adresse Ihres Proxyservers.",
+        "traffic-type-desc": "Welche Art von Verkehr soll über den Proxy laufen?",
+        "aboutus": "Über Kaas",
+        "version": "Version",
+        "commit": "Commit"
+    },
+    "select": {
+        "dark-theme": "Dunkler Modus",
+        "light-theme": "Heller Modus",
+        "system": "System folgen"
+    },
+    "message": {
+        "change-setting-success": "{{setting}} wurde geändert",
+        "change-setting-failure": "{{setting}} konnte nicht geändert werden",
+        "built-by": "Erstellt von <userLink>{{name}}</userLink> mit <icon/> und <depsLink>vielen großartigen Open-Source-Softwares</depsLink>"
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "section": {
+        "choose-model": "Kies een model voor {{subject}}",
+        "set-system-message": "Stel het systeembericht in voor {{subject}}",
+        "recent": "Recent",
+        "use-prompt": "Gebruik een prompt-sjabloon",
+        "change-options": "Wijzig modelopties van dit gesprek"
+    },
+    "label": {
+        "enter-to-send": "Druk op Enter om te verzenden",
+        "shift-enter-to-send": "Druk op Shift+Enter om te verzenden",
+        "quick-send": "Snel verzenden",
+        "context-length": "Contextlengte",
+        "num-ctx": "Aantal invoertokens",
+        "num-predict": "Aantal uitvoertokens",
+        "stream": "Stream",
+        "temperature": "Temperatuur",
+        "top-p": "Top P",
+        "frequency-penalty": "Frequentieboete",
+        "presence-penalty": "Aanwezigheidsboete",
+        "max-tokens": "Maximale tokens",
+        "user": "Gebruiker",
+        "show-reasoning": "Toon redenering"
+    },
+    "message": {
+        "no-model": "U moet eerst een model kiezen",
+        "set-system-message-tips": "Definieer het algemene gedrag van de bot.\nHet systeembericht wordt bij elk gebruikersbericht verzonden.",
+        "set-system-message-success": "Systeembericht is ingesteld",
+        "set-system-message-error": "Kan systeembericht niet instellen: {{errorMsg}}",
+        "unset-system-message-success": "Systeembericht is niet ingesteld",
+        "unset-system-message-error": "Kan systeembericht niet ongedaan maken: {{errorMsg}}",
+        "restart-conversation-success": "Gesprek is opnieuw gestart",
+        "restart-conversation-error": "Kan gesprek niet opnieuw starten: {{errorMsg}}",
+        "restart-conversation-warning": "Alle berichten in dit gesprek worden verwijderd en kunnen niet worden hersteld.",
+        "input-placeholder": "Hoe kan ik helpen?",
+        "use-prompt-tips": "Vervang variabelen in uw prompt-sjabloon door echte waarden.",
+        "insert-into-prompt": "Invoegen in prompt",
+        "token-usage": "Tokens gebruikt voor dit bericht: {{usage}}",
+        "total-token-usage": "Tokens gebruikt voor dit gesprek: {{totalUsage}}",
+        "change-options-tips": "Het wijzigen van de opties kan onvoorspelbaar gedrag en zelfs fouten veroorzaken. Wijzig met de nodige voorzichtigheid."
+    }
+}

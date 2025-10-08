@@ -1,0 +1,29 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Prompts",
+    "section": {
+        "your-prompts": "Uw prompts",
+        "create-prompt": "Nieuwe prompt-sjabloon maken",
+        "update-prompt": "Prompt-sjabloon bewerken",
+        "use-prompt": "Een gesprek starten met deze prompt",
+        "delete-prompt": "{{promptAlias}} verwijderen?",
+        "template": "Sjabloon",
+        "preview": "Voorbeeld",
+        "variables": "Variabelen"
+    },
+    "message": {
+        "no-prompt": "U heeft nog geen prompts",
+        "no-model": "U heeft nog geen modellen",
+        "create-prompt-success": "Prompt is gemaakt",
+        "create-prompt-tips": "U kunt variabelen in uw prompt gebruiken, sluit ze in met accolades, bijv. {variable_name}. 
+_Gebruik niet meer dan 20 alfanumerieke tekens of underscore voor de naam van de variabele._",
+        "update-prompt-success": "Prompt is bijgewerkt",
+        "delete-prompt-success": "Prompt is verwijderd",
+        "use-prompt-tips": "Vervang variabelen in uw prompt-sjabloon door echte waarden en kies vervolgens een model om een nieuw gesprek te starten.",
+        "delete-prompt-warning": "Verwijderde prompt kan niet worden hersteld.
+Wilt u toch doorgaan?",
+        "fill-the-template": "Vul de sjabloon in",
+        "pick-a-model": "Kies een model",
+        "start-conversation": "Gesprek starten"
+    }
+}

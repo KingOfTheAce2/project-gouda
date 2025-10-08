@@ -1,0 +1,17 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "validation": {
+        "invalid-proxy-url": "Ungültige Proxy-URL",
+        "empty-proxy-url": "Proxy-URL darf nicht leer sein",
+        "empty-traffic-type": "Es muss mindestens ein Protokoll ausgewählt werden",
+        "invalid-int-minmax": "{{value}} sollte eine ganze Zahl zwischen {{min}} und {{max}} sein",
+        "empty-prompt": "Ihr Prompt ist leer. Ein leerer Prompt ist eine Verschwendung Ihres Token-Kontingents.",
+        "empty-api-key": "API-Schlüssel darf nicht leer sein.",
+        "empty-endpoint": "Endpunkt darf nicht leer sein."
+    },
+    "image-save-error": "Bild konnte nicht gespeichert werden",
+    "conversation": {
+        "invalid-id": "{{conversationId}} ist keine gültige Nummer",
+        "missing": "Hoppla, das Gespräch mit der ID = {{conversationId}} fehlt"
+    }
+}

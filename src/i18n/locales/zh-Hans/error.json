@@ -1,0 +1,17 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "validation": {
+        "invalid-proxy-url": "代理地址无效",
+        "empty-proxy-url": "代理地址不应为空",
+        "empty-traffic-type": "请选择至少一项协议",
+        "invalid-int-minmax": "{{value}}应介于{{min}}到{{max}}之间",
+        "empty-prompt": "你输入了空的提示词。空提示词只会浪费你的接口资源。",
+        "empty-api-key": "API密钥不能为空。",
+        "empty-endpoint": "Endpoint不能为空。"
+    },
+    "image-save-error": "图片保存失败",
+    "conversation": {
+        "invalid-id": "{{conversationId}} 不是有效的数字",
+        "missing": "糟糕，无法找到ID为 {{conversationId}} 的对话"
+    }
+}

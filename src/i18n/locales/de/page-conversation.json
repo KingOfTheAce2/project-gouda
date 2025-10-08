@@ -1,0 +1,43 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "section": {
+        "choose-model": "Wählen Sie ein Modell für {{subject}}",
+        "set-system-message": "Stellen Sie die Systemnachricht für {{subject}} ein",
+        "recent": "Kürzlich",
+        "use-prompt": "Verwenden Sie eine Prompt-Vorlage",
+        "change-options": "Modelloptionen dieses Gesprächs ändern"
+    },
+    "label": {
+        "enter-to-send": "Drücken Sie die Eingabetaste zum Senden",
+        "shift-enter-to-send": "Drücken Sie Umschalt+Eingabe zum Senden",
+        "quick-send": "Schnell senden",
+        "context-length": "Kontextlänge",
+        "num-ctx": "Anzahl der Eingabe-Token",
+        "num-predict": "Anzahl der Ausgabe-Token",
+        "stream": "Stream",
+        "temperature": "Temperatur",
+        "top-p": "Top P",
+        "frequency-penalty": "Frequenzstrafe",
+        "presence-penalty": "Anwesenheitsstrafe",
+        "max-tokens": "Maximale Token",
+        "user": "Benutzer",
+        "show-reasoning": "Begründung anzeigen"
+    },
+    "message": {
+        "no-model": "Sie müssen zuerst ein Modell auswählen",
+        "set-system-message-tips": "Definieren Sie das allgemeine Verhalten des Bots.\nDie Systemnachricht wird mit jeder Benutzernachricht gesendet.",
+        "set-system-message-success": "Systemnachricht wurde eingestellt",
+        "set-system-message-error": "Systemnachricht konnte nicht eingestellt werden: {{errorMsg}}",
+        "unset-system-message-success": "Systemnachricht wurde aufgehoben",
+        "unset-system-message-error": "Systemnachricht konnte nicht aufgehoben werden: {{errorMsg}}",
+        "restart-conversation-success": "Das Gespräch wurde neu gestartet",
+        "restart-conversation-error": "Das Gespräch konnte nicht neu gestartet werden: {{errorMsg}}",
+        "restart-conversation-warning": "Alle Nachrichten in diesem Gespräch werden gelöscht und können nicht wiederhergestellt werden.",
+        "input-placeholder": "Wie kann ich helfen?",
+        "use-prompt-tips": "Ersetzen Sie Variablen in Ihrer Prompt-Vorlage durch echte Werte.",
+        "insert-into-prompt": "In Prompt einfügen",
+        "token-usage": "Für diese Nachricht verwendete Token: {{usage}}",
+        "total-token-usage": "Für dieses Gespräch verwendete Token: {{totalUsage}}",
+        "change-options-tips": "Das Ändern der Optionen kann zu unvorhersehbarem Verhalten und sogar zu Fehlern führen. Mit Vorsicht ändern."
+    }
+}

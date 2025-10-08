@@ -1,0 +1,18 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "title": "Conversations",
+    "label": {
+        "quick-start": "Quick start a new conversation",
+        "num-of-conversations": "{{num}} conversations"
+    },
+    "message": {
+        "no-model": "You need to create a model first",
+        "no-conversation": "No conversations yet",
+        "delete-conversation-warning": "Deleted conversation cannot be recovered.\nDo you still want to proceed?",
+        "delete-conversation-success": "Conversation has been deleted",
+        "delete-conversation-error": "Failed to delete conversation: {{errorMsg}}",
+        "create-conversation-error": "Failed to create conversation: {{errorMsg}}",
+        "input-cant-be-empty": "Input can't be empty. Type something to start a new conversation.",
+        "ask-anything": "Ask anything..."
+    }
+}

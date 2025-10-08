@@ -1,0 +1,42 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Instellingen",
+    "label": {
+        "display": "Weergave",
+        "profile": "Profiel",
+        "models": "Modellen",
+        "network": "Netwerk",
+        "language": "Taal",
+        "theme": "Thema",
+        "name": "Naam",
+        "proxy": "Proxy",
+        "use-proxy": "Proxy gebruiken",
+        "proxy-server": "Server",
+        "traffic-type": "Verkeerstype",
+        "traffic-http": "HTTP",
+        "traffic-https": "HTTPS",
+        "proxy-username": "Gebruikersnaam (optioneel)",
+        "proxy-password": "Wachtwoord (optioneel)",
+        "proxy-name-psw-tips": "Als uw proxy vereist",
+        "name-desc": "Wordt weergegeven in gesprekken.",
+        "context-length": "Standaard contextlengte",
+        "context-length-desc": "Aantal vorige berichten opgenomen in elk modelverzoek. Kan worden overschreven door de opties van het gesprek.",
+        "max-tokens": "Standaard maximale tokens",
+        "max-tokens-desc": "Aantal vorige berichten opgenomen in elk modelverzoek. Kan worden overschreven door de opties van het gesprek.",
+        "proxy-server-desc": "Het adres van uw proxyserver.",
+        "traffic-type-desc": "Welk type verkeer moet via de proxy lopen?",
+        "aboutus": "Over Kaas",
+        "version": "Versie",
+        "commit": "Commit"
+    },
+    "select": {
+        "dark-theme": "Donkere modus",
+        "light-theme": "Lichte modus",
+        "system": "Systeem volgen"
+    },
+    "message": {
+        "change-setting-success": "{{setting}} is gewijzigd",
+        "change-setting-failure": "Kan {{setting}} niet wijzigen",
+        "built-by": "Gemaakt door <userLink>{{name}}</userLink> met <icon/> en <depsLink>vele geweldige open-source softwares</depsLink>"
+    }
+}

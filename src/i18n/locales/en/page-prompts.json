@@ -1,0 +1,29 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "title": "Prompts",
+    "section": {
+        "your-prompts": "Your Prompts",
+        "create-prompt": "Create new prompt template",
+        "update-prompt": "Edit prompt template",
+        "use-prompt": "Start a conversation with this prompt",
+        "delete-prompt": "Delete {{promptAlias}} ?",
+        "template": "Template",
+        "preview": "Preview",
+        "variables": "Variables"
+    },
+    "message": {
+        "no-prompt": "You have no prompts yet",
+        "no-model": "You have no models yet",
+        "create-prompt-success": "Prompt has been created",
+        "create-prompt-tips": "You can use variables in your prompt, enclose them with curly braces, e.g. {variable_name}. 
+_Use no more than 20 alphanumeric characters or underscore for variable name._",
+        "update-prompt-success": "Prompt has been updated",
+        "delete-prompt-success": "Prompt has been deleted",
+        "use-prompt-tips": "Replace variables in your prompt template with real values, then pick a model to start a new conversation.",
+        "delete-prompt-warning": "Deleted prompt cannot be recovered.
+Do you still want to proceed?",
+        "fill-the-template": "Fill the template",
+        "pick-a-model": "Pick a model",
+        "start-conversation": "Start conversation"
+    }
+}

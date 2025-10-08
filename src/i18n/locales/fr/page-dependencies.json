@@ -1,0 +1,10 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "title": "Dépendances",
+    "label": {
+        "name": "Nom",
+        "link": "Lien",
+        "license": "Licence",
+        "author": "Auteur"
+    }
+}

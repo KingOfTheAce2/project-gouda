@@ -1,0 +1,10 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "title": "依赖",
+    "label": {
+        "name": "名称",
+        "link": "链接",
+        "license": "许可",
+        "author": "作者"
+    }
+}

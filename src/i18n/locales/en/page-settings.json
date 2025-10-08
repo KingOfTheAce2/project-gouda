@@ -1,0 +1,42 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "title": "Settings",
+    "label": {
+        "display": "Display",
+        "profile": "Profile",
+        "models": "Models",
+        "network": "Network",
+        "language": "Language",
+        "theme": "Theme",
+        "name": "Name",
+        "proxy": "Proxy",
+        "use-proxy": "Use proxy",
+        "proxy-server": "Server",
+        "traffic-type": "Traffic type",
+        "traffic-http": "HTTP",
+        "traffic-https": "HTTPS",
+        "proxy-username": "Username (optional)",
+        "proxy-password": "Password (optional)",
+        "proxy-name-psw-tips": "If your proxy requires",
+        "name-desc": "Will be shown in conversations.",
+        "context-length": "Default context length",
+        "context-length-desc": "Number of previous messages included  in each model request. Can be overridden by conversation's options.",
+        "max-tokens": "Default max tokens",
+        "max-tokens-desc": "Number of previous messages included  in each model request. Can be overridden by conversation's options.",
+        "proxy-server-desc": "The address of your proxy server.",
+        "traffic-type-desc": "Which type of traffic should go through proxy?",
+        "aboutus": "About Kaas",
+        "version": "Version",
+        "commit": "Commit"
+    },
+    "select": {
+        "dark-theme": "Dark Mode",
+        "light-theme": "Light Mode",
+        "system": "Follow system"
+    },
+    "message": {
+        "change-setting-success": "{{setting}} has been changed",
+        "change-setting-failure": "Failed to change {{setting}}",
+        "built-by": "Built by <userLink>{{name}}</userLink> with <icon/> and <depsLink>many great open-source softwares</depsLink>"
+    }
+}

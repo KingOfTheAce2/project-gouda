@@ -1,0 +1,29 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Prompts",
+    "section": {
+        "your-prompts": "Ihre Prompts",
+        "create-prompt": "Neue Prompt-Vorlage erstellen",
+        "update-prompt": "Prompt-Vorlage bearbeiten",
+        "use-prompt": "Ein Gespräch mit diesem Prompt beginnen",
+        "delete-prompt": "{{promptAlias}} löschen?",
+        "template": "Vorlage",
+        "preview": "Vorschau",
+        "variables": "Variablen"
+    },
+    "message": {
+        "no-prompt": "Sie haben noch keine Prompts",
+        "no-model": "Sie haben noch keine Modelle",
+        "create-prompt-success": "Prompt wurde erstellt",
+        "create-prompt-tips": "Sie können Variablen in Ihrem Prompt verwenden, schließen Sie sie in geschweifte Klammern ein, z.B. {variable_name}. 
+Verwenden Sie nicht mehr als 20 alphanumerische Zeichen oder Unterstriche für den Variablennamen.",
+        "update-prompt-success": "Prompt wurde aktualisiert",
+        "delete-prompt-success": "Prompt wurde gelöscht",
+        "use-prompt-tips": "Ersetzen Sie Variablen in Ihrer Prompt-Vorlage durch echte Werte und wählen Sie dann ein Modell aus, um ein neues Gespräch zu beginnen.",
+        "delete-prompt-warning": "Gelöschter Prompt kann nicht wiederhergestellt werden.
+Möchten Sie trotzdem fortfahren?",
+        "fill-the-template": "Füllen Sie die Vorlage aus",
+        "pick-a-model": "Wählen Sie ein Modell aus",
+        "start-conversation": "Gespräch beginnen"
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "title": "Debug",
+    "label": {
+        "be-invoker": "Backend Invokers",
+        "provider": "Provider",
+        "api-key": "API Key",
+        "sys-info": "System Information",
+        "webview-info": "Webview Info",
+        "os-info": "Operating System info"
+    }
+}

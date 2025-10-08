@@ -1,0 +1,17 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "validation": {
+        "invalid-proxy-url": "Invalid proxy URL",
+        "empty-proxy-url": "Proxy URL cannot be empty",
+        "empty-traffic-type": "At least one protocol must be selected",
+        "invalid-int-minmax": "{{value}} should be an integer between {{min}} and {{max}}",
+        "empty-prompt": "You prompt is blank. Blank prompt is a waste of your tokens quota.",
+        "empty-api-key": "API key cannot be empty.",
+        "empty-endpoint": "Endpoint cannot be empty."
+    },
+    "image-save-error": "Failed to save image",
+    "conversation": {
+        "invalid-id": "{{conversationId}} is not a valid number",
+        "missing": "Oops, the conversation with id = {{conversationId}} is missing"
+    }
+}

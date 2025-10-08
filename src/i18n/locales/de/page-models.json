@@ -1,0 +1,37 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Modelle",
+    "section": {
+        "your-models": "Ihre Modelle",
+        "supported-models": "Unterstützte Modelle",
+        "create-model": "Neues $t(generic:model:{{provider}})-Modell erstellen",
+        "update-model": "Modelleinstellungen bearbeiten",
+        "pick-provider": "Wählen Sie einen Anbieter"
+    },
+    "label": {
+        "alias": "Alias",
+        "api-key": "API-Schlüssel",
+        "endpoint": "Endpunkt",
+        "api-version": "API-Version",
+        "deployment-id": "Bereitstellungs-ID",
+        "model": "Modell"
+    },
+    "message": {
+        "no-model": "Sie haben noch keine Modelle",
+        "add-model": "Jetzt eins hinzufügen",
+        "update-model-success": "Modell wurde aktualisiert",
+        "delete-model-success": "Modell wurde gelöscht",
+        "delete-model-error": "Modell konnte nicht gelöscht werden: {{errorMsg}}",
+        "create-model-tips": "Geben Sie die API-Informationen Ihres $t(generic:model:{{provider}}) ein.",
+        "update-model-tips": "Geben Sie Ihrem Modell einen Alias, um es leichter identifizieren zu können.",
+        "delete-model-warning": "Gelöschtes Modell kann nicht wiederhergestellt werden.\nMöchten Sie trotzdem fortfahren?",
+        "alias-tips": "Alias hilft Ihnen, Ihr Modell zu identifizieren",
+        "api-key-tips": "Der Schlüssel für die API Ihres Modells",
+        "endpoint-tips": "Der Endpunkt der API Ihres Modells",
+        "endpoint-tips-azure": "Der Endpunkt der API Ihres Modells. Das Format lautet normalerweise \"https://{your-resource-name}.openai.azure.com\".",
+        "api-version-tips": "Die Version der API Ihres Modells. Sie folgt normalerweise dem Format YYYY-MM-DD.",
+        "claude-api-version-tips": "Die Version der API Ihres Modells. Sie folgt normalerweise dem Format YYYY-MM-DD. Derzeit werden nur Versionen ab 2023-06-01 unterstützt.",
+        "deployment-id-tips": "Der Bereitstellungsname der API Ihres Modells",
+        "model-tips": "Das Modell, das Sie verwenden möchten"
+    }
+}

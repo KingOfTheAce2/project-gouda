@@ -1,0 +1,18 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Gespräche",
+    "label": {
+        "quick-start": "Schnell ein neues Gespräch beginnen",
+        "num-of-conversations": "{{num}} Gespräche"
+    },
+    "message": {
+        "no-model": "Sie müssen zuerst ein Modell erstellen",
+        "no-conversation": "Noch keine Gespräche",
+        "delete-conversation-warning": "Gelöschtes Gespräch kann nicht wiederhergestellt werden.\nMöchten Sie trotzdem fortfahren?",
+        "delete-conversation-success": "Gespräch wurde gelöscht",
+        "delete-conversation-error": "Gespräch konnte nicht gelöscht werden: {{errorMsg}}",
+        "create-conversation-error": "Gespräch konnte nicht erstellt werden: {{errorMsg}}",
+        "input-cant-be-empty": "Eingabe darf nicht leer sein. Geben Sie etwas ein, um ein neues Gespräch zu beginnen.",
+        "ask-anything": "Fragen Sie irgendetwas..."
+    }
+}

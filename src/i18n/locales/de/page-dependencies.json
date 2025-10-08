@@ -1,0 +1,10 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Abhängigkeiten",
+    "label": {
+        "name": "Name",
+        "link": "Link",
+        "license": "Lizenz",
+        "author": "Autor"
+    }
+}

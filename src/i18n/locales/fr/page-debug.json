@@ -1,0 +1,12 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "title": "Déboguer",
+    "label": {
+        "be-invoker": "Invocateur Backend",
+        "provider": "Fournisseur",
+        "api-key": "Clé API",
+        "sys-info": "Informations Système",
+        "webview-info": "Informations Webview",
+        "os-info": "Informations Système d'Exploitation"
+    }
+}

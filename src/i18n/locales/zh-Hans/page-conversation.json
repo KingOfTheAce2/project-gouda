@@ -1,0 +1,43 @@
+{
+    "_license": "This product includes software developed under the MIT License. Copyright (c) 2024-present Frank Zhang",
+    "section": {
+        "choose-model": "为{{subject}}选择一个模型",
+        "set-system-message": "为{{subject}}设置系统消息",
+        "recent": "最近",
+        "use-prompt": "使用prompt模板",
+        "change-options": "更改此对话的模型设置"
+    },
+    "label": {
+        "enter-to-send": "按回车发送",
+        "shift-enter-to-send": "按Shift+回车发送",
+        "quick-send": "快捷发送",
+        "context-length": "上下文长度",
+        "num-ctx": "输入tokens数量",
+        "num-predict": "输出tokens数量",
+        "stream": "流输出",
+        "temperature" : "温度系数",
+        "top-p": "Top P",
+        "frequency-penalty": "Frequency Penalty",
+        "presence-penalty": "Presence Penalty",
+        "max-tokens": "最大tokens数量",
+        "user": "用户",
+        "show-reasoning": "显示推理过程"
+    },
+    "message": {
+        "no-model": "你需要先选择一个模型",
+        "set-system-message-tips": "定义机器人的一般行为.\n系统消息将随每一条用户消息一起发送给模型。",
+        "set-system-message-success": "已设置系统消息",
+        "set-system-message-error": "设置系统消息失败: {{errorMsg}}",
+        "unset-system-message-success": "已清除系统消息",
+        "unset-system-message-error": "清除系统消息失败: {{errorMsg}}",
+        "restart-conversation-success": "已重启对话",
+        "restart-conversation-error": "重启对话失败: {{errorMsg}}",
+        "restart-conversation-warning": "对话中的全部消息将被删除且无法恢复。",
+        "input-placeholder": "可以为你做点什么？",
+        "use-prompt-tips": "将模板中的变量替换为真实值。",
+        "insert-into-prompt": "插入prompt",
+        "token-usage": "此消息消耗: {{usage}} tokens",
+        "total-token-usage": "此对话共消耗: {{totalUsage}} tokens",
+        "change-options-tips": "更改选项可能会导致不可预测的行为和错误，请谨慎修改。"
+    }
+}

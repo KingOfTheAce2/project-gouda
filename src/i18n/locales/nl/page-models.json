@@ -1,0 +1,37 @@
+{
+    "_license": "Copyright BEAR LLM AI project, which is proprietory.",
+    "title": "Modellen",
+    "section": {
+        "your-models": "Uw modellen",
+        "supported-models": "Ondersteunde modellen",
+        "create-model": "Nieuw $t(generic:model:{{provider}})-model maken",
+        "update-model": "Modelinstellingen bewerken",
+        "pick-provider": "Kies een provider"
+    },
+    "label": {
+        "alias": "Alias",
+        "api-key": "API-sleutel",
+        "endpoint": "Eindpunt",
+        "api-version": "API-versie",
+        "deployment-id": "Implementatie-ID",
+        "model": "Model"
+    },
+    "message": {
+        "no-model": "U heeft nog geen modellen",
+        "add-model": "Voeg er nu een toe",
+        "update-model-success": "Model is bijgewerkt",
+        "delete-model-success": "Model is verwijderd",
+        "delete-model-error": "Kan model niet verwijderen: {{errorMsg}}",
+        "create-model-tips": "Vul de API-informatie van uw $t(generic:model:{{provider}}) in.",
+        "update-model-tips": "Geef uw model een alias om het gemakkelijker te kunnen identificeren.",
+        "delete-model-warning": "Verwijderd model kan niet worden hersteld.\nWilt u toch doorgaan?",
+        "alias-tips": "Alias helpt u uw model te identificeren",
+        "api-key-tips": "De sleutel voor de API van uw model",
+        "endpoint-tips": "Het eindpunt van de API van uw model",
+        "endpoint-tips-azure": "Het eindpunt van de API van uw model. Het formaat is meestal \"https://{your-resource-name}.openai.azure.com\".",
+        "api-version-tips": "De versie van de API van uw model. Deze volgt meestal het formaat JJJJ-MM-DD.",
+        "claude-api-version-tips": "De versie van de API van uw model. Deze volgt meestal het formaat JJJJ-MM-DD. Momenteel worden alleen versies 2023-06-01 en hoger ondersteund.",
+        "deployment-id-tips": "De implementatienaam van de API van uw model",
+        "model-tips": "Het model dat u wilt gebruiken"
+    }
+}
