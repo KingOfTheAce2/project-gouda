@@ -1,3 +1,4 @@
+# This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 [package]
 name = "migration"
 version = "0.1.0"
@@ -10,6 +11,8 @@ path = "src/lib.rs"
 
 [dependencies]
 async-std = { version = "1", features = ["attributes", "tokio1"] }
+entity = { path = "../entity" }
+serde_json = "1.0"
 
 [dependencies.sea-orm-migration]
 version = "0.12.0"
