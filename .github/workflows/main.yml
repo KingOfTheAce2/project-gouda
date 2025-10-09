@@ -52,11 +52,11 @@ jobs:
 
       - name: Check cargo version
         run: cargo --version
-        # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
+        # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 
       - name: List files in src-tauri
         run: ls -la src-tauri
-        # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
+        # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
