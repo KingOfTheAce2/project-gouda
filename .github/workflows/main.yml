@@ -54,8 +54,15 @@ jobs:
         run: cargo --version
         # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 
-      - name: List files in src-tauri
+      - name: List files in src-tauri (Unix)
+        if: runner.os != 'Windows'
         run: ls -la src-tauri
+        # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+
+      - name: List files in src-tauri (Windows)
+        if: runner.os == 'Windows'
+        run: Get-ChildItem -Path src-tauri -Force
+        shell: pwsh
         # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 
       - name: install dependencies (ubuntu only)
