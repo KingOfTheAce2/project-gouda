@@ -50,13 +50,13 @@ jobs:
           # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
-      # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
       - name: Check cargo version
-                run: cargo --version
-      
-      # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
+        run: cargo --version
+        # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
+
       - name: List files in src-tauri
-              run: ls -la src-tauri
+        run: ls -la src-tauri
+        # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT.
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
