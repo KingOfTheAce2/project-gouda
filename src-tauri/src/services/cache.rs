@@ -1,7 +1,9 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 // MIT License Copyright (c) 2024-present Frank Zhang
 use std::collections::HashMap;
 use tauri::{
     AppHandle,
+    Emitter,
     Manager,
     Wry,
 };

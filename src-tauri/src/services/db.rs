@@ -1,7 +1,8 @@
 // This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
-// BEAR LLM AI changes - Fixed MigratorTrait import to use sea_orm_migration::MigratorTrait
+// BEAR LLM AI changes - Fixed MigratorTrait import and added ActiveModelTrait, QueryFilter, ColumnTrait
 // MIT License Copyright (c) 2024-present Frank Zhang
-use sea_orm::{Database, DatabaseConnection, EntityTrait, Set};
+use sea_orm::{Database, DatabaseConnection, EntityTrait, Set, ActiveModelTrait, QueryFilter, ColumnTrait};
+use sea_orm_migration::MigratorTrait;
 use std::path::Path;
 
 use crate::errors::BearLlmAiError;
@@ -12,7 +13,7 @@ use entity::entities::{
     prompts,
     settings::{self, Setting, SettingKey},
 };
-use migration::{Migrator, sea_orm_migration::MigratorTrait};
+use migration::Migrator;
 
 const DB_NAME: &str = "bear-llm-ai.db";
 
@@ -50,17 +51,18 @@ impl Db {
         payload: Vec<Setting>,
     ) -> Result<(), BearLlmAiError> {
         for setting in payload {
-            let s = settings::Entity::find_by_id(setting.key.clone())
+            let key_str = setting.key.as_str().to_string();
+            let s = settings::Entity::find_by_id(key_str.clone())
                 .one(db)
                 .await?;
             if let Some(s) = s {
                 let mut active_model: settings::ActiveModel = s.into();
-                active_model.value = Set(setting.value.to_string());
+                active_model.value = Set(setting.value);
                 active_model.update(db).await?;
             } else {
                 let new_setting = settings::ActiveModel {
-                    key: Set(setting.key.to_owned()),
-                    value: Set(setting.value.to_owned()),
+                    key: Set(key_str),
+                    value: Set(setting.value),
                 };
                 new_setting.insert(db).await?;
             }
@@ -72,7 +74,8 @@ impl Db {
         db: &DatabaseConnection,
         key: SettingKey,
     ) -> Result<Setting, BearLlmAiError> {
-        let setting = settings::Entity::find_by_id(key).one(db).await?;
+        let key_str = key.as_str().to_string();
+        let setting = settings::Entity::find_by_id(key_str).one(db).await?;
         match setting {
             Some(s) => Ok(s.into()),
             None => Err(BearLlmAiError::DbErr(sea_orm::DbErr::RecordNotFound(
@@ -84,7 +87,7 @@ impl Db {
     pub async fn get_proxy_setting(
         db: &DatabaseConnection,
     ) -> Result<Option<settings::ProxySetting>, BearLlmAiError> {
-        let setting = settings::Entity::find_by_id(SettingKey::Proxy).one(db).await?;
+        let setting = settings::Entity::find_by_id(SettingKey::Proxy.as_str().to_string()).one(db).await?;
         match setting {
             Some(s) => {
                 let proxy_setting: settings::ProxySetting = serde_json::from_str(&s.value)
@@ -151,7 +154,7 @@ impl Db {
     }
 
     pub async fn get_providers(
-        db: &DatabaseConnection,
+        _db: &DatabaseConnection,
     ) -> Result<Vec<models::Provider>, BearLlmAiError> {
         let res = models::Provider::all();
         Ok(res)

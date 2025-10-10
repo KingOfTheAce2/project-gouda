@@ -30,7 +30,9 @@ impl LLMClient {
         proxy_setting: Option<ProxySetting>,
     ) -> Result<Self, String> {
         let _http_client: reqwest::Client = build_http_client(proxy_setting);
-        match config.provider.as_str().into() {
+        let provider = config.provider.parse::<Providers>()
+            .map_err(|_| format!("Unknown provider: {}", config.provider))?;
+        match provider {
             Providers::Ollama => {
                 let raw_config: RawOllamaConfig = serde_json::from_str(&config.config)
                     .map_err(|_| format!("Failed to parse model config: {}", &config.config))?;
@@ -38,7 +40,6 @@ impl LLMClient {
                 let ollama_config: OllamaConfig = raw_config.into();
                 Ok(LLMClient::OllamaClient(ollama_config, model))
             }
-            _ => Err("Unsupported provider".to_string()),
         }
     }
 

@@ -58,6 +58,16 @@ pub struct Setting {
     pub value: String,
 }
 
+impl From<Model> for Setting {
+    fn from(model: Model) -> Self {
+        let key = model.key.parse::<SettingKey>().unwrap_or(SettingKey::General);
+        Self {
+            key,
+            value: model.value,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct OllamaSetting {
     pub enabled: bool,

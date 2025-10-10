@@ -16,7 +16,8 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
             .path()
             .app_data_dir()
             .expect("failed to resolve app data dir");
-        Db::new(&app_data_dir).await
+        let db_wrapper = Db::new(&app_data_dir).await;
+        db_wrapper.0
     });
     handle.manage(BearLlmAiHandle { db });
     Ok(())

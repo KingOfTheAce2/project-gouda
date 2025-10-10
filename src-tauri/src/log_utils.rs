@@ -1,5 +1,7 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 // MIT License Copyright (c) 2024-present Frank Zhang
 use log::{Level, Log, Metadata, Record};
+use tauri::Emitter;
 
 pub struct FrontendLogger(pub tauri::AppHandle);
 
