@@ -42,12 +42,12 @@ key: sea_orm::ActiveValue::Set(SettingKey::General.to_string()),
 ### 2. Migration File: `m20240101_100002_seed_prompts.rs`
 
 **Problems:**
-- Missing trait imports: `ActiveModelTrait`, `EntityTrait`, `ColumnTrait`
-- Methods `.insert()`, `.delete_many()`, and `.eq()` were unavailable
+- Missing trait imports: `ActiveModelTrait`, `EntityTrait`, `ColumnTrait`, `QueryFilter`
+- Methods `.insert()`, `.delete_many()`, `.filter()`, and `.eq()` were unavailable
 
 **Solutions:**
 - ✅ Added trait imports from `sea_orm_migration::sea_orm`
-- ✅ All 16 errors resolved by importing the necessary traits
+- ✅ All errors resolved by importing the necessary traits
 - ✅ Added BEAR AI license header
 
 **Files Modified:**
@@ -59,7 +59,7 @@ use sea_orm_migration::prelude::*;
 // After
 use entity::entities::prompts;
 use sea_orm_migration::prelude::*;
-use sea_orm_migration::sea_orm::{ActiveModelTrait, EntityTrait, ColumnTrait};
+use sea_orm_migration::sea_orm::{ActiveModelTrait, EntityTrait, ColumnTrait, QueryFilter};
 ```
 
 ## Verification Completed
@@ -150,7 +150,8 @@ pnpm tauri build
 When using SeaORM's `ActiveModel` methods in migrations, these traits must be imported:
 - `ActiveModelTrait` - Provides `.insert()`, `.update()`, `.delete()` methods
 - `EntityTrait` - Provides `.find()`, `.delete_by_id()`, `.delete_many()` methods
-- `ColumnTrait` - Provides query filter methods like `.eq()`, `.ne()`, etc.
+- `ColumnTrait` - Provides column filter methods like `.eq()`, `.ne()`, etc.
+- `QueryFilter` - Provides `.filter()` method for filtering query results
 
 ### SettingKey Enum Handling
 The `SettingKey` enum has proper `Display` and `From<SettingKey> for String` implementations in `entity/src/entities/settings.rs:40-44`, which allows `.to_string()` conversion.

@@ -1,9 +1,9 @@
 // This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
-// BEAR LLM AI changes - Added missing trait imports for ActiveModelTrait, EntityTrait, and ColumnTrait
+// BEAR LLM AI changes - Added missing trait imports for ActiveModelTrait, EntityTrait, ColumnTrait, and QueryFilter
 // MIT License Copyright (c) 2024-present Frank Zhang
 use entity::entities::prompts;
 use sea_orm_migration::prelude::*;
-use sea_orm_migration::sea_orm::{ActiveModelTrait, EntityTrait, ColumnTrait};
+use sea_orm_migration::sea_orm::{ActiveModelTrait, EntityTrait, ColumnTrait, QueryFilter};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;

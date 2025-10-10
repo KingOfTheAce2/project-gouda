@@ -3,7 +3,7 @@
 // MIT License Copyright (c) 2024-present Frank Zhang
 use entity::entities::settings::{self, SettingKey};
 use sea_orm_migration::prelude::*;
-use sea_orm_migration::sea_orm::{ActiveModelTrait, EntityTrait, ColumnTrait};
+use sea_orm_migration::sea_orm::{ActiveModelTrait, EntityTrait};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
