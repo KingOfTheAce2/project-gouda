@@ -14,7 +14,7 @@ use crate::{
     services::{
         db::Db,
         llm::{
-            chat::{BotReply, BotReplyStream, GlobalSettings},
+            chat::{BotReply, GlobalSettings},
             client::LLMClient,
             models::RemoteModel,
         },
@@ -236,7 +236,7 @@ pub async fn chat_completions_stream(
 
     // Spawn a task to emit stream chunks as events
     tauri::async_runtime::spawn(async move {
-        use futures::StreamExt;
+        use tokio_stream::StreamExt;
 
         while let Some(result) = stream.next().await {
             match result {
