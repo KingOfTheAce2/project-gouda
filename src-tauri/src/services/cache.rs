@@ -3,7 +3,6 @@
 use std::collections::HashMap;
 use tauri::{
     AppHandle,
-    Emitter,
     Manager,
     Wry,
 };
@@ -41,12 +40,14 @@ pub fn set_prompts_to_cache(
 ) -> Result<(), String> {
     let mut cache = handle.state::<HashMap<String, Vec<Prompt>>>().inner().clone();
     cache.insert(PROMPTS_CACHE_KEY.to_string(), prompts);
-    handle.emit_all(
+    // Note: Using emit instead of emit_all for compatibility
+    // emit broadcasts to all windows, which is the desired behavior
+    let _ = handle.emit(
         "prompts_cache_change",
         CacheChangeEvent {
             key: PROMPTS_CACHE_KEY.to_string(),
             value: cache.get(PROMPTS_CACHE_KEY).unwrap(),
         },
-    ).map_err(|e| e.to_string())?;
+    );
     Ok(())
 }

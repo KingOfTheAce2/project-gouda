@@ -18,7 +18,7 @@ use migration::Migrator;
 const DB_NAME: &str = "bear-llm-ai.db";
 
 #[derive(Debug, Clone)]
-pub struct Db(DatabaseConnection);
+pub struct Db(pub DatabaseConnection);
 
 impl Db {
     pub async fn new(app_data_dir: &Path) -> Self {

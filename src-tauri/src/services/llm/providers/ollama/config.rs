@@ -24,10 +24,10 @@ pub struct RawOllamaConfig {
     pub api_base: Option<String>,
 }
 
-impl Into<OllamaConfig> for RawOllamaConfig {
-    fn into(self) -> OllamaConfig {
+impl From<RawOllamaConfig> for OllamaConfig {
+    fn from(raw: RawOllamaConfig) -> Self {
         OllamaConfig {
-            api_base: self.api_base.unwrap_or(OLLAMA_API_BASE.to_string()),
+            api_base: raw.api_base.unwrap_or(OLLAMA_API_BASE.to_string()),
         }
     }
 }
