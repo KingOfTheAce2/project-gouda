@@ -4,6 +4,7 @@
 use serde_json::Value;
 use tauri::{
     AppHandle,
+    Emitter,
     Manager,
 };
 
@@ -217,7 +218,7 @@ pub async fn chat_completions_stream(
     messages: Vec<MessageDTO>,
     options: GenericOptions,
     handle: AppHandle,
-) -> Result<BotReplyStream, String> {
+) -> Result<(), String> {
     let bear_llm_ai_handle = handle.state::<BearLlmAiHandle>();
     let model = Db::get_model(&bear_llm_ai_handle.db, model_id)
         .await
@@ -231,6 +232,28 @@ pub async fn chat_completions_stream(
             .await
             .map_err(|err| err.to_string())?,
     };
-    let stream = client.chat_stream(messages, options, global_settings).await?;
-    Ok(stream)
+    let mut stream = client.chat_stream(messages, options, global_settings).await?;
+
+    // Spawn a task to emit stream chunks as events
+    tauri::async_runtime::spawn(async move {
+        use futures::StreamExt;
+
+        while let Some(result) = stream.next().await {
+            match result {
+                Ok(reply) => {
+                    // Emit each chunk to the frontend
+                    let _ = handle.emit("chat_stream_chunk", reply);
+                }
+                Err(err) => {
+                    // Emit error event
+                    let _ = handle.emit("chat_stream_error", err);
+                    break;
+                }
+            }
+        }
+        // Emit stream completion event
+        let _ = handle.emit("chat_stream_end", ());
+    });
+
+    Ok(())
 }
