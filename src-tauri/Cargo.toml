@@ -20,6 +20,8 @@ rust-version = "1.60"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+# This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+# BEAR LLM AI changes - Removed async-openai, using reqwest directly for Ollama
 # local crates
 entity = { path = "entity" }
 migration = { path = "migration" }

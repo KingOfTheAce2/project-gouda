@@ -1,5 +1,8 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+// BEAR LLM AI changes - Added Db import
 // MIT License Copyright (c) 2024-present Frank Zhang
 use crate::core::handle::BearLlmAiHandle;
+use crate::services::db::Db;
 use tauri::{
     App,
     Manager,

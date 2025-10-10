@@ -1,40 +1,38 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+// BEAR LLM AI changes - Removed async_openai dependency, using reqwest directly
 // MIT License Copyright (c) 2024-present Frank Zhang
-use async_openai::{
-    types::{CreateChatCompletionResponse, CreateChatCompletionStreamResponse},
-    Client,
-};
-use futures::Stream;
-use std::pin::Pin;
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 use super::config::OllamaConfig;
-
-pub type OllamaChatCompletionResponseStream =
-    Pin<Box<dyn Stream<Item = Result<CreateChatCompletionStreamResponse, async_openai::error::OpenAIError>> + Send>>;
+use crate::services::llm::providers::types;
 
 #[derive(Debug)]
 pub struct OllamaChat {
-    client: Client<OllamaConfig>,
+    client: Client,
+    config: OllamaConfig,
 }
 
-#[derive(serde::Serialize, Debug, Clone, Default)]
+#[derive(Serialize, Debug, Clone, Default)]
 pub struct OllamaChatCompletionRequest {
     #[serde(flatten)]
-    pub common: super::types::ChatCompletionRequestCommon,
+    pub common: types::ChatCompletionRequestCommon,
     pub messages: Vec<OllamaMessage>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<OllamaOptions>,
 }
 
-#[derive(serde::Deserialize, Debug, Clone)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct OllamaChatCompletionResponse {
     #[serde(flatten)]
-    pub common: super::types::ChatCompletionResponseCommon,
+    pub common: types::ChatCompletionResponseCommon,
     pub message: Option<OllamaMessage>,
     pub prompt_eval_count: Option<u32>,
     pub eval_count: Option<u32>,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Default)] pub struct OllamaOptions {
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct OllamaOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,7 +54,7 @@ impl From<entity::entities::conversations::OllamaOptions> for OllamaOptions {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(tag = "role", content = "content")]
 pub enum OllamaMessage {
     #[serde(rename = "system")]
@@ -79,23 +77,37 @@ impl From<entity::entities::messages::MessageDTO> for OllamaMessage {
 }
 
 impl OllamaChat {
-    pub fn new(client: &Client<OllamaConfig>) -> Self {
+    pub fn new(config: OllamaConfig) -> Self {
         Self {
-            client: client.clone(),
+            client: Client::new(),
+            config,
         }
     }
 
     pub async fn create(
         &self,
         request: OllamaChatCompletionRequest,
-    ) -> Result<CreateChatCompletionResponse, async_openai::error::OpenAIError> {
-        self.client.chat().create(request.into()).await
+    ) -> Result<OllamaChatCompletionResponse, reqwest::Error> {
+        let url = format!("{}/api/chat", self.config.api_base);
+        let response = self.client
+            .post(&url)
+            .json(&request)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(response)
     }
 
     pub async fn create_stream(
         &self,
         request: OllamaChatCompletionRequest,
-    ) -> Result<OllamaChatCompletionResponseStream, async_openai::error::OpenAIError> {
-        self.client.chat().create_stream(request.into()).await
+    ) -> Result<reqwest::Response, reqwest::Error> {
+        let url = format!("{}/api/chat", self.config.api_base);
+        self.client
+            .post(&url)
+            .json(&request)
+            .send()
+            .await
     }
 }

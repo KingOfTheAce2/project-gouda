@@ -1,10 +1,10 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+// BEAR LLM AI changes - Removed unused imports State and Wry
 // MIT License Copyright (c) 2024-present Frank Zhang
 use serde_json::Value;
 use tauri::{
     AppHandle,
     Manager,
-    State,
-    Wry,
 };
 
 use crate::{

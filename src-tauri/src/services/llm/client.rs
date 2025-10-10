@@ -1,6 +1,6 @@
-/* This change is Copyright BEAR LLM AI project, which is proprietory. */
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+// BEAR LLM AI changes - Removed async_openai dependency, using direct Ollama config
 // MIT License Copyright (c) 2024-present Frank Zhang
-use async_openai::{config::Config, Client};
 use entity::entities::{
     conversations::GenericOptions,
     messages::MessageDTO,
@@ -17,10 +17,10 @@ use super::{
     utils::build_http_client,
 };
 
-/// Wrapper of async-openai's Client struct
+/// LLM Client for various providers
 #[derive(Debug, Clone)]
 pub enum LLMClient {
-    OllamaClient(Client<OllamaConfig>, Option<String>),
+    OllamaClient(OllamaConfig, Option<String>),
 }
 
 impl LLMClient {
@@ -29,14 +29,14 @@ impl LLMClient {
         config: GenericConfig,
         proxy_setting: Option<ProxySetting>,
     ) -> Result<Self, String> {
-        let http_client: reqwest::Client = build_http_client(proxy_setting);
+        let _http_client: reqwest::Client = build_http_client(proxy_setting);
         match config.provider.as_str().into() {
             Providers::Ollama => {
                 let raw_config: RawOllamaConfig = serde_json::from_str(&config.config)
                     .map_err(|_| format!("Failed to parse model config: {}", &config.config))?;
                 let model = raw_config.model.clone();
-                let client = Client::with_config(raw_config.into()).with_http_client(http_client);
-                Ok(LLMClient::OllamaClient(client, model))
+                let ollama_config: OllamaConfig = raw_config.into();
+                Ok(LLMClient::OllamaClient(ollama_config, model))
             }
             _ => Err("Unsupported provider".to_string()),
         }
@@ -49,10 +49,10 @@ impl LLMClient {
         global_settings: GlobalSettings,
     ) -> Result<BotReply, String> {
         match self {
-            LLMClient::OllamaClient(client, model) => match model {
+            LLMClient::OllamaClient(config, model) => match model {
                 Some(model_str) => {
                     let reply =
-                        ChatRequestExecutor::ollama(client, messages, options, global_settings, model_str.to_string())?
+                        ChatRequestExecutor::ollama(config, messages, options, global_settings, model_str.to_string())?
                             .execute()
                             .await?;
                     Ok(reply)
@@ -69,10 +69,10 @@ impl LLMClient {
         global_settings: GlobalSettings,
     ) -> Result<BotReplyStream, String> {
         match self {
-            LLMClient::OllamaClient(client, model) => match model {
+            LLMClient::OllamaClient(config, model) => match model {
                 Some(model_str) => {
                     let stream =
-                        ChatRequestExecutor::ollama(client, messages, options, global_settings, model_str.to_string())?
+                        ChatRequestExecutor::ollama(config, messages, options, global_settings, model_str.to_string())?
                             .execute_stream()
                             .await?;
                     Ok(stream)
@@ -84,8 +84,8 @@ impl LLMClient {
 
     pub async fn models(&self) -> Result<Vec<RemoteModel>, String> {
         match self {
-            LLMClient::OllamaClient(client, _) => {
-                let result = ListModelsRequestExecutor::ollama(client).execute().await?;
+            LLMClient::OllamaClient(config, _) => {
+                let result = ListModelsRequestExecutor::ollama(config).execute().await?;
                 Ok(result)
             }
         }

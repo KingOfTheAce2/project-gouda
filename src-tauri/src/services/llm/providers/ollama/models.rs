@@ -1,15 +1,15 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+// BEAR LLM AI changes - Removed async_openai dependency, using reqwest directly
 // MIT License Copyright (c) 2024-present Frank Zhang
-use async_openai::Client;
-use serde::{
-    Deserialize,
-    Serialize,
-};
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
 
 use super::config::OllamaConfig;
 
 #[derive(Debug)]
 pub struct OllamaModels {
-    client: Client<OllamaConfig>,
+    client: Client,
+    config: OllamaConfig,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -25,13 +25,21 @@ pub struct OllamaListModelsResponse {
 }
 
 impl OllamaModels {
-    pub fn new(client: &Client<OllamaConfig>) -> Self {
+    pub fn new(config: OllamaConfig) -> Self {
         Self {
-            client: client.clone(),
+            client: Client::new(),
+            config,
         }
     }
 
-    pub async fn list(&self) -> Result<OllamaListModelsResponse, async_openai::error::OpenAIError> {
-        self.client.models().list().await
+    pub async fn list(&self) -> Result<OllamaListModelsResponse, reqwest::Error> {
+        let url = format!("{}/api/tags", self.config.api_base);
+        let response = self.client
+            .get(&url)
+            .send()
+            .await?
+            .json()
+            .await?;
+        Ok(response)
     }
 }

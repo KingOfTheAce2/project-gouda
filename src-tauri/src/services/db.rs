@@ -1,3 +1,5 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+// BEAR LLM AI changes - Fixed MigratorTrait import to use sea_orm_migration::MigratorTrait
 // MIT License Copyright (c) 2024-present Frank Zhang
 use sea_orm::{Database, DatabaseConnection, EntityTrait, Set};
 use std::path::Path;
@@ -10,7 +12,7 @@ use entity::entities::{
     prompts,
     settings::{self, Setting, SettingKey},
 };
-use migration::{Migrator, MigratorTrait};
+use migration::{Migrator, sea_orm_migration::MigratorTrait};
 
 const DB_NAME: &str = "bear-llm-ai.db";
 
