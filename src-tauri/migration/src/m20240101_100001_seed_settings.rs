@@ -1,6 +1,9 @@
+// This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
+// BEAR LLM AI changes - Added missing trait imports for ActiveModelTrait and EntityTrait
 // MIT License Copyright (c) 2024-present Frank Zhang
 use entity::entities::settings::{self, SettingKey};
 use sea_orm_migration::prelude::*;
+use sea_orm_migration::sea_orm::{ActiveModelTrait, EntityTrait, ColumnTrait};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -13,7 +16,7 @@ impl MigrationTrait for Migration {
             "maxTokens": 4096,
         });
         settings::ActiveModel {
-            key: sea_orm::ActiveValue::Set(SettingKey::General),
+            key: sea_orm::ActiveValue::Set(SettingKey::General.to_string()),
             value: sea_orm::ActiveValue::Set(general_settings.to_string()),
         }
         .insert(db)
@@ -24,7 +27,7 @@ impl MigrationTrait for Migration {
             "url": "http://localhost:11434",
         });
         settings::ActiveModel {
-            key: sea_orm::ActiveValue::Set(SettingKey::Ollama),
+            key: sea_orm::ActiveValue::Set(SettingKey::Ollama.to_string()),
             value: sea_orm::ActiveValue::Set(ollama_settings.to_string()),
         }
         .insert(db)
@@ -37,7 +40,7 @@ impl MigrationTrait for Migration {
             "language": "en",
         });
         settings::ActiveModel {
-            key: sea_orm::ActiveValue::Set(SettingKey::Appearance),
+            key: sea_orm::ActiveValue::Set(SettingKey::Appearance.to_string()),
             value: sea_orm::ActiveValue::Set(appearance_settings.to_string()),
         }
         .insert(db)
@@ -50,7 +53,7 @@ impl MigrationTrait for Migration {
             "port": 7890,
         });
         settings::ActiveModel {
-            key: sea_orm::ActiveValue::Set(SettingKey::Proxy),
+            key: sea_orm::ActiveValue::Set(SettingKey::Proxy.to_string()),
             value: sea_orm::ActiveValue::Set(proxy_settings.to_string()),
         }
         .insert(db)
@@ -61,16 +64,16 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         let db = manager.get_connection();
-        settings::Entity::delete_by_id(SettingKey::General)
+        settings::Entity::delete_by_id(SettingKey::General.to_string())
             .exec(db)
             .await?;
-        settings::Entity::delete_by_id(SettingKey::Ollama)
+        settings::Entity::delete_by_id(SettingKey::Ollama.to_string())
             .exec(db)
             .await?;
-        settings::Entity::delete_by_id(SettingKey::Appearance)
+        settings::Entity::delete_by_id(SettingKey::Appearance.to_string())
             .exec(db)
             .await?;
-        settings::Entity::delete_by_id(SettingKey::Proxy)
+        settings::Entity::delete_by_id(SettingKey::Proxy.to_string())
             .exec(db)
             .await?;
         Ok(())
