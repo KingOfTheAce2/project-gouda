@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 use tauri::{
     AppHandle,
+    Emitter,
     Manager,
     Wry,
 };
