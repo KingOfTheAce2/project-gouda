@@ -31,6 +31,13 @@ node_modules
 *.sln
 *.sw?
 *.env
+.env
+.env.local
+.env.*.local
+
+# Tauri signing keys (NEVER COMMIT THESE!)
+src-tauri/*.key
+src-tauri/*.key.pub
 
 # Claude Flow generated files
 # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).

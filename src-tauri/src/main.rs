@@ -5,7 +5,7 @@
 use tauri_plugin_log::fern::colors::ColoredLevelConfig;
 
 fn main() {
-    let mut context = tauri::generate_context!();
+    let context = tauri::generate_context!();
     let log = tauri_plugin_log::Builder::new()
         .level(log::LevelFilter::Info)
         .with_colors(ColoredLevelConfig::default());
