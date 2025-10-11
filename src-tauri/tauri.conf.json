@@ -23,6 +23,10 @@
       "certificateThumbprint": null,
       "digestAlgorithm": "sha256",
       "timestampUrl": "",
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
       "nsis": {
         "installMode": "currentUser"
       },
@@ -51,8 +55,8 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.1",
-  "identifier": "com.bearllmai",
+  "version": "0.0.2",
+  "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE3N0U1NTAyMkI5MTY4RUQKUldUdGFKRXJBbFYrRitSaUcvUGFsYkpseGhqSDFUMjFlLzMycnlaY1VKaDJJTkpUNU9iU0srSmQK",

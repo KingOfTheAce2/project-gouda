@@ -23,13 +23,28 @@ pub struct Db(pub DatabaseConnection);
 impl Db {
     pub async fn new(app_data_dir: &Path) -> Self {
         let db_path = app_data_dir.join(DB_NAME);
-        let db_url = format!("sqlite:{}", db_path.to_str().unwrap());
+
+        // Ensure parent directory exists
+        if let Some(parent) = db_path.parent() {
+            if !parent.exists() {
+                std::fs::create_dir_all(parent)
+                    .expect("Failed to create database directory");
+            }
+        }
+
+        let db_url = format!("sqlite:{}?mode=rwc", db_path.to_str().unwrap());
+        eprintln!("Connecting to database at: {}", db_url);
+
         let conn = Database::connect(&db_url)
             .await
             .expect("failed to connect to database");
+
+        eprintln!("Running database migrations...");
         Migrator::up(&conn, None)
             .await
             .expect("failed to run migrations");
+
+        eprintln!("Database initialized successfully");
         Self(conn)
     }
 
