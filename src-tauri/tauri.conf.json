@@ -24,7 +24,7 @@
       "digestAlgorithm": "sha256",
       "timestampUrl": "",
       "webviewInstallMode": {
-        "type": "downloadBootstrapper",
+        "type": "embedBootstrapper",
         "silent": true
       },
       "nsis": {
@@ -55,7 +55,7 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {

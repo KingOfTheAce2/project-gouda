@@ -16,7 +16,8 @@ fn setup_webview2_user_data_folder(app_data_dir: &PathBuf) -> Result<(), Box<dyn
     use std::os::windows::fs::MetadataExt;
 
     // Create WebView2 user data folder path
-    let webview2_dir = app_data_dir.join("EBWebView");
+    // Note: Using "WebView2" folder name to avoid confusion with legacy EBWebView
+    let webview2_dir = app_data_dir.join("WebView2");
 
     log::info!("Setting up WebView2 user data folder at: {:?}", webview2_dir);
 
