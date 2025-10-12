@@ -27,16 +27,8 @@
         "type": "downloadBootstrapper",
         "silent": true
       },
-      "webviewFixedRuntimePath": null,
-      "allowDowngrades": false,
       "nsis": {
-        "installMode": "currentUser",
-        "installerIcon": null,
-        "headerImage": null,
-        "sidebarImage": null,
-        "deleteAppDataOnUninstall": false,
-        "startMenuFolder": null,
-        "languages": null
+        "installMode": "currentUser"
       },
       "wix": {
         "language": "en-US"
