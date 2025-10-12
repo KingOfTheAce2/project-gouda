@@ -27,8 +27,16 @@
         "type": "downloadBootstrapper",
         "silent": true
       },
+      "webviewFixedRuntimePath": null,
+      "allowDowngrades": false,
       "nsis": {
-        "installMode": "currentUser"
+        "installMode": "currentUser",
+        "installerIcon": null,
+        "headerImage": null,
+        "sidebarImage": null,
+        "deleteAppDataOnUninstall": false,
+        "startMenuFolder": null,
+        "languages": null
       },
       "wix": {
         "language": "en-US"
@@ -55,7 +63,7 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {
