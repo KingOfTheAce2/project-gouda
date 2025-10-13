@@ -5,7 +5,7 @@
 workspace = { members = [".", "entity", "migration"] }
 [package]
 name = "bear-llm-ai"
-version = "0.0.4"
+version = "0.0.5"
 description = "A LLM client designed to serve multiple providers and platforms."
 authors = ["Frank Zhang"]
 license = "MIT"

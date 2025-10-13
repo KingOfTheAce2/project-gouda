@@ -39,6 +39,10 @@ node_modules
 src-tauri/*.key
 src-tauri/*.key.pub
 
+# WebView2 Runtime - using downloadBootstrapper, DLL not needed
+# If switching to embedBootstrapper in the future, comment this line to track the DLL
+# src-tauri/WebView2Loader.dll
+
 # Claude Flow generated files
 # This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 .claude/settings.local.json

@@ -46,6 +46,15 @@ To get a local copy up and running, follow these simple steps.
 - **Rust**: Follow the official instructions to install Rust and Cargo.
   - [https://www.rust-lang.org/tools/install](https://www.rust-lang.org/tools/install)
 
+### System Requirements
+
+- **OS**: Windows 10 (version 1809 or later) / macOS 10.15+ / Linux
+- **RAM**: 8GB minimum
+- **Storage**: 10GB free space
+- **CPU**: 4 cores recommended
+- **WebView2** (Windows only): Automatically downloaded and installed on first launch if not present
+- **Internet Connection**: Required for first Windows launch (to download WebView2 runtime if needed, ~100MB one-time download)
+
 ### Installation & Running
 
 1.  **Clone the repository**
