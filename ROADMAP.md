@@ -2,8 +2,8 @@
 
 | ✅   | **Task**                                       | **Description / Focus Area**                                                               |
 | --- | ---------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [ ] | **Remove HTTPS callbacks**                     | Guarantee all operations remain 100% local. No network callbacks or telemetry.             |
-| [ ] | **Add full Dutch and German i18n coverage**    | Localize UI, error messages, and legal notices in Dutch and German.                        |
+| ✅ | **Remove HTTPS callbacks**                     | Guarantee all operations remain 100% local. No network callbacks or telemetry.             |
+| ✅ | **Add full Dutch and German i18n coverage**    | Localize UI, error messages, and legal notices in Dutch and German.                        |
 | [ ] | **Add GDPR compliance**                        | Implement local privacy features: data minimization, deletion, encryption, audit logs.     |
 | [ ] | **Add AI Act compliance**                      | Include transparency labels, explainability, provenance, and edit-before-export workflows. |
 | [ ] | **Add local model support with Candle and HF** | Run all inference offline with Candle + Hugging Face. Allow manual model downloads.        |
