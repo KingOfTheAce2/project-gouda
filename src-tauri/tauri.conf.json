@@ -30,9 +30,8 @@
       "allowDowngrades": true,
       "nsis": {
         "installMode": "perMachine",
-        "languages": ["English"],
-        "displayLanguageSelector": false,
-        "compressionLevel": "high"
+        "installerLanguages": ["English"],
+        "displayLanguageSelector": false
       },
       "wix": {
         "language": "en-US"

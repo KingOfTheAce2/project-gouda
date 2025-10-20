@@ -45,17 +45,16 @@
 ```json
 "nsis": {
   "installMode": "perMachine",
-  "languages": ["English"],
-  "displayLanguageSelector": false,
-  "compressionLevel": "high"
+  "installerLanguages": ["English"],
+  "displayLanguageSelector": false
 }
 ```
 
 **Benefits:**
-- Faster installation with high compression
 - Simplified installer (English only)
-- Smaller installer size
+- Cleaner language selection
 - More reliable installation process
+- Follows Tauri v2 configuration schema
 
 ## Common Windows Installation Errors
 
@@ -137,9 +136,8 @@ if ($webview2) {
       "allowDowngrades": true,  // NEW: Allow version downgrade
       "nsis": {
         "installMode": "perMachine",  // CHANGED: Was "currentUser"
-        "languages": ["English"],  // NEW: Simplified language selection
-        "displayLanguageSelector": false,  // NEW: Hide language selector
-        "compressionLevel": "high"  // NEW: Better compression
+        "installerLanguages": ["English"],  // NEW: Simplified language selection
+        "displayLanguageSelector": false  // NEW: Hide language selector
       }
     }
   }
