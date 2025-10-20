@@ -13,7 +13,6 @@ use std::path::PathBuf;
 /// Initialize WebView2 user data folder with proper permissions for current user
 #[cfg(target_os = "windows")]
 fn setup_webview2_user_data_folder(app_data_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
-    use std::os::windows::fs::MetadataExt;
 
     // Create WebView2 user data folder path
     // Note: Using "WebView2" folder name to avoid confusion with legacy EBWebView
@@ -28,7 +27,7 @@ fn setup_webview2_user_data_folder(app_data_dir: &PathBuf) -> Result<(), Box<dyn
     } else {
         // Check if we can write to the existing directory
         match std::fs::metadata(&webview2_dir) {
-            Ok(metadata) => {
+            Ok(_metadata) => {
                 // Try to create a test file to verify write permissions
                 let test_file = webview2_dir.join(".write_test");
                 match std::fs::write(&test_file, b"test") {

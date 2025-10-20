@@ -76,6 +76,25 @@ jobs:
       - name: install frontend dependencies
         run: pnpm i # change this to npm, pnpm or bun depending on which one you use.
 
+      - name: Verify WebView2 Bootstrapper Configuration (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Verifying WebView2 configuration..." -ForegroundColor Cyan
+          $config = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
+          $installMode = $config.bundle.windows.webviewInstallMode.type
+          Write-Host "WebView2 Install Mode: $installMode" -ForegroundColor Yellow
+          if ($installMode -eq "embedBootstrapper") {
+            Write-Host "✓ Using embedBootstrapper (recommended)" -ForegroundColor Green
+            Write-Host "  The WebView2 bootstrapper (~2MB) will be embedded in the installer" -ForegroundColor Gray
+          } elseif ($installMode -eq "fixedRuntime") {
+            Write-Host "✓ Using fixedRuntime (offline mode)" -ForegroundColor Green
+            Write-Host "  Full WebView2 runtime will be bundled (~150MB)" -ForegroundColor Gray
+          } elseif ($installMode -eq "downloadBootstrapper") {
+            Write-Host "⚠ Warning: downloadBootstrapper is not recommended for production" -ForegroundColor Yellow
+            Write-Host "  Consider switching to embedBootstrapper" -ForegroundColor Gray
+          }
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
