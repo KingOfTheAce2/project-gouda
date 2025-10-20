@@ -43,7 +43,8 @@
       "signingIdentity": null
     },
     "resources": [
-      "resources/*"
+      "resources/*",
+      "WebView2Loader.dll"
     ],
     "shortDescription": "",
     "linux": {
@@ -55,7 +56,7 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {

@@ -8,9 +8,6 @@
 3. ALWAYS organize files in appropriate subdirectories
 4. **USE CLAUDE CODE'S TASK TOOL** for spawning agents concurrently, not just MCP
 
-**⚠️ BEAR-LLM/BEAR AI SPECIAL RULE:**
-**ALWAYS consider BOTH frontend AND backend when working on this codebase!**
-
 ### ⚡ GOLDEN RULE: "1 MESSAGE = ALL RELATED OPERATIONS"
 
 **MANDATORY PATTERNS:**
@@ -353,4 +350,3 @@ NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 Never save working files, text/mds and tests to the root folder.
-Any changes should be marked with This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary). Any new files should have a comment on top regarding this.

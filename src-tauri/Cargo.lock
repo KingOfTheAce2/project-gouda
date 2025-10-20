@@ -584,6 +584,43 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 
 [[package]]
+name = "bear-llm-ai"
+version = "0.0.6"
+dependencies = [
+ "base64 0.22.1",
+ "chrono",
+ "derive_builder",
+ "entity",
+ "infer",
+ "log",
+ "migration",
+ "once_cell",
+ "reqwest",
+ "reqwest-eventsource",
+ "sea-orm",
+ "sea-orm-migration",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "strum 0.26.3",
+ "strum_macros",
+ "sys-locale",
+ "sysinfo",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-log",
+ "tauri-plugin-shell",
+ "tauri-plugin-updater",
+ "thiserror 1.0.61",
+ "tokio",
+ "tokio-stream",
+]
+
+[[package]]
 name = "bigdecimal"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1569,6 +1606,8 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_repr",
+ "strum 0.26.3",
+ "strum_macros",
 ]
 
 [[package]]
@@ -2897,42 +2936,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "kaas"
-version = "1.0.9"
-dependencies = [
- "base64 0.22.1",
- "chrono",
- "derive_builder",
- "entity",
- "infer",
- "log",
- "migration",
- "once_cell",
- "reqwest",
- "reqwest-eventsource",
- "sea-orm",
- "secrecy",
- "serde",
- "serde_json",
- "sqlx",
- "strum 0.26.3",
- "strum_macros",
- "sys-locale",
- "sysinfo",
- "tauri",
- "tauri-build",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-log",
- "tauri-plugin-shell",
- "tauri-plugin-updater",
- "thiserror 1.0.61",
- "tokio",
- "tokio-stream",
-]
-
-[[package]]
 name = "keyboard-types"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3191,7 +3194,9 @@ name = "migration"
 version = "0.1.0"
 dependencies = [
  "async-std",
+ "entity",
  "sea-orm-migration",
+ "serde_json",
 ]
 
 [[package]]
