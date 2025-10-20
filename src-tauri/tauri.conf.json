@@ -27,8 +27,12 @@
         "type": "embedBootstrapper",
         "silent": true
       },
+      "allowDowngrades": true,
       "nsis": {
-        "installMode": "currentUser"
+        "installMode": "perMachine",
+        "languages": ["English"],
+        "displayLanguageSelector": false,
+        "compressionLevel": "high"
       },
       "wix": {
         "language": "en-US"

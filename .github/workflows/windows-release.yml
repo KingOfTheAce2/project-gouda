@@ -1,0 +1,128 @@
+# Windows-Only Release Workflow
+# This workflow builds and publishes Windows installers only
+# Use this for testing and releases on Windows platform
+
+name: "windows-release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'draft'
+        type: choice
+        options:
+          - draft
+          - prerelease
+          - release
+  push:
+    branches:
+      - release
+    paths:
+      - 'src-tauri/**'
+      - 'src/**'
+      - 'package.json'
+
+jobs:
+  publish-windows:
+    permissions:
+      contents: write
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check Rust and Cargo versions
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: List src-tauri directory
+        run: Get-ChildItem -Path src-tauri -Force
+        shell: pwsh
+
+      - name: Install frontend dependencies
+        run: pnpm i
+
+      - name: Verify WebView2 Configuration
+        shell: pwsh
+        run: |
+          Write-Host "================================" -ForegroundColor Cyan
+          Write-Host "WebView2 Configuration Check" -ForegroundColor Cyan
+          Write-Host "================================" -ForegroundColor Cyan
+          $config = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
+          $installMode = $config.bundle.windows.webviewInstallMode.type
+          $nsisMode = $config.bundle.windows.nsis.installMode
+
+          Write-Host "Install Mode: $installMode" -ForegroundColor Yellow
+          Write-Host "NSIS Mode: $nsisMode" -ForegroundColor Yellow
+          Write-Host "Allow Downgrades: $($config.bundle.windows.allowDowngrades)" -ForegroundColor Yellow
+
+          if ($installMode -eq "embedBootstrapper") {
+            Write-Host "✓ WebView2 bootstrapper will be embedded" -ForegroundColor Green
+          } else {
+            Write-Host "⚠ Warning: Not using embedBootstrapper" -ForegroundColor Yellow
+          }
+
+          if ($nsisMode -eq "perMachine") {
+            Write-Host "✓ Using perMachine installation (recommended for Windows)" -ForegroundColor Green
+          }
+          Write-Host "================================" -ForegroundColor Cyan
+
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          includeUpdaterJson: true
+          tagName: bear-llm-ai-v__VERSION__
+          releaseName: "BEAR LLM AI v__VERSION__ (Windows)"
+          releaseBody: |
+            ## Windows Release v__VERSION__
+
+            ### Installation
+            - Download the `.exe` installer below
+            - Run the installer (may require administrator privileges)
+            - WebView2 will be installed automatically if needed
+
+            ### What's New
+            - Industry-standard WebView2 bundling
+            - Improved Windows installer reliability
+            - Fixed installation errors on Windows 10/11
+
+            ### System Requirements
+            - Windows 10 (1809+) or Windows 11
+            - ~200MB disk space
+            - Internet connection for first launch (WebView2 download if needed)
+
+            ---
+
+            🤖 Generated with [Claude Code](https://claude.com/claude-code)
+          releaseDraft: ${{ github.event.inputs.release_type == 'draft' || github.event.inputs.release_type == '' }}
+          prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
+          args: ""
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installers
+          path: |
+            src-tauri/target/release/bundle/nsis/*.exe
+            src-tauri/target/release/bundle/msi/*.msi
+          retention-days: 7
