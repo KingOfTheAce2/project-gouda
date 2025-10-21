@@ -1,0 +1,11 @@
+# Cargo configuration for BEAR LLM AI
+# Ensures dynamic runtime linkage on Windows
+
+[build]
+# Incremental compilation disabled for release builds
+incremental = false
+
+[target.x86_64-pc-windows-msvc]
+# Force dynamic linking (/MD) to prevent runtime conflicts
+# This is critical for WebView2 and other Windows dependencies
+rustflags = ["-Ctarget-feature=-crt-static"]

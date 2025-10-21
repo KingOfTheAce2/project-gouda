@@ -86,6 +86,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Force dynamic runtime linkage (/MD) to prevent conflicts
+          RUSTFLAGS: "-Ctarget-feature=-crt-static"
+          CFLAGS: "/MD /wd9025"
+          CXXFLAGS: "/MD /wd9025"
         with:
           includeUpdaterJson: true
           tagName: bear-llm-ai-v__VERSION__

@@ -4,5 +4,6 @@ pub mod core;
 pub mod errors;
 pub mod init;
 pub mod log_utils;
+pub mod process_helper;
 pub mod services;
 pub mod utils;

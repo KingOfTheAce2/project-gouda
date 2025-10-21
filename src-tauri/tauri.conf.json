@@ -25,7 +25,7 @@
       "timestampUrl": "",
       "webviewInstallMode": {
         "type": "downloadBootstrapper",
-        "silent": false
+        "silent": true
       },
       "allowDowngrades": true,
       "nsis": {
@@ -46,6 +46,7 @@
       "signingIdentity": null
     },
     "resources": [
+      "WebView2Loader.dll",
       "resources/*"
     ],
     "shortDescription": "",
@@ -58,7 +59,7 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {
