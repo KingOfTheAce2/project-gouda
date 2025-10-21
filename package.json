@@ -1,7 +1,9 @@
 {
   "name": "bear-llm-ai",
   "private": true,
-  "version": "0.0.7",
+  "version": "0.0.8",
+  "author": "Ernst A.P. van Gassen",
+  "description": "BEAR LLM AI - An intelligent multi-provider LLM client with advanced conversation management and local model support",
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -585,7 +585,7 @@ checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 
 [[package]]
 name = "bear-llm-ai"
-version = "0.0.6"
+version = "0.0.8"
 dependencies = [
  "base64 0.22.1",
  "chrono",

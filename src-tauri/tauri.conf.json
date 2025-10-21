@@ -9,7 +9,7 @@
   "bundle": {
     "active": true,
     "category": "DeveloperTool",
-    "copyright": "© 2024 Frank Zhang All Rights Reserved",
+    "copyright": "© 2024 Ernst A.P. van Gassen All Rights Reserved",
     "targets": ["nsis", "msi", "appimage", "dmg"],
     "externalBin": [],
     "icon": [
@@ -30,7 +30,7 @@
       "allowDowngrades": true,
       "nsis": {
         "installMode": "perMachine",
-        "installerLanguages": ["English"],
+        "languages": ["English"],
         "displayLanguageSelector": false
       },
       "wix": {
@@ -59,7 +59,7 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {

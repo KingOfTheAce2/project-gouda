@@ -67,9 +67,11 @@ jobs:
           $config = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
           $installMode = $config.bundle.windows.webviewInstallMode.type
           $nsisMode = $config.bundle.windows.nsis.installMode
+          $languages = $config.bundle.windows.nsis.languages
 
           Write-Host "Install Mode: $installMode" -ForegroundColor Yellow
           Write-Host "NSIS Mode: $nsisMode" -ForegroundColor Yellow
+          Write-Host "Languages: $($languages -join ', ')" -ForegroundColor Yellow
           Write-Host "Allow Downgrades: $($config.bundle.windows.allowDowngrades)" -ForegroundColor Yellow
 
           if ($installMode -eq "embedBootstrapper") {
