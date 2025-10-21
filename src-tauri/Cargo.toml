@@ -39,7 +39,7 @@ strum_macros = "0.26"
 tauri = { version = "2.0", features = [] }
 tauri-plugin-log = { version = "2.0", features = ["colored"] }
 thiserror = "1.0"
-tokio = "1.36.0"
+tokio = { version = "1.36.0", features = ["process"] }
 tokio-stream = "0.1.15"
 base64 = "0.22.1"
 infer = "0.16.0"
