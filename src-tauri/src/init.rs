@@ -13,12 +13,25 @@ use std::path::PathBuf;
 /// Initialize WebView2 user data folder with proper permissions for current user
 #[cfg(target_os = "windows")]
 fn setup_webview2_user_data_folder(app_data_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+    use std::env;
 
     // Create WebView2 user data folder path
     // Note: Using "WebView2" folder name to avoid confusion with legacy EBWebView
     let webview2_dir = app_data_dir.join("WebView2");
 
     log::info!("Setting up WebView2 user data folder at: {:?}", webview2_dir);
+
+    // Check if WebView2Loader.dll is available in the application directory
+    if let Ok(exe_path) = env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            let webview2_loader = exe_dir.join("WebView2Loader.dll");
+            if webview2_loader.exists() {
+                log::info!("WebView2Loader.dll found at: {:?}", webview2_loader);
+            } else {
+                log::warn!("WebView2Loader.dll not found at: {:?}", webview2_loader);
+            }
+        }
+    }
 
     // Ensure the directory exists with proper permissions
     if !webview2_dir.exists() {
@@ -98,11 +111,12 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
         }
 
         // Setup WebView2 user data folder with proper permissions (Windows only)
-        setup_webview2_user_data_folder(&app_data_dir)
-            .map_err(|e| {
-                eprintln!("Failed to setup WebView2 user data folder: {:?}", e);
-                format!("WebView2 initialization failed: {:?}", e)
-            })?;
+        // Use a non-fatal approach - log warnings but don't crash the app
+        if let Err(e) = setup_webview2_user_data_folder(&app_data_dir) {
+            eprintln!("WARNING: Failed to setup WebView2 user data folder: {:?}", e);
+            log::warn!("WebView2 setup failed, continuing with default configuration: {:?}", e);
+            // Continue execution - WebView2 will use system defaults
+        }
 
         // Initialize database
         let db_wrapper = Db::new(&app_data_dir).await;

@@ -31,7 +31,10 @@
       "nsis": {
         "installMode": "perMachine",
         "languages": ["English"],
-        "displayLanguageSelector": false
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "template": "installer.nsi",
+        "compression": "lzma"
       },
       "wix": {
         "language": "en-US"
