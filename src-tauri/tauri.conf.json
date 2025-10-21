@@ -29,7 +29,7 @@
       },
       "allowDowngrades": true,
       "nsis": {
-        "installMode": "perMachine",
+        "installMode": "both",
         "languages": ["English"],
         "displayLanguageSelector": false,
         "installerIcon": "icons/icon.ico",

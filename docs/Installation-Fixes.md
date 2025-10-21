@@ -69,18 +69,32 @@ tokio = { version = "1.36.0", features = ["process"] }
 
 ## Installation Instructions (For Users)
 
-### Recommended Installation Method
+### Recommended Installation Method (No Admin Required) ✅
 1. Download the `.exe` installer
-2. **Right-click** the installer
-3. Select **"Run as administrator"**
+2. **Double-click** the installer (no admin needed)
+3. Select **"Install for current user only (recommended, no admin required)"**
 4. Follow the installation wizard
 5. WebView2 will be automatically downloaded if not present
 
-### Alternative: Double-Click Installation
-If you double-click the installer without admin rights:
-- A clear error message will appear
-- Message: "Administrator privileges are required to install BEAR LLM AI"
-- Solution: Right-click and select "Run as administrator"
+**Install Location**: `%LOCALAPPDATA%\Programs\BEAR LLM AI`
+
+### Alternative: All Users Installation (Requires Admin)
+1. Download the `.exe` installer
+2. **Right-click** the installer → Select **"Run as administrator"**
+3. Select **"Install for all users (requires administrator privileges)"**
+4. Follow the installation wizard
+5. WebView2 will be automatically downloaded if not present
+
+**Install Location**: `C:\Program Files\BEAR LLM AI`
+
+### Installation Mode Selection
+During installation, you'll see:
+```
+⦿ Install for current user only (recommended, no admin required)
+○ Install for all users (requires administrator privileges)
+```
+
+**Default**: Current user only (no admin needed)
 
 ## Troubleshooting
 
