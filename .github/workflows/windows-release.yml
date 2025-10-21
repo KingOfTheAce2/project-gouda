@@ -6,16 +6,6 @@ name: "windows-release"
 
 on:
   workflow_dispatch:
-    inputs:
-      release_type:
-        description: 'Release type'
-        required: true
-        default: 'draft'
-        type: choice
-        options:
-          - draft
-          - prerelease
-          - release
   push:
     branches:
       - release
@@ -66,18 +56,23 @@ jobs:
           Write-Host "================================" -ForegroundColor Cyan
           $config = Get-Content src-tauri/tauri.conf.json | ConvertFrom-Json
           $installMode = $config.bundle.windows.webviewInstallMode.type
+          $silentMode = $config.bundle.windows.webviewInstallMode.silent
           $nsisMode = $config.bundle.windows.nsis.installMode
           $languages = $config.bundle.windows.nsis.languages
 
           Write-Host "Install Mode: $installMode" -ForegroundColor Yellow
+          Write-Host "Silent Mode: $silentMode" -ForegroundColor Yellow
           Write-Host "NSIS Mode: $nsisMode" -ForegroundColor Yellow
           Write-Host "Languages: $($languages -join ', ')" -ForegroundColor Yellow
           Write-Host "Allow Downgrades: $($config.bundle.windows.allowDowngrades)" -ForegroundColor Yellow
 
-          if ($installMode -eq "embedBootstrapper") {
-            Write-Host "✓ WebView2 bootstrapper will be embedded" -ForegroundColor Green
+          if ($installMode -eq "downloadBootstrapper") {
+            Write-Host "✓ WebView2 bootstrapper will be downloaded at install time" -ForegroundColor Green
+            if ($silentMode -eq $false) {
+              Write-Host "✓ WebView2 installation will be visible to user" -ForegroundColor Green
+            }
           } else {
-            Write-Host "⚠ Warning: Not using embedBootstrapper" -ForegroundColor Yellow
+            Write-Host "⚠ Warning: Not using downloadBootstrapper" -ForegroundColor Yellow
           }
 
           if ($nsisMode -eq "perMachine") {
@@ -101,23 +96,24 @@ jobs:
             ### Installation
             - Download the `.exe` installer below
             - Run the installer (may require administrator privileges)
-            - WebView2 will be installed automatically if needed
+            - If WebView2 is not installed, you will see a separate WebView2 installation window
+            - Wait for WebView2 installation to complete, then BEAR LLM AI installation will continue
 
             ### What's New
-            - Industry-standard WebView2 bundling
+            - Visible WebView2 installation progress
+            - Fixed file writing errors during installation
             - Improved Windows installer reliability
-            - Fixed installation errors on Windows 10/11
 
             ### System Requirements
             - Windows 10 (1809+) or Windows 11
-            - ~200MB disk space
-            - Internet connection for first launch (WebView2 download if needed)
+            - ~100MB disk space
+            - Internet connection required during installation (for WebView2 download)
 
             ---
 
             🤖 Generated with [Claude Code](https://claude.com/claude-code)
-          releaseDraft: ${{ github.event.inputs.release_type == 'draft' || github.event.inputs.release_type == '' }}
-          prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
+          releaseDraft: false
+          prerelease: false
           args: ""
 
       - name: Upload Build Artifacts

@@ -24,8 +24,8 @@
       "digestAlgorithm": "sha256",
       "timestampUrl": "",
       "webviewInstallMode": {
-        "type": "embedBootstrapper",
-        "silent": true
+        "type": "downloadBootstrapper",
+        "silent": false
       },
       "allowDowngrades": true,
       "nsis": {
@@ -46,8 +46,7 @@
       "signingIdentity": null
     },
     "resources": [
-      "resources/*",
-      "WebView2Loader.dll"
+      "resources/*"
     ],
     "shortDescription": "",
     "linux": {
@@ -59,7 +58,7 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {
