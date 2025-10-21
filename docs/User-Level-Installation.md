@@ -24,13 +24,9 @@ BEAR LLM AI now supports **two installation modes**:
 
 **Step 2**: Double-click the installer (no need to "Run as administrator")
 
-**Step 3**: On the installation type page, select:
-```
-⦿ Install for current user only (recommended, no admin required)
-○ Install for all users (requires administrator privileges)
-```
+**Step 3**: The installer will automatically install for the current user
 
-**Step 4**: Click "Next" and complete installation
+**Step 4**: Follow the installation wizard and complete installation
 
 **Result**:
 - Installed to: `%LOCALAPPDATA%\Programs\BEAR LLM AI`
@@ -44,13 +40,9 @@ BEAR LLM AI now supports **two installation modes**:
 
 **Step 2**: Right-click installer → "Run as administrator"
 
-**Step 3**: On the installation type page, select:
-```
-○ Install for current user only (recommended, no admin required)
-⦿ Install for all users (requires administrator privileges)
-```
+**Step 3**: The installer will detect admin privileges and offer system-wide installation
 
-**Step 4**: Click "Next" and complete installation
+**Step 4**: Follow the installation wizard and complete installation
 
 **Result**:
 - Installed to: `C:\Program Files\BEAR LLM AI`
@@ -60,23 +52,21 @@ BEAR LLM AI now supports **two installation modes**:
 
 ## Smart Installation Behavior
 
-### If you select "All Users" without admin rights:
+The Tauri NSIS installer automatically detects your privilege level:
 
-The installer will show a helpful dialog:
-```
-Installing for all users requires administrator privileges.
+**If run normally (double-click)**:
+- Installs to current user location
+- No UAC prompt
+- Fast installation
 
-Do you want to install for current user only instead?
+**If run as administrator**:
+- Offers both current user and system-wide options
+- Prompts for installation scope
+- Can install to Program Files
 
-[Yes] [No]
-```
+### Default Behavior
 
-- **Click "Yes"**: Switches to current user installation automatically
-- **Click "No"**: Shows error and exits (you can restart as admin)
-
-### Default Mode
-
-By default, the installer selects **"Current user only"** to provide the smoothest installation experience without admin requirements.
+When run without admin privileges, the installer automatically uses **current user mode** - no prompts, no hassle, just works!
 
 ## Installation Locations
 
@@ -196,35 +186,31 @@ WebView2 Runtime installation behavior is **the same for both modes**:
 
 ## Technical Details
 
-### NSIS Configuration:
+### NSIS Configuration (tauri.conf.json):
 ```json
 {
   "nsis": {
     "installMode": "both",
     "languages": ["English"],
     "installerIcon": "icons/icon.ico",
-    "template": "installer.nsi"
+    "compression": "lzma"
   }
 }
 ```
 
-### Installer Behavior:
-```nsi
-RequestExecutionLevel user  ; Start with user privileges
-
-Function .onInit
-    StrCpy $InstallMode "CurrentUser"  ; Default to current user
-    SetShellVarContext current
-FunctionEnd
-```
+### Installation Behavior:
+- Tauri's built-in NSIS installer handles dual-mode automatically
+- No admin required: Installs to `%LOCALAPPDATA%\Programs`
+- With admin: Offers choice between current user and all users
+- Smart privilege detection
 
 ### Installation Path Logic:
 ```
-If CurrentUser:
-    $INSTDIR = $LOCALAPPDATA\Programs\BEAR LLM AI
+If no admin privileges:
+    → %LOCALAPPDATA%\Programs\BEAR LLM AI
 
-If AllUsers:
-    $INSTDIR = $PROGRAMFILES\BEAR LLM AI
+If admin privileges:
+    → User chooses: %LOCALAPPDATA% or C:\Program Files
 ```
 
 ## Security Considerations

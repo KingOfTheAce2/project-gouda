@@ -33,7 +33,6 @@
         "languages": ["English"],
         "displayLanguageSelector": false,
         "installerIcon": "icons/icon.ico",
-        "template": "installer.nsi",
         "compression": "lzma"
       },
       "wix": {
