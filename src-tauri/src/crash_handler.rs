@@ -1,7 +1,7 @@
 // This change is made under the BEAR AI SOFTWARE LICENSE AGREEMENT (Proprietary).
 // MIT License Copyright (c) 2024-present Frank Zhang
 
-use std::fs::{File, OpenOptions};
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
 use std::panic;
@@ -18,7 +18,7 @@ pub fn init_crash_handler(app_data_dir: &PathBuf) {
         let mut crash_log = String::new();
 
         crash_log.push_str(&format!(
-            "\n{'=':<80}\n",
+            "\n{:=<80}\n",
             ""
         ));
         crash_log.push_str(&format!(
@@ -26,7 +26,7 @@ pub fn init_crash_handler(app_data_dir: &PathBuf) {
             Local::now().format("%Y-%m-%d %H:%M:%S")
         ));
         crash_log.push_str(&format!(
-            "{'=':<80}\n\n",
+            "{:=<80}\n\n",
             ""
         ));
 
@@ -54,7 +54,7 @@ pub fn init_crash_handler(app_data_dir: &PathBuf) {
         crash_log.push_str(&format!("{:?}\n", std::backtrace::Backtrace::force_capture()));
 
         crash_log.push_str(&format!(
-            "\n{'=':<80}\n\n",
+            "\n{:=<80}\n\n",
             ""
         ));
 
@@ -267,10 +267,10 @@ pub fn run_dependency_diagnostics(app_data_dir: &PathBuf) {
     #[cfg(target_os = "windows")]
     {
         use sysinfo::System;
-        let sys = System::new_all();
+        let _sys = System::new_all();
         write_diagnostic_info(
             app_data_dir,
-            &format!("OS: {} {}", sys.name().unwrap_or_default(), sys.os_version().unwrap_or_default())
+            &format!("OS: {} {}", System::name().unwrap_or_default(), System::os_version().unwrap_or_default())
         );
     }
 
