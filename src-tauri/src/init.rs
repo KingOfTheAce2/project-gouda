@@ -88,8 +88,12 @@ fn setup_webview2_user_data_folder(_app_data_dir: &PathBuf) -> Result<(), Box<dy
 }
 
 pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
+    log::info!("Starting Tauri application initialization...");
     let handle = app.handle();
+
     let db = tauri::async_runtime::block_on(async {
+        log::info!("Starting async initialization block...");
+
         // Get app data directory with better error handling
         let app_data_dir = handle
             .path()
@@ -103,34 +107,53 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
 
         // Ensure the directory exists
         if !app_data_dir.exists() {
+            log::info!("App data directory does not exist, creating it...");
             std::fs::create_dir_all(&app_data_dir)
                 .map_err(|e| {
                     log::error!("Failed to create app data directory: {:?}", e);
                     format!("Cannot create app data directory: {:?}", e)
                 })?;
             log::info!("Created app data directory");
+        } else {
+            log::info!("App data directory already exists");
         }
 
         // Initialize crash handler ASAP
+        log::info!("Initializing crash handler...");
         crash_handler::init_crash_handler(&app_data_dir);
+        log::info!("Crash handler initialized");
 
         // Run dependency diagnostics and log results
         log::info!("Running dependency diagnostics...");
         crash_handler::run_dependency_diagnostics(&app_data_dir);
+        log::info!("Dependency diagnostics complete");
 
         // Setup WebView2 user data folder with proper permissions (Windows only)
         // Use a non-fatal approach - log warnings but don't crash the app
+        log::info!("Setting up WebView2 user data folder...");
         if let Err(e) = setup_webview2_user_data_folder(&app_data_dir) {
             log::warn!("Failed to setup WebView2 user data folder: {:?}", e);
             log::warn!("WebView2 setup failed, continuing with default configuration");
             // Continue execution - WebView2 will use system defaults
+        } else {
+            log::info!("WebView2 user data folder setup complete");
         }
 
         // Initialize database
-        let db_wrapper = Db::new(&app_data_dir).await;
+        log::info!("Initializing database...");
+        let db_wrapper = Db::new(&app_data_dir)
+            .await
+            .map_err(|e| {
+                log::error!("Database initialization failed: {:?}", e);
+                format!("Failed to initialize database: {:?}", e)
+            })?;
+
+        log::info!("Database initialization complete");
         Ok::<_, String>(db_wrapper.0)
     })?;
 
+    log::info!("Managing application state...");
     handle.manage(BearLlmAiHandle { db });
+    log::info!("Tauri application initialization complete");
     Ok(())
 }

@@ -21,31 +21,44 @@ const DB_NAME: &str = "bear-llm-ai.db";
 pub struct Db(pub DatabaseConnection);
 
 impl Db {
-    pub async fn new(app_data_dir: &Path) -> Self {
+    pub async fn new(app_data_dir: &Path) -> Result<Self, Box<dyn std::error::Error>> {
         let db_path = app_data_dir.join(DB_NAME);
+
+        log::info!("Initializing database at: {:?}", db_path);
 
         // Ensure parent directory exists
         if let Some(parent) = db_path.parent() {
             if !parent.exists() {
+                log::info!("Creating database directory: {:?}", parent);
                 std::fs::create_dir_all(parent)
-                    .expect("Failed to create database directory");
+                    .map_err(|e| {
+                        log::error!("Failed to create database directory {:?}: {:?}", parent, e);
+                        format!("Failed to create database directory: {:?}", e)
+                    })?;
+                log::info!("Database directory created successfully");
             }
         }
 
-        let db_url = format!("sqlite:{}?mode=rwc", db_path.to_str().unwrap());
+        let db_url = format!("sqlite:{}?mode=rwc", db_path.to_str().ok_or("Invalid database path")?);
         log::info!("Connecting to database at: {}", db_url);
 
         let conn = Database::connect(&db_url)
             .await
-            .expect("failed to connect to database");
+            .map_err(|e| {
+                log::error!("Failed to connect to database: {:?}", e);
+                format!("Database connection failed: {:?}", e)
+            })?;
 
-        log::info!("Running database migrations...");
+        log::info!("Database connected successfully, running migrations...");
         Migrator::up(&conn, None)
             .await
-            .expect("failed to run migrations");
+            .map_err(|e| {
+                log::error!("Failed to run database migrations: {:?}", e);
+                format!("Database migration failed: {:?}", e)
+            })?;
 
         log::info!("Database initialized successfully");
-        Self(conn)
+        Ok(Self(conn))
     }
 
     // --- Settings
