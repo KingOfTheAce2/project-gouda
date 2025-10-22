@@ -5,6 +5,57 @@
 use tauri_plugin_log::fern::colors::ColoredLevelConfig;
 
 fn main() {
+    // Early dependency check before Tauri initialization
+    // This helps diagnose issues before the window is created
+    #[cfg(target_os = "windows")]
+    {
+        use std::io::Write;
+
+        // Use LocalAppData\BEAR LLM AI for all logs (consistent location)
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            let log_dir = std::path::Path::new(&local_app_data).join("BEAR LLM AI");
+
+            // Create directory if it doesn't exist
+            let _ = std::fs::create_dir_all(&log_dir);
+
+            let pre_init_log = log_dir.join("preinit.log");
+
+            if let Ok(mut file) = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(&pre_init_log)
+            {
+                let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                let _ = writeln!(file, "\n[{}] === PRE-INITIALIZATION CHECK ===", timestamp);
+
+                // Check WebView2 runtime
+                match bear_llm_ai_lib::crash_handler::check_webview2_runtime() {
+                    Ok(msg) => {
+                        let _ = writeln!(file, "[{}] ✓ {}", timestamp, msg);
+                    }
+                    Err(msg) => {
+                        let _ = writeln!(file, "[{}] ✗ WARNING: {}", timestamp, msg);
+                        let _ = writeln!(file, "[{}] Application may fail to start due to missing WebView2 runtime", timestamp);
+                    }
+                }
+
+                // Check VC++ Runtime
+                match bear_llm_ai_lib::crash_handler::check_vcredist_runtime() {
+                    Ok(msg) => {
+                        let _ = writeln!(file, "[{}] ✓ {}", timestamp, msg);
+                    }
+                    Err(msg) => {
+                        let _ = writeln!(file, "[{}] ✗ WARNING: {}", timestamp, msg);
+                        let _ = writeln!(file, "[{}] Application may fail to start due to missing VC++ runtime", timestamp);
+                    }
+                }
+
+                let _ = writeln!(file, "[{}] Pre-initialization check complete. Log: {:?}", timestamp, pre_init_log);
+                let _ = writeln!(file, "[{}] Proceeding to Tauri initialization...\n", timestamp);
+            }
+        }
+    }
+
     let context = tauri::generate_context!();
     let log = tauri_plugin_log::Builder::new()
         .level(log::LevelFilter::Info)
@@ -13,7 +64,7 @@ fn main() {
     #[cfg(debug_assertions)]
     let log = log.level(log::LevelFilter::Debug);
 
-    tauri::Builder::default()
+    let result = tauri::Builder::default()
         .plugin(log.build())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
@@ -41,6 +92,31 @@ fn main() {
                 bear_llm_ai_lib::commands::delete_prompt,
                 bear_llm_ai_lib::commands::chat_completions,
                 bear_llm_ai_lib::commands::chat_completions_stream        ])
-        .run(context)
-        .expect("error while running tauri application");
+        .run(context);
+
+    // If run() fails, write error to file before exiting
+    if let Err(e) = result {
+        #[cfg(target_os = "windows")]
+        {
+            use std::io::Write;
+            if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+                let log_dir = std::path::Path::new(&local_app_data).join("BEAR LLM AI");
+                let _ = std::fs::create_dir_all(&log_dir);
+                let error_log = log_dir.join("fatal_error.log");
+
+                if let Ok(mut file) = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(&error_log)
+                {
+                    let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                    let _ = writeln!(file, "\n[{}] === FATAL ERROR ===", timestamp);
+                    let _ = writeln!(file, "[{}] Error: {:?}", timestamp, e);
+                    let _ = writeln!(file, "[{}] Error log: {:?}\n", timestamp, error_log);
+                }
+            }
+        }
+
+        panic!("Error while running Tauri application: {:?}", e);
+    }
 }

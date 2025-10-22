@@ -3,6 +3,7 @@
 // MIT License Copyright (c) 2024-present Frank Zhang
 use crate::core::handle::BearLlmAiHandle;
 use crate::services::db::Db;
+use crate::crash_handler;
 use tauri::{
     App,
     Manager,
@@ -109,6 +110,13 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
                 })?;
             log::info!("Created app data directory");
         }
+
+        // Initialize crash handler ASAP
+        crash_handler::init_crash_handler(&app_data_dir);
+
+        // Run dependency diagnostics and log results
+        log::info!("Running dependency diagnostics...");
+        crash_handler::run_dependency_diagnostics(&app_data_dir);
 
         // Setup WebView2 user data folder with proper permissions (Windows only)
         // Use a non-fatal approach - log warnings but don't crash the app
