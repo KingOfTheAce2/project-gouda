@@ -109,4 +109,34 @@
   DetailPrint "Uninstalling BEAR LLM AI..."
   DetailPrint "Note: Visual C++ Runtime is preserved (may be used by other applications)"
 
+  ; Clean up application data and logs
+  ; Get LocalAppData folder
+  ReadEnvStr $0 LOCALAPPDATA
+  ${If} $0 != ""
+    DetailPrint "Cleaning up application data and logs..."
+
+    ; Define the app data folder
+    StrCpy $1 "$0\BEAR LLM AI"
+
+    ; Check if the folder exists before attempting to delete
+    ${If} ${FileExists} "$1\*.*"
+      DetailPrint "Removing logs and temporary data from: $1"
+
+      ; Remove specific log files first
+      Delete "$1\preinit.log"
+      Delete "$1\fatal_error.log"
+      Delete "$1\crash.log"
+      Delete "$1\diagnostics.log"
+
+      ; Remove WebView2 user data folder (can be regenerated)
+      RMDir /r "$1\WebView2"
+
+      DetailPrint "Application data cleanup complete"
+    ${Else}
+      DetailPrint "No application data found to clean up"
+    ${EndIf}
+  ${Else}
+    DetailPrint "Could not determine LocalAppData folder, skipping cleanup"
+  ${EndIf}
+
 !macroend

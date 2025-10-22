@@ -128,15 +128,30 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
         crash_handler::run_dependency_diagnostics(&app_data_dir);
         log::info!("Dependency diagnostics complete");
 
-        // Setup WebView2 user data folder with proper permissions (Windows only)
-        // Use a non-fatal approach - log warnings but don't crash the app
-        log::info!("Setting up WebView2 user data folder...");
-        if let Err(e) = setup_webview2_user_data_folder(&app_data_dir) {
-            log::warn!("Failed to setup WebView2 user data folder: {:?}", e);
-            log::warn!("WebView2 setup failed, continuing with default configuration");
-            // Continue execution - WebView2 will use system defaults
-        } else {
-            log::info!("WebView2 user data folder setup complete");
+        // WebView2 user data folder is now set in main.rs BEFORE Tauri initialization
+        // This section verifies the setup and logs additional diagnostics
+        #[cfg(target_os = "windows")]
+        {
+            if let Ok(webview2_path) = std::env::var("WEBVIEW2_USER_DATA_FOLDER") {
+                log::info!("WebView2 user data folder already configured: {}", webview2_path);
+
+                // Verify the folder is writable
+                let webview2_dir = std::path::PathBuf::from(&webview2_path);
+                let test_file = webview2_dir.join(".write_test");
+                match std::fs::write(&test_file, b"test") {
+                    Ok(_) => {
+                        let _ = std::fs::remove_file(&test_file);
+                        log::info!("✓ WebView2 folder is writable");
+                    }
+                    Err(e) => {
+                        log::error!("✗ WebView2 folder is not writable: {:?}", e);
+                        log::error!("This may cause the application to fail. Please check folder permissions.");
+                    }
+                }
+            } else {
+                log::warn!("WEBVIEW2_USER_DATA_FOLDER environment variable not set");
+                log::warn!("WebView2 will use system default location");
+            }
         }
 
         // Initialize database

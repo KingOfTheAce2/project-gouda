@@ -104,8 +104,7 @@ jobs:
             - Wait for WebView2 installation to complete, then BEAR LLM AI installation will continue
 
             ### What's New
-            - Version 0.0.13 release
-            - Automated GitHub release with exe download support
+            See the [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for detailed release notes.
 
             ### System Requirements
             - Windows 10 (1809+) or Windows 11
