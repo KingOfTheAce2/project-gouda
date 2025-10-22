@@ -92,8 +92,8 @@ jobs:
           CXXFLAGS: "/MD /wd9025"
         with:
           includeUpdaterJson: true
-          tagName: bear-llm-ai-v__VERSION__
-          releaseName: "BEAR LLM AI v__VERSION__ (Windows)"
+          tagName: v__VERSION__
+          releaseName: "BEAR LLM AI v__VERSION__"
           releaseBody: |
             ## Windows Release v__VERSION__
 
@@ -104,9 +104,8 @@ jobs:
             - Wait for WebView2 installation to complete, then BEAR LLM AI installation will continue
 
             ### What's New
-            - Visible WebView2 installation progress
-            - Fixed file writing errors during installation
-            - Improved Windows installer reliability
+            - Version 0.0.13 release
+            - Automated GitHub release with exe download support
 
             ### System Requirements
             - Windows 10 (1809+) or Windows 11
@@ -118,6 +117,7 @@ jobs:
             🤖 Generated with [Claude Code](https://claude.com/claude-code)
           releaseDraft: false
           prerelease: false
+          releaseCommitish: ${{ github.sha }}
           args: ""
 
       - name: Upload Build Artifacts
