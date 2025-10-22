@@ -31,7 +31,12 @@
 
   ; The VC++ installer is bundled in resources/windows/vc_redist.x64.exe
   SetOutPath "$TEMP"
-  File "${RESOURCES}\windows\vc_redist.x64.exe"
+
+  ; Use /nonfatal flag - if the file is not found, continue without error
+  File /nonfatal "${RESOURCES}\windows\vc_redist.x64.exe"
+
+  ; Check if the file was actually extracted
+  IfFileExists "$TEMP\vc_redist.x64.exe" 0 VC_NOT_FOUND
 
   ; Run the installer silently
   ; /install = install mode
@@ -52,6 +57,11 @@
 
   ; Clean up temporary installer
   Delete "$TEMP\vc_redist.x64.exe"
+  Goto VC_INSTALLED
+
+  VC_NOT_FOUND:
+    DetailPrint "Visual C++ Runtime installer not found in bundle, skipping..."
+    DetailPrint "Note: Application may require manual installation of Visual C++ Runtime"
 
   VC_INSTALLED:
 

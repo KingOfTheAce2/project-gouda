@@ -92,6 +92,17 @@ export function InitializationProvider({
     }
   }, [isModelsSuccess, isSettingsSuccess]);
 
+  // Add initialization timeout protection
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!initialized) {
+        console.warn('Initialization timeout - proceeding with defaults');
+        setInitialized(true);
+      }
+    }, 5000); // 5 second timeout
+    return () => clearTimeout(timer);
+  }, [initialized]);
+
   if (initialized) {
     // Successfully initialized
     return children;
@@ -110,8 +121,15 @@ export function InitializationProvider({
       'Failed to initiate settings!'
     );
   }
-  // Loading
-  return null;
+  // Show loading screen instead of blank screen
+  return (
+    <div className="flex items-center justify-center h-screen w-screen bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary" />
+        <p className="text-sm text-muted-foreground">Initializing...</p>
+      </div>
+    </div>
+  );
 }
 
 export function ConversationsContextProvider({
