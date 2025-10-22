@@ -159,65 +159,149 @@ pub fn check_webview2_runtime() -> Result<String, String> {
     Ok("WebView2 check skipped (not Windows)".to_string())
 }
 
-/// Check if Visual C++ Runtime is installed
+/// Check if Visual C++ Runtime is installed with detailed diagnostics
 #[cfg(target_os = "windows")]
 pub fn check_vcredist_runtime() -> Result<String, String> {
+    check_vcredist_runtime_detailed(false)
+}
+
+/// Internal function with optional verbose logging
+#[cfg(target_os = "windows")]
+fn check_vcredist_runtime_detailed(verbose: bool) -> Result<String, String> {
     use std::process::Command;
 
-    // Check for VC++ 2015-2022 runtime (x64)
-    let vcredist_check = Command::new("reg")
-        .args(&[
-            "query",
-            "HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x64",
-            "/v",
-            "Installed"
-        ])
-        .output();
+    // Registry paths to check for VC++ 2015-2022 runtime (most common)
+    let registry_paths = [
+        // x64 paths
+        ("HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x64", "x64"),
+        ("HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x64", "x64 (WOW64)"),
+        // x86 paths (also needed by some applications)
+        ("HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x86", "x86"),
+        ("HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x86", "x86 (WOW64)"),
+    ];
 
-    if let Ok(output) = vcredist_check {
-        if output.status.success() {
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            if stdout.contains("0x1") {
-                // Get version
-                let version_output = Command::new("reg")
-                    .args(&[
-                        "query",
-                        "HKLM\\SOFTWARE\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x64",
-                        "/v",
-                        "Version"
-                    ])
-                    .output();
+    let mut found_versions = Vec::new();
+    let mut diagnostic_info = Vec::new();
 
-                if let Ok(ver_out) = version_output {
-                    let ver_stdout = String::from_utf8_lossy(&ver_out.stdout);
-                    if let Some(version_line) = ver_stdout.lines().find(|line| line.contains("Version")) {
-                        if let Some(version) = version_line.split_whitespace().last() {
-                            return Ok(format!("Visual C++ Runtime installed: version {}", version));
+    if verbose {
+        diagnostic_info.push("Starting VC++ Runtime detection...".to_string());
+    }
+
+    // Check all registry paths
+    for (path, arch) in &registry_paths {
+        if verbose {
+            diagnostic_info.push(format!("Checking registry: {}", path));
+        }
+
+        let vcredist_check = Command::new("reg")
+            .args(&["query", path, "/v", "Installed"])
+            .output();
+
+        match vcredist_check {
+            Ok(output) if output.status.success() => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+
+                if verbose {
+                    diagnostic_info.push(format!("  Registry output: {}", stdout.lines().collect::<Vec<_>>().join(" | ")));
+                }
+
+                // Check if the Installed value is 0x1 (indicating installed)
+                if stdout.contains("Installed") && (stdout.contains("0x1") || (stdout.contains("REG_DWORD") && stdout.contains("1"))) {
+                    // Try to get the version
+                    let version_output = Command::new("reg")
+                        .args(&["query", path, "/v", "Version"])
+                        .output();
+
+                    if let Ok(ver_out) = version_output {
+                        let ver_stdout = String::from_utf8_lossy(&ver_out.stdout);
+                        if let Some(version_line) = ver_stdout.lines().find(|line| line.contains("Version")) {
+                            if let Some(version) = version_line.split_whitespace().last() {
+                                found_versions.push(format!("{} - version {}", arch, version));
+                                if verbose {
+                                    diagnostic_info.push(format!("  ✓ Found: {} version {}", arch, version));
+                                }
+                                continue;
+                            }
                         }
                     }
+                    found_versions.push(format!("{}", arch));
+                    if verbose {
+                        diagnostic_info.push(format!("  ✓ Found: {} (version unknown)", arch));
+                    }
+                } else if verbose {
+                    diagnostic_info.push(format!("  ✗ Not installed or invalid value"));
                 }
-                return Ok("Visual C++ Runtime installed".to_string());
+            }
+            Ok(output) => {
+                if verbose {
+                    let stderr = String::from_utf8_lossy(&output.stderr);
+                    diagnostic_info.push(format!("  ✗ Registry query failed: {}", stderr));
+                }
+            }
+            Err(e) => {
+                if verbose {
+                    diagnostic_info.push(format!("  ✗ Command error: {}", e));
+                }
             }
         }
     }
 
-    // Also check WOW6432Node
-    let vcredist_check_wow = Command::new("reg")
-        .args(&[
-            "query",
-            "HKLM\\SOFTWARE\\WOW6432Node\\Microsoft\\VisualStudio\\14.0\\VC\\Runtimes\\x64",
-            "/v",
-            "Installed"
-        ])
-        .output();
+    if !found_versions.is_empty() {
+        let result = format!("Visual C++ Runtime installed: {}", found_versions.join(", "));
+        if verbose {
+            diagnostic_info.push(format!("Result: {}", result));
+        }
+        return Ok(result);
+    }
 
-    if let Ok(output) = vcredist_check_wow {
-        if output.status.success() {
-            return Ok("Visual C++ Runtime installed (WOW64)".to_string());
+    // Fallback: Check for actual VC++ runtime DLL files in System32
+    if verbose {
+        diagnostic_info.push("Registry check failed, checking DLL files...".to_string());
+    }
+
+    let system_paths = [
+        r"C:\Windows\System32\vcruntime140.dll",
+        r"C:\Windows\System32\msvcp140.dll",
+        r"C:\Windows\SysWOW64\vcruntime140.dll",
+        r"C:\Windows\SysWOW64\msvcp140.dll",
+    ];
+
+    let mut found_dlls = Vec::new();
+    for dll_path in &system_paths {
+        let exists = std::path::Path::new(dll_path).exists();
+        if verbose {
+            diagnostic_info.push(format!("  {} {}", if exists { "✓" } else { "✗" }, dll_path));
+        }
+        if exists {
+            found_dlls.push(*dll_path);
         }
     }
 
-    Err("Visual C++ Runtime NOT found - may cause runtime errors".to_string())
+    if !found_dlls.is_empty() {
+        let result = format!("Visual C++ Runtime DLLs found: {} of {} files detected ({})",
+            found_dlls.len(), system_paths.len(),
+            found_dlls.join(", "));
+        if verbose {
+            diagnostic_info.push(format!("Result: {}", result));
+        }
+        return Ok(result);
+    }
+
+    // Not found - provide helpful error message
+    let error_msg = format!(
+        "Visual C++ Runtime NOT found - Application requires Microsoft Visual C++ 2015-2022 Redistributable (x64 and x86). \
+        Download from: https://aka.ms/vs/17/release/vc_redist.x64.exe and https://aka.ms/vs/17/release/vc_redist.x86.exe"
+    );
+
+    if verbose {
+        diagnostic_info.push(format!("Result: {}", error_msg));
+        diagnostic_info.push("Diagnostic info:".to_string());
+        for info in &diagnostic_info {
+            eprintln!("{}", info);
+        }
+    }
+
+    Err(error_msg)
 }
 
 #[cfg(not(target_os = "windows"))]

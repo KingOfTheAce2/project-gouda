@@ -79,10 +79,32 @@ Shows:
 
 **Error:** `✗ Visual C++ Runtime NOT found`
 
-**Fix:**
-1. Download VC++ Redistributable: https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist
-2. Install "Visual C++ Redistributable for Visual Studio 2015-2022" (x64)
-3. Restart BEAR LLM AI
+**Fix:** You need to install **BOTH** x64 and x86 versions:
+
+1. **Download x64 version:** https://aka.ms/vs/17/release/vc_redist.x64.exe
+   - Run the installer
+   - Click "Install"
+   - Wait for completion
+
+2. **Download x86 version:** https://aka.ms/vs/17/release/vc_redist.x86.exe
+   - Run the installer
+   - Click "Install"
+   - Wait for completion
+
+3. **Restart your computer** (important!)
+
+4. Try running BEAR LLM AI again
+
+**Why both versions?**
+- x64 version: Required for 64-bit components
+- x86 version: Required for some 32-bit dependencies
+- Both are needed for full compatibility
+
+**Still not working?**
+- Check `preinit.log` to verify detection
+- Make sure both installers completed without errors
+- Check Windows Update for additional updates
+- If issue persists, see "Sending Crash Reports" below
 
 ## Sending Crash Reports
 
