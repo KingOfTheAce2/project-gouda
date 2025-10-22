@@ -67,6 +67,9 @@ fn main() {
         }
     }
 
+    // Log start of Tauri initialization to console
+    println!("[BEAR LLM AI] Starting Tauri initialization...");
+
     let context = tauri::generate_context!();
     let log = tauri_plugin_log::Builder::new()
         .level(log::LevelFilter::Info)
@@ -75,12 +78,16 @@ fn main() {
     #[cfg(debug_assertions)]
     let log = log.level(log::LevelFilter::Debug);
 
+    println!("[BEAR LLM AI] Building Tauri application...");
     let result = tauri::Builder::default()
         .plugin(log.build())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-            .setup(bear_llm_ai_lib::init::init)
+            .setup(|app| {
+                println!("[BEAR LLM AI] Running setup handler...");
+                bear_llm_ai_lib::init::init(app)
+            })
               .invoke_handler(tauri::generate_handler![
                 bear_llm_ai_lib::commands::get_settings,
                 bear_llm_ai_lib::commands::update_settings,
@@ -107,6 +114,8 @@ fn main() {
 
     // If run() fails, write error to file before exiting
     if let Err(e) = result {
+        eprintln!("[BEAR LLM AI] FATAL ERROR: {:?}", e);
+
         #[cfg(target_os = "windows")]
         {
             use std::io::Write;
@@ -123,11 +132,23 @@ fn main() {
                     let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
                     let _ = writeln!(file, "\n[{}] === FATAL ERROR ===", timestamp);
                     let _ = writeln!(file, "[{}] Error: {:?}", timestamp, e);
+                    let _ = writeln!(file, "[{}] ", timestamp);
+                    let _ = writeln!(file, "[{}] TROUBLESHOOTING STEPS:", timestamp);
+                    let _ = writeln!(file, "[{}] 1. Check if WebView2 Runtime is installed (see preinit.log)", timestamp);
+                    let _ = writeln!(file, "[{}] 2. Check if Visual C++ Runtime is installed (see preinit.log)", timestamp);
+                    let _ = writeln!(file, "[{}] 3. Verify app data directory is accessible: {:?}", timestamp, log_dir);
+                    let _ = writeln!(file, "[{}] 4. Check disk space availability", timestamp);
+                    let _ = writeln!(file, "[{}] 5. Run as administrator if permission issues persist", timestamp);
+                    let _ = writeln!(file, "[{}] ", timestamp);
                     let _ = writeln!(file, "[{}] Error log: {:?}\n", timestamp, error_log);
+
+                    eprintln!("[BEAR LLM AI] Error details written to: {:?}", error_log);
                 }
             }
         }
 
         panic!("Error while running Tauri application: {:?}", e);
     }
+
+    println!("[BEAR LLM AI] Application running successfully");
 }
