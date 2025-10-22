@@ -33,18 +33,18 @@ impl Db {
         }
 
         let db_url = format!("sqlite:{}?mode=rwc", db_path.to_str().unwrap());
-        eprintln!("Connecting to database at: {}", db_url);
+        log::info!("Connecting to database at: {}", db_url);
 
         let conn = Database::connect(&db_url)
             .await
             .expect("failed to connect to database");
 
-        eprintln!("Running database migrations...");
+        log::info!("Running database migrations...");
         Migrator::up(&conn, None)
             .await
             .expect("failed to run migrations");
 
-        eprintln!("Database initialized successfully");
+        log::info!("Database initialized successfully");
         Self(conn)
     }
 

@@ -94,7 +94,7 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
             .path()
             .app_data_dir()
             .map_err(|e| {
-                eprintln!("Failed to resolve app data directory: {:?}", e);
+                log::error!("Failed to resolve app data directory: {:?}", e);
                 format!("Cannot access app data directory: {:?}", e)
             })?;
 
@@ -104,7 +104,7 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
         if !app_data_dir.exists() {
             std::fs::create_dir_all(&app_data_dir)
                 .map_err(|e| {
-                    eprintln!("Failed to create app data directory: {:?}", e);
+                    log::error!("Failed to create app data directory: {:?}", e);
                     format!("Cannot create app data directory: {:?}", e)
                 })?;
             log::info!("Created app data directory");
@@ -113,8 +113,8 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
         // Setup WebView2 user data folder with proper permissions (Windows only)
         // Use a non-fatal approach - log warnings but don't crash the app
         if let Err(e) = setup_webview2_user_data_folder(&app_data_dir) {
-            eprintln!("WARNING: Failed to setup WebView2 user data folder: {:?}", e);
-            log::warn!("WebView2 setup failed, continuing with default configuration: {:?}", e);
+            log::warn!("Failed to setup WebView2 user data folder: {:?}", e);
+            log::warn!("WebView2 setup failed, continuing with default configuration");
             // Continue execution - WebView2 will use system defaults
         }
 
