@@ -45,8 +45,19 @@ fn main() {
                         let _ = writeln!(file, "[{}] ✓ {}", timestamp, msg);
                     }
                     Err(msg) => {
-                        let _ = writeln!(file, "[{}] ✗ WARNING: {}", timestamp, msg);
-                        let _ = writeln!(file, "[{}] Application may fail to start due to missing VC++ runtime", timestamp);
+                        let _ = writeln!(file, "[{}] ✗ ERROR: {}", timestamp, msg);
+                        let _ = writeln!(file, "[{}] ", timestamp);
+                        let _ = writeln!(file, "[{}] INSTALLATION REQUIRED:", timestamp);
+                        let _ = writeln!(file, "[{}] 1. Download and install BOTH x64 and x86 versions:", timestamp);
+                        let _ = writeln!(file, "[{}]    - x64: https://aka.ms/vs/17/release/vc_redist.x64.exe", timestamp);
+                        let _ = writeln!(file, "[{}]    - x86: https://aka.ms/vs/17/release/vc_redist.x86.exe", timestamp);
+                        let _ = writeln!(file, "[{}] 2. Restart your computer after installation", timestamp);
+                        let _ = writeln!(file, "[{}] 3. Try running the application again", timestamp);
+                        let _ = writeln!(file, "[{}] ", timestamp);
+                        let _ = writeln!(file, "[{}] If the issue persists after installation, please:", timestamp);
+                        let _ = writeln!(file, "[{}] - Verify both installers completed successfully", timestamp);
+                        let _ = writeln!(file, "[{}] - Check Windows Update for additional updates", timestamp);
+                        let _ = writeln!(file, "[{}] - Report the issue with this log file", timestamp);
                     }
                 }
 
