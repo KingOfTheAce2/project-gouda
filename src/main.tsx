@@ -20,6 +20,15 @@ import {
   useOutlet,
 } from 'react-router-dom';
 
+// Global error handlers for better debugging
+window.addEventListener('error', (event) => {
+  console.error('🔴 Window error:', event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('🔴 Unhandled promise rejection:', event.reason);
+});
+
 import logoImg from '@/assets/images/logo.svg';
 import CommonLayout from '@/layouts/CommonLayout';
 import {
@@ -252,33 +261,48 @@ const KeyboardBlocker = () => {
   return null;
 };
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <KeyboardBlocker />
-    {/* Wrap everything in an empty context menu to avoid native */}
-    {/* context menu from showing up when right clicking on the page */}
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <ErrorBoundary FallbackComponent={GlobalFallback}>
-          <RQProvider>
-            <ThemeProvider defaultTheme="system" attribute="class">
-              <TooltipProvider delayDuration={0}>
-                <Suspense fallback={<PageSkeleton />}>
-                  <ConversationsContextProvider>
-                    <InitializationProvider>
-                      <RouterProvider router={router} />
-                    </InitializationProvider>
-                  </ConversationsContextProvider>
-                </Suspense>
-              </TooltipProvider>
-            </ThemeProvider>
-          </RQProvider>
-        </ErrorBoundary>
-      </ContextMenuTrigger>
-      <ContextMenuContent className="min-w-fit">
-        <div className="p-1">
-                        <img src={logoImg} alt="BEAR LLM AI" width={16} height={16} />        </div>
-      </ContextMenuContent>
-    </ContextMenu>
-  </React.StrictMode>
-);
+// Wrap React initialization in try-catch for better error handling
+const rootElement = document.getElementById('root') as HTMLElement;
+
+try {
+  ReactDOM.createRoot(rootElement).render(
+    <React.StrictMode>
+      <KeyboardBlocker />
+      {/* Wrap everything in an empty context menu to avoid native */}
+      {/* context menu from showing up when right clicking on the page */}
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <ErrorBoundary FallbackComponent={GlobalFallback}>
+            <RQProvider>
+              <ThemeProvider defaultTheme="system" attribute="class">
+                <TooltipProvider delayDuration={0}>
+                  <Suspense fallback={<PageSkeleton />}>
+                    <ConversationsContextProvider>
+                      <InitializationProvider>
+                        <RouterProvider router={router} />
+                      </InitializationProvider>
+                    </ConversationsContextProvider>
+                  </Suspense>
+                </TooltipProvider>
+              </ThemeProvider>
+            </RQProvider>
+          </ErrorBoundary>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="min-w-fit">
+          <div className="p-1">
+            <img src={logoImg} alt="BEAR LLM AI" width={16} height={16} />
+          </div>
+        </ContextMenuContent>
+      </ContextMenu>
+    </React.StrictMode>
+  );
+} catch (error) {
+  console.error('🔴 Fatal error during React initialization:', error);
+  rootElement.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: system-ui;">
+      <h1 style="color: #dc2626; margin-bottom: 16px;">Fatal Error</h1>
+      <p style="color: #6b7280; margin-bottom: 8px;">The application failed to initialize. Please check the console for details.</p>
+      <p style="color: #9ca3af; font-size: 14px;">Error: ${error instanceof Error ? error.message : String(error)}</p>
+    </div>
+  `;
+}
