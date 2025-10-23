@@ -201,51 +201,10 @@ fn main() {
 
     // Run the application event loop
     println!("[BEAR LLM AI] Running application event loop...");
-    let run_result = app.run(|_app_handle, event| {
+    app.run(|_app_handle, event| {
         // Handle application events
         if let tauri::RunEvent::ExitRequested { api, .. } = event {
             api.prevent_exit();
         }
     });
-
-    // If run() fails, write error to file before exiting
-    if let Err(e) = run_result {
-        eprintln!("[BEAR LLM AI] FATAL ERROR during event loop: {:?}", e);
-
-        #[cfg(target_os = "windows")]
-        {
-            use std::io::Write;
-            if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
-                let log_dir = std::path::Path::new(&local_app_data).join("BEAR LLM AI");
-                let _ = std::fs::create_dir_all(&log_dir);
-                let error_log = log_dir.join("fatal_error.log");
-
-                if let Ok(mut file) = std::fs::OpenOptions::new()
-                    .create(true)
-                    .append(true)
-                    .open(&error_log)
-                {
-                    let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
-                    let _ = writeln!(file, "\n[{}] === FATAL ERROR DURING EVENT LOOP ===", timestamp);
-                    let _ = writeln!(file, "[{}] Error: {:?}", timestamp, e);
-                    let _ = writeln!(file, "[{}] ", timestamp);
-                    let _ = writeln!(file, "[{}] TROUBLESHOOTING STEPS:", timestamp);
-                    let _ = writeln!(file, "[{}] 1. Check if WebView2 Runtime is installed (see preinit.log)", timestamp);
-                    let _ = writeln!(file, "[{}] 2. Check if Visual C++ Runtime is installed (see preinit.log)", timestamp);
-                    let _ = writeln!(file, "[{}] 3. Verify app data directory is accessible: {:?}", timestamp, log_dir);
-                    let _ = writeln!(file, "[{}] 4. Check disk space availability", timestamp);
-                    let _ = writeln!(file, "[{}] 5. Run as administrator if permission issues persist", timestamp);
-                    let _ = writeln!(file, "[{}] 6. Try deleting the WebView2 folder and restarting", timestamp);
-                    let _ = writeln!(file, "[{}] ", timestamp);
-                    let _ = writeln!(file, "[{}] Error log: {:?}\n", timestamp, error_log);
-
-                    eprintln!("[BEAR LLM AI] Error details written to: {:?}", error_log);
-                }
-            }
-        }
-
-        panic!("Error while running Tauri application: {:?}", e);
-    }
-
-    println!("[BEAR LLM AI] Application exited successfully");
 }
