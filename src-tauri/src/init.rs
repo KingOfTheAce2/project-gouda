@@ -95,5 +95,22 @@ pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Managing application state...");
     handle.manage(BearLlmAiHandle { db });
     log::info!("Tauri application initialization complete");
+
+    // Show the main window now that initialization is complete
+    if let Some(window) = app.get_webview_window("main") {
+        log::info!("Showing main window...");
+        if let Err(e) = window.show() {
+            log::error!("Failed to show main window: {:?}", e);
+        } else {
+            log::info!("Main window is now visible");
+        }
+        // Ensure window is focused
+        if let Err(e) = window.set_focus() {
+            log::error!("Failed to focus window: {:?}", e);
+        }
+    } else {
+        log::warn!("Main window not found during initialization");
+    }
+
     Ok(())
 }

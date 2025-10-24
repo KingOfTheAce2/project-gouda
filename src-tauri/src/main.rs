@@ -76,12 +76,67 @@ fn main() {
             let log_dir = std::path::Path::new(&local_app_data).join("BEAR LLM AI");
             let _ = std::fs::create_dir_all(&log_dir);
 
-            // Setup WebView2 user data folder
+            // Setup WebView2 user data folder with proper permissions
             let webview2_dir = log_dir.join("WebView2");
+
+            // Clear any corrupted WebView2 cache if it exists
+            if webview2_dir.exists() {
+                if let Ok(mut file) = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(log_dir.join("preinit.log"))
+                {
+                    let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                    let _ = writeln!(file, "[{}] Existing WebView2 folder detected, checking integrity...", timestamp);
+                }
+
+                // Check if the folder is writable
+                let test_file = webview2_dir.join(".write_test");
+                match std::fs::write(&test_file, b"test") {
+                    Ok(_) => {
+                        let _ = std::fs::remove_file(&test_file);
+                        if let Ok(mut file) = std::fs::OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open(log_dir.join("preinit.log"))
+                        {
+                            let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                            let _ = writeln!(file, "[{}] ✓ WebView2 folder is writable", timestamp);
+                        }
+                    }
+                    Err(e) => {
+                        if let Ok(mut file) = std::fs::OpenOptions::new()
+                            .create(true)
+                            .append(true)
+                            .open(log_dir.join("preinit.log"))
+                        {
+                            let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                            let _ = writeln!(file, "[{}] ✗ WebView2 folder permission error: {:?}", timestamp, e);
+                            let _ = writeln!(file, "[{}] Attempting to recreate WebView2 folder...", timestamp);
+                        }
+
+                        // Try to recreate the folder
+                        let _ = std::fs::remove_dir_all(&webview2_dir);
+                    }
+                }
+            }
+
+            // Create or recreate WebView2 folder
             if let Err(e) = std::fs::create_dir_all(&webview2_dir) {
                 eprintln!("[BEAR LLM AI] Failed to create WebView2 folder: {:?}", e);
+                if let Ok(mut file) = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(log_dir.join("preinit.log"))
+                {
+                    let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                    let _ = writeln!(file, "[{}] ✗ CRITICAL: Cannot create WebView2 folder: {:?}", timestamp, e);
+                }
             } else {
+                // Set multiple environment variables to ensure WebView2 uses our folder
                 std::env::set_var("WEBVIEW2_USER_DATA_FOLDER", &webview2_dir);
+                std::env::set_var("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--user-data-dir=\"".to_owned() + webview2_dir.to_str().unwrap_or("") + "\"");
+
                 println!("[BEAR LLM AI] WebView2 user data folder set to: {:?}", webview2_dir);
 
                 // Log to preinit.log
@@ -92,6 +147,7 @@ fn main() {
                 {
                     let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
                     let _ = writeln!(file, "[{}] ✓ WebView2 user data folder configured: {:?}", timestamp, webview2_dir);
+                    let _ = writeln!(file, "[{}] ✓ WEBVIEW2_USER_DATA_FOLDER={:?}", timestamp, webview2_dir);
                 }
             }
         }

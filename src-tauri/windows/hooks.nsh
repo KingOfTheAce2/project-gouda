@@ -109,34 +109,57 @@
   DetailPrint "Uninstalling BEAR LLM AI..."
   DetailPrint "Note: Visual C++ Runtime is preserved (may be used by other applications)"
 
-  ; Clean up application data and logs
   ; Get LocalAppData folder
   ReadEnvStr $0 LOCALAPPDATA
-  ${If} $0 != ""
-    DetailPrint "Cleaning up application data and logs..."
+  ${If} $0 == ""
+    DetailPrint "Could not determine LocalAppData folder, skipping cleanup"
+    Goto CLEANUP_DONE
+  ${EndIf}
 
-    ; Define the app data folder
-    StrCpy $1 "$0\BEAR LLM AI"
+  ; Define the app data folder
+  StrCpy $1 "$0\BEAR LLM AI"
 
-    ; Check if the folder exists before attempting to delete
-    ${If} ${FileExists} "$1\*.*"
-      DetailPrint "Removing logs and temporary data from: $1"
+  ; Check if the folder exists before attempting to delete
+  ${If} ${FileExists} "$1\*.*"
+    ; Ask user if they want to remove all data including settings and logs
+    MessageBox MB_YESNO|MB_ICONQUESTION "Do you want to remove all application data including:$\r$\n$\r$\n  • Settings and configuration$\r$\n  • Conversation history$\r$\n  • Log files$\r$\n  • Cache files$\r$\n$\r$\nLocation: $1$\r$\n$\r$\nSelect 'No' to keep your data for future installations." /SD IDYES IDYES REMOVE_ALL_DATA IDNO REMOVE_PARTIAL_DATA
 
-      ; Remove specific log files first
+    REMOVE_ALL_DATA:
+      DetailPrint "Removing all application data from: $1"
+
+      ; Remove the entire application data folder
+      RMDir /r "$1"
+
+      ; Verify removal
+      ${If} ${FileExists} "$1\*.*"
+        DetailPrint "Warning: Some files could not be removed (may be in use)"
+        DetailPrint "Please manually delete: $1"
+      ${Else}
+        DetailPrint "All application data removed successfully"
+      ${EndIf}
+      Goto CLEANUP_DONE
+
+    REMOVE_PARTIAL_DATA:
+      DetailPrint "Removing temporary data only (keeping settings and database)..."
+
+      ; Remove only temporary/cache files
       Delete "$1\preinit.log"
       Delete "$1\fatal_error.log"
       Delete "$1\crash.log"
       Delete "$1\diagnostics.log"
 
-      ; Remove WebView2 user data folder (can be regenerated)
+      ; Remove WebView2 cache (can be regenerated)
       RMDir /r "$1\WebView2"
 
-      DetailPrint "Application data cleanup complete"
-    ${Else}
-      DetailPrint "No application data found to clean up"
-    ${EndIf}
+      DetailPrint "Temporary data cleanup complete"
+      DetailPrint "User data preserved at: $1"
+      Goto CLEANUP_DONE
+
   ${Else}
-    DetailPrint "Could not determine LocalAppData folder, skipping cleanup"
+    DetailPrint "No application data found to clean up"
   ${EndIf}
+
+  CLEANUP_DONE:
+  DetailPrint "Uninstallation complete"
 
 !macroend
