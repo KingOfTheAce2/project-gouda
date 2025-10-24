@@ -5,6 +5,24 @@
 use tauri_plugin_log::fern::colors::ColoredLevelConfig;
 
 fn main() {
+    // Helper macro to log to both console and file
+    #[cfg(target_os = "windows")]
+    macro_rules! log_to_file {
+        ($log_path:expr, $($arg:tt)*) => {{
+            use std::io::Write;
+            let message = format!($($arg)*);
+            eprintln!("{}", message);  // Console output for debugging
+            if let Ok(mut file) = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open($log_path)
+            {
+                let timestamp = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+                let _ = writeln!(file, "[{}] {}", timestamp, message);
+            }
+        }};
+    }
+
     // Early dependency check before Tauri initialization
     // This helps diagnose issues before the window is created
     #[cfg(target_os = "windows")]
@@ -125,30 +143,41 @@ fn main() {
             // Create or recreate WebView2 folder with proper permissions
             match std::fs::create_dir_all(&webview2_dir) {
                 Ok(_) => {
-                    // Set environment variables to direct WebView2 to our custom location
-                    // Both variables ensure WebView2 respects our folder choice
+                    // Set PRIMARY environment variable for WebView2
+                    // NOTE: WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS removed as potentially redundant
+                    // WebView2 should respect WEBVIEW2_USER_DATA_FOLDER alone
                     std::env::set_var("WEBVIEW2_USER_DATA_FOLDER", &webview2_dir);
-                    std::env::set_var(
-                        "WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS",
-                        format!("--user-data-dir=\"{}\"", webview2_dir.to_str().unwrap_or(""))
-                    );
-
-                    println!("[BEAR LLM AI] WebView2 user data folder set to: {:?}", webview2_dir);
                     log_msg(&format!("✓ WebView2 user data folder configured: {:?}", webview2_dir));
                 }
                 Err(e) => {
                     // Critical failure - application may crash on startup
-                    eprintln!("[BEAR LLM AI] CRITICAL: Failed to create WebView2 folder: {:?}", e);
                     log_msg(&format!("✗ CRITICAL: Cannot create WebView2 folder: {:?}", e));
                 }
             }
+
+            // Log start of Tauri initialization
+            log_msg("Starting Tauri initialization...");
+            log_msg("Generating Tauri context...");
         }
     }
 
-    // Log start of Tauri initialization to console
-    println!("[BEAR LLM AI] Starting Tauri initialization...");
+    #[cfg(target_os = "windows")]
+    let preinit_log = {
+        if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
+            std::path::Path::new(&local_app_data).join("BEAR LLM AI").join("preinit.log")
+        } else {
+            std::path::PathBuf::from("preinit.log")
+        }
+    };
+
+    #[cfg(target_os = "windows")]
+    log_to_file!(&preinit_log, "Tauri context generated successfully");
 
     let context = tauri::generate_context!();
+
+    #[cfg(target_os = "windows")]
+    log_to_file!(&preinit_log, "Creating logging plugin...");
+
     let log = tauri_plugin_log::Builder::new()
         .level(log::LevelFilter::Info)
         .with_colors(ColoredLevelConfig::default());
@@ -156,7 +185,8 @@ fn main() {
     #[cfg(debug_assertions)]
     let log = log.level(log::LevelFilter::Debug);
 
-    println!("[BEAR LLM AI] Building Tauri application...");
+    #[cfg(target_os = "windows")]
+    log_to_file!(&preinit_log, "Building Tauri application with plugins...");
 
     // Build the Tauri application with all plugins and handlers
     let result = tauri::Builder::default()
@@ -164,15 +194,19 @@ fn main() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-        .setup(|app| {
-            println!("[BEAR LLM AI] Running setup handler...");
+        .setup(move |app| {
+            #[cfg(target_os = "windows")]
+            log_to_file!(&preinit_log, "Running setup handler...");
+
             match bear_llm_ai_lib::init::init(app) {
                 Ok(_) => {
-                    println!("[BEAR LLM AI] Setup completed successfully");
+                    #[cfg(target_os = "windows")]
+                    log_to_file!(&preinit_log, "✓ Setup completed successfully");
                     Ok(())
                 }
                 Err(e) => {
-                    eprintln!("[BEAR LLM AI] Setup failed: {:?}", e);
+                    #[cfg(target_os = "windows")]
+                    log_to_file!(&preinit_log, "✗ Setup failed: {:?}", e);
                     Err(e)
                 }
             }
@@ -202,18 +236,26 @@ fn main() {
         ])
         .build(context);
 
+    #[cfg(target_os = "windows")]
+    log_to_file!(&preinit_log, "Tauri Builder configuration complete, calling .build()...");
+
     // Handle build errors
     let app = match result {
         Ok(app) => {
-            println!("[BEAR LLM AI] Application built successfully, starting event loop...");
+            #[cfg(target_os = "windows")]
+            log_to_file!(&preinit_log, "✓ Application built successfully!");
+
+            #[cfg(target_os = "windows")]
+            log_to_file!(&preinit_log, "Starting event loop...");
+
             app
         }
         Err(e) => {
-            eprintln!("[BEAR LLM AI] FATAL ERROR during application build: {:?}", e);
-
             #[cfg(target_os = "windows")]
             {
                 use std::io::Write;
+                log_to_file!(&preinit_log, "✗ FATAL ERROR during application build: {:?}", e);
+
                 if let Ok(local_app_data) = std::env::var("LOCALAPPDATA") {
                     let log_dir = std::path::Path::new(&local_app_data).join("BEAR LLM AI");
                     let _ = std::fs::create_dir_all(&log_dir);
@@ -235,11 +277,12 @@ fn main() {
                         let _ = writeln!(file, "[{}] 3. Plugin initialization failed", timestamp);
                         let _ = writeln!(file, "[{}] 4. Database initialization failed (check app data folder permissions)", timestamp);
                         let _ = writeln!(file, "[{}] ", timestamp);
-                        let _ = writeln!(file, "[{}] Please check the logs above for more details.", timestamp);
+                        let _ = writeln!(file, "[{}] Please check preinit.log and fatal_error.log for details.", timestamp);
                         let _ = writeln!(file, "[{}] Error log: {:?}\n", timestamp, error_log);
-
-                        eprintln!("[BEAR LLM AI] Error details written to: {:?}", error_log);
                     }
+
+                    log_to_file!(&preinit_log, "Fatal error details written to fatal_error.log");
+                    log_to_file!(&preinit_log, "Application will now terminate.");
                 }
             }
 
@@ -248,7 +291,9 @@ fn main() {
     };
 
     // Run the application event loop
-    println!("[BEAR LLM AI] Running application event loop...");
+    #[cfg(target_os = "windows")]
+    log_to_file!(&preinit_log, "Application event loop running - initialization complete!");
+
     app.run(|_app_handle, event| {
         // Handle application events
         if let tauri::RunEvent::ExitRequested { api, .. } = event {
