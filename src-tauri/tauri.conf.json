@@ -63,7 +63,7 @@
   },
   "productName": "BEAR LLM AI",
   "mainBinaryName": "BEAR LLM AI",
-  "version": "0.0.16",
+  "version": "0.0.18",
   "identifier": "com.bearllm.ai",
   "plugins": {
     "updater": {
