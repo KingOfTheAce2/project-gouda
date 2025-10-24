@@ -1,0 +1,1 @@
+npx claude-flow@alpha hive-mind spawn "<context>There are persistant WebView 2 issues. There have been multiple attempts to fix it. I have a GitHub repo of BEAR-LLM, where this error is not.</context>. <task>Your task is to check the fixes and patches. Delete all old non-working code and implement a working solution if you find anything that does not work</task>" --claude
