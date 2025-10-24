@@ -197,20 +197,22 @@ fn main() {
         .setup({
             #[cfg(target_os = "windows")]
             let setup_log = preinit_log.clone();
+            
             move |app| {
                 #[cfg(target_os = "windows")]
                 log_to_file!(&setup_log, "Running setup handler...");
 
-            match bear_llm_ai_lib::init::init(app) {
-                Ok(_) => {
-                    #[cfg(target_os = "windows")]
-                    log_to_file!(&preinit_log, "✓ Setup completed successfully");
-                    Ok(())
-                }
-                Err(e) => {
-                    #[cfg(target_os = "windows")]
-                    log_to_file!(&preinit_log, "✗ Setup failed: {:?}", e);
-                    Err(e)
+                match bear_llm_ai_lib::init::init(app) {
+                    Ok(_) => {
+                        #[cfg(target_os = "windows")]
+                        log_to_file!(&setup_log, "✓ Setup completed successfully");
+                        Ok(())
+                    }
+                    Err(e) => {
+                        #[cfg(target_os = "windows")]
+                        log_to_file!(&setup_log, "✗ Setup failed: {:?}", e);
+                        Err(e)
+                    }
                 }
             }
         })
