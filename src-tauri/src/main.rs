@@ -194,9 +194,12 @@ fn main() {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
-        .setup(move |app| {
+        .setup({
             #[cfg(target_os = "windows")]
-            log_to_file!(&preinit_log, "Running setup handler...");
+            let setup_log = preinit_log.clone();
+            move |app| {
+                #[cfg(target_os = "windows")]
+                log_to_file!(&setup_log, "Running setup handler...");
 
             match bear_llm_ai_lib::init::init(app) {
                 Ok(_) => {

@@ -9,8 +9,6 @@ use tauri::{
     Manager,
     Wry,
 };
-use std::path::PathBuf;
-
 
 pub fn init(app: &mut App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
     log::info!("Starting Tauri application initialization...");
