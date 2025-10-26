@@ -2636,6 +2636,435 @@ entity/src/
 
 ---
 
+### Step 23: Prompt Library & Template System
+**Priority**: High | **Effort**: Medium | **Legal Risk**: Low
+
+**What**: Local prompt library allowing users to import, organize, and reuse prompts via txt/md files. No telemetry, fully offline.
+
+**Implementation**:
+
+1. **Prompt Library Structure**:
+   ```
+   ~/BEAR_LLM_AI/prompts/
+   ├── system/                    # Built-in system prompts
+   │   ├── contract_review.md
+   │   ├── gdpr_advisor.md
+   │   ├── case_summarizer.md
+   │   ├── legal_researcher.md
+   │   └── compliance_checker.md
+   ├── user/                      # User-created prompts
+   │   ├── my_custom_prompt.md
+   │   └── client_intake.txt
+   ├── templates/                 # Document templates
+   │   ├── nda_template.md
+   │   ├── privacy_policy.md
+   │   └── dpa_template.md
+   └── shared/                    # Shared across cases (optional)
+       └── common_clauses.md
+   ```
+
+2. **Prompt File Format** (.md or .txt):
+   ```markdown
+   ---
+   name: Contract Review Assistant
+   description: Analyzes contracts for potential risks and missing clauses
+   category: contract_analysis
+   language: en
+   tags: [contract, review, risk-assessment]
+   version: 1.0
+   created: 2025-01-26
+   author: User
+   license_tier: basic  # basic, pro, enterprise, free
+   ---
+
+   # Contract Review Prompt
+
+   You are a legal contract reviewer. Analyze the following contract for:
+   1. Missing essential clauses
+   2. Ambiguous language
+   3. Potential liability issues
+   4. GDPR compliance (if applicable)
+   5. Unusual or non-standard terms
+
+   Focus on Dutch/Belgian law where applicable.
+
+   Contract to review:
+   {CONTRACT_TEXT}
+   ```
+
+3. **Prompt Library UI**:
+   - **Browse View**: Grid or list view of all prompts
+   - **Categories**: Filter by category, language, tier
+   - **Search**: Full-text search across prompts
+   - **Preview**: Markdown preview before using
+   - **Import**: Drag-and-drop .txt/.md files
+   - **Export**: Export prompts for sharing (respecting licensing)
+   - **Edit**: Built-in markdown editor
+   - **Variables**: Support {VARIABLE_NAME} placeholders
+   - **Version Control**: Track prompt versions
+
+4. **Prompt Usage**:
+   - Select prompt from library
+   - Fill in variables (interactive form)
+   - Preview final prompt
+   - Execute with current case context
+   - Save results to case
+
+5. **Built-in System Prompts** (Included):
+   - **Contract Reviewer**: Analyze contracts for risks
+   - **GDPR Advisor**: Answer GDPR compliance questions
+   - **Case Summarizer**: Summarize case files
+   - **Legal Researcher**: Research legal questions (Pro tier with law library)
+   - **Compliance Checker**: Check documents against regulations
+   - **Citation Finder**: Find and verify legal citations
+   - **Timeline Builder**: Extract chronological events
+   - **Due Diligence**: M&A and due diligence analysis
+
+6. **Tier-Based Prompt Access**:
+   - **Free Tier**: 3 basic system prompts
+   - **Basic Tier**: All system prompts + unlimited custom prompts
+   - **Pro Tier**: All Basic + premium prompts with law library integration
+   - **Enterprise Tier**: All Pro + team prompt sharing + centralized library
+
+**Technical Details**:
+- Store prompts in user data directory
+- No cloud sync (100% local)
+- Support .txt and .md formats
+- YAML frontmatter for metadata
+- Variable substitution engine
+- Markdown rendering
+- Full-text search index
+- Category and tag system
+- Tier-based access control
+
+**Rust Backend**:
+```rust
+// src-tauri/src/prompts/mod.rs
+pub struct PromptLibrary {
+    prompts: Vec<Prompt>,
+    system_prompts: Vec<SystemPrompt>,
+    user_dir: PathBuf,
+}
+
+pub struct Prompt {
+    id: String,
+    name: String,
+    description: String,
+    category: String,
+    content: String,
+    variables: Vec<String>,
+    tier: LicenseTier,
+    metadata: PromptMetadata,
+}
+
+impl PromptLibrary {
+    pub fn load_prompts() -> Result<Vec<Prompt>, Error>;
+    pub fn import_prompt(path: PathBuf) -> Result<Prompt, Error>;
+    pub fn save_prompt(prompt: &Prompt) -> Result<(), Error>;
+    pub fn search_prompts(query: &str) -> Vec<Prompt>;
+    pub fn get_by_category(category: &str) -> Vec<Prompt>;
+    pub fn check_tier_access(prompt: &Prompt, user_tier: LicenseTier) -> bool;
+}
+```
+
+**Success Criteria**:
+- Import .txt/.md files with drag-and-drop
+- Full-text search across 1000+ prompts in <500ms
+- Variable substitution works correctly
+- Tier-based access control functional
+- No telemetry or cloud sync
+- Markdown preview and editing
+- Export functionality works
+
+**Rust Files**:
+```
+src-tauri/src/
+├── prompts/
+│   ├── mod.rs                           # Prompt library manager
+│   ├── parser.rs                        # Parse .md/.txt files with frontmatter
+│   ├── variables.rs                     # Variable substitution engine
+│   ├── search.rs                        # Full-text search
+│   ├── categories.rs                    # Category management
+│   ├── tier_control.rs                  # License tier access control
+│   └── system_prompts.rs                # Built-in system prompts
+├── templates/
+│   ├── mod.rs                           # Template management
+│   ├── renderer.rs                      # Markdown rendering
+│   └── validator.rs                     # Template validation
+└── commands/
+    ├── prompts.rs                       # Prompt commands
+    └── templates.rs                     # Template commands
+
+migration/src/
+├── m20250114_000014_add_prompts.rs      # Prompt library table
+└── m20250115_000015_add_templates.rs    # Templates table
+
+entity/src/
+├── prompts.rs                           # Prompt entity
+└── templates.rs                         # Template entity
+```
+
+---
+
+## Phase 5a: Licensing & Payment System (Priority: HIGH)
+**Revenue Model - Supporting Social Mission**
+
+### Step 24: License Tier System
+**Priority**: Critical | **Effort**: High | **Legal Risk**: Medium
+
+**What**: Implement tiered licensing with local validation and payment integration (Stripe, Mollie, or Plug and Play).
+
+**Pricing Tiers**:
+
+#### 🆓 **Free Tier** (Social Mission)
+**Target**: Social legal institutes (Rechtswinkels, sociale advocatuur, legal aid clinics)
+**Price**: €0 / Free
+**Features**:
+- ✅ Basic chat interface
+- ✅ Local AI inference (up to 7B model)
+- ✅ 3 system prompts
+- ✅ RAG on local files (up to 100 documents)
+- ✅ Basic PII detection (Layer 1 - regex)
+- ✅ Export to PDF/TXT
+- ✅ GDPR & AI Act compliant
+- ✅ All 5 languages (EN/NL/DE/FR/ZH)
+- ❌ No prompt library access
+- ❌ No law library RAG
+- ❌ No advanced templates
+
+**Verification Required**:
+- Proof of non-profit status (KvK registration)
+- Organization email (no personal emails)
+- Application form with mission statement
+- Renewable annually
+
+---
+
+#### 💼 **Basic Tier**
+**Target**: Solo practitioners, freelance lawyers, small firms
+**Price**: €9.99/month or €99/year (save 17%)
+**USD**: $9.99/month or $99/year
+
+**Features**:
+- ✅ All Free Tier features
+- ✅ **Full prompt library** (unlimited custom prompts)
+- ✅ **All system prompts** (8+ built-in)
+- ✅ **RAG on local files** (unlimited documents)
+- ✅ **Document templates** (contracts, NDAs, privacy policies)
+- ✅ Advanced PII detection (Layer 1 + Layer 2 NER)
+- ✅ Case/matter organization
+- ✅ Export to DOCX/PDF
+- ✅ Dark mode
+- ✅ Priority email support
+- ❌ No law library RAG
+- ❌ No team features
+
+---
+
+#### 🏆 **Pro Tier**
+**Target**: Individual lawyers, boutique firms, specialists
+**Price**: €19.99/month or €199/year (save 17%)
+**USD**: $19.99/month or $199/year
+
+**Features**:
+- ✅ All Basic Tier features
+- ✅ **Law Library RAG** (search across legal databases)
+  - GDPR full text + case law
+  - National laws (NL/BE/DE/FR)
+  - EU regulations and directives
+  - Case law databases (where available)
+  - Legal doctrine and commentary
+- ✅ **Advanced legal research prompts**
+- ✅ **Citation verification**
+- ✅ **Precedent finder**
+- ✅ PII Layer 3 (Presidio integration - optional)
+- ✅ Advanced document comparison
+- ✅ Compliance checklists
+- ✅ Timeline and evidence builder
+- ✅ Priority support with 24h response
+- ❌ No team/centralized billing
+
+---
+
+#### 🏢 **Enterprise Tier**
+**Target**: Law firms, legal departments, multi-user teams
+**Price**: €19.99/month per seat (minimum 3 seats)
+**USD**: $19.99/month per seat
+
+**Features**:
+- ✅ All Pro Tier features (per user)
+- ✅ **Centralized billing** (one invoice for all seats)
+- ✅ **Team prompt library** (shared prompts across team)
+- ✅ **Team template library**
+- ✅ **Usage analytics** (aggregate, anonymized)
+- ✅ **SSO integration** (optional)
+- ✅ **Bulk license management**
+- ✅ **Dedicated support** (priority + phone)
+- ✅ **Custom onboarding**
+- ✅ **Quarterly review calls**
+- ✅ **SLA guarantee** (99.5% uptime for license validation)
+
+**Minimum**: 3 seats
+**Volume discounts**:
+- 10+ seats: 10% discount
+- 25+ seats: 15% discount
+- 50+ seats: 20% discount
+- 100+ seats: Contact for custom pricing
+
+---
+
+### Payment Gateway Integration
+
+**Supported Payment Providers**:
+
+1. **Stripe** (Primary - Global)
+   - Credit/debit cards
+   - SEPA Direct Debit (Europe)
+   - iDEAL (Netherlands)
+   - Bancontact (Belgium)
+   - Apple Pay / Google Pay
+   - Subscription management
+   - Invoice generation
+
+2. **Mollie** (Alternative - Europe)
+   - All European payment methods
+   - iDEAL, Bancontact, Sofort
+   - SEPA Direct Debit
+   - Credit cards
+   - PayPal
+   - Better European coverage
+
+3. **Plug and Play** (Enterprise - Custom)
+   - Custom payment flows
+   - Invoice-based billing
+   - Purchase orders
+   - Wire transfers
+
+**Implementation Strategy**:
+- **Online activation** (preferred): Payment → instant license key
+- **Offline activation** (optional): Purchase → manual license key (for air-gapped setups)
+- **License validation**: Local validation with periodic online check (monthly)
+- **Grace period**: 30 days if offline or payment fails
+- **Automatic renewal**: Optional, user can disable
+
+**Technical Flow**:
+```
+1. User selects tier → Payment page (Stripe/Mollie)
+2. Payment successful → Generate license key
+3. License key → Stored locally (encrypted)
+4. Monthly validation check (non-blocking)
+5. If validation fails → 30-day grace period
+6. After grace → Downgrade to free tier (data preserved)
+```
+
+**License Key Format**:
+```
+Format: BEAR-XXXX-XXXX-XXXX-XXXX
+Example: BEAR-PRO1-A3F9-K8L2-9X4M
+
+Encoding:
+- BEAR: Product identifier
+- PRO1/BAS1/ENT1/FREE: Tier identifier
+- Next 3 blocks: Encrypted data (tier, expiry, features)
+- Signed with RSA private key (verified locally)
+```
+
+**Success Criteria**:
+- Payment processing works in EUR and USD
+- License activation completes in <30 seconds
+- Offline activation works for air-gapped systems
+- Tier-based feature gating functional
+- Free tier verification process works
+- Centralized billing for Enterprise
+- License renewal automatic (if enabled)
+
+**Rust Files (Licensing & Payment)**:
+```
+src-tauri/src/
+├── licensing/
+│   ├── mod.rs                           # License manager
+│   ├── tier.rs                          # Tier definitions and features
+│   ├── validator.rs                     # License key validation
+│   ├── generator.rs                     # License key generation (server-side)
+│   ├── activation.rs                    # License activation
+│   ├── verification.rs                  # Periodic verification
+│   ├── grace_period.rs                  # Grace period management
+│   └── social_mission.rs                # Free tier verification
+├── payment/
+│   ├── mod.rs                           # Payment module
+│   ├── stripe.rs                        # Stripe integration
+│   ├── mollie.rs                        # Mollie integration
+│   ├── plug_and_play.rs                 # Plug and Play integration
+│   ├── webhook.rs                       # Payment webhooks
+│   └── invoice.rs                       # Invoice generation
+├── features/
+│   ├── mod.rs                           # Feature flags
+│   ├── tier_control.rs                  # Tier-based access control
+│   ├── limits.rs                        # Usage limits per tier
+│   └── restrictions.rs                  # Feature restrictions
+└── commands/
+    ├── licensing.rs                     # License commands
+    ├── payment.rs                       # Payment commands
+    └── subscription.rs                  # Subscription management
+
+migration/src/
+├── m20250116_000016_add_licenses.rs     # License table
+├── m20250117_000017_add_subscriptions.rs # Subscription tracking
+└── m20250118_000018_add_payments.rs     # Payment history
+
+entity/src/
+├── licenses.rs                          # License entity
+├── subscriptions.rs                     # Subscription entity
+└── payments.rs                          # Payment entity
+```
+
+**Privacy & Security**:
+- ✅ **No telemetry**: Only license validation pings (once/month)
+- ✅ **Encrypted license keys**: RSA-2048 signed
+- ✅ **Local storage**: All payment info on Stripe/Mollie (not stored locally)
+- ✅ **Offline mode**: 30-day grace period if no internet
+- ✅ **GDPR compliant**: Minimal data collection
+- ✅ **Transparent pricing**: No hidden fees
+- ✅ **Cancel anytime**: No lock-in
+
+**Social Mission Implementation**:
+
+1. **Free Tier Application Process**:
+   ```
+   Apply → Submit Proof → Review (1-3 business days) → Approved → Free license key
+   ```
+
+2. **Required Documentation**:
+   - KvK registration (Netherlands) or equivalent
+   - Organization email domain
+   - Mission statement (max 500 words)
+   - Proof of non-profit status
+   - Annual renewal form
+
+3. **Verification**:
+   - Manual review by BEAR LLM AI team
+   - Check against public registries
+   - Email verification
+   - Optional: Reference from legal aid network
+
+4. **Renewal**:
+   - Annual renewal required
+   - Automated email reminder 30 days before expiry
+   - Re-verification process
+   - Continued compliance check
+
+**Organizations Eligible for Free Tier**:
+- **Rechtswinkels** (Legal Advice Centers - NL)
+- **Sociale advocatuur** (Social Legal Aid - NL/BE)
+- **Juridisch Loket** (Legal Counter - NL)
+- **Pro Bono partnerships**
+- **University legal clinics**
+- **Refugee legal aid**
+- **Public interest law organizations**
+- **Legal aid societies** (international)
+
+---
+
 ## STRATEGIC DECISION POINT: Choose Your Path 🔀
 
 **After completing GDPR compliance, AI Act compliance, and basic PII protection (Phases 1-5), you face a critical architectural decision that will shape the future of your legal AI system.**
