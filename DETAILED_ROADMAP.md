@@ -713,12 +713,486 @@ This roadmap provides a complete development path from initial project setup thr
 
 ---
 
+### Step 0.8: Case/Matter Organization (Lawyer-Centric Architecture)
+**Priority**: Critical | **Effort**: Medium | **Risk**: Low
+
+**What**: Implement case/matter-based data organization from the start - this is how lawyers actually work.
+
+**Implementation**:
+
+1. **Database Schema for Cases/Matters**:
+   ```rust
+   // src-tauri/migration/src/m20250101_000002_create_cases.rs
+   use sea_orm_migration::prelude::*;
+
+   #[async_trait::async_trait]
+   impl MigrationTrait for Migration {
+       async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Cases::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Cases::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Cases::Name).string().not_null())
+                       .col(ColumnDef::new(Cases::ClientName).string().not_null())
+                       .col(ColumnDef::new(Cases::CaseNumber).string().unique_key())
+                       .col(ColumnDef::new(Cases::Description).text())
+                       .col(ColumnDef::new(Cases::Status).string().not_null().default("active"))
+                       .col(ColumnDef::new(Cases::CreatedAt).timestamp().not_null())
+                       .col(ColumnDef::new(Cases::UpdatedAt).timestamp().not_null())
+                       .to_owned(),
+               )
+               .await?;
+
+           // Create conversations table linked to cases
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Conversations::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Conversations::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Conversations::CaseId).integer().not_null())
+                       .col(ColumnDef::new(Conversations::Title).string().not_null())
+                       .col(ColumnDef::new(Conversations::CreatedAt).timestamp().not_null())
+                       .foreign_key(
+                           ForeignKey::create()
+                               .name("fk_conversation_case")
+                               .from(Conversations::Table, Conversations::CaseId)
+                               .to(Cases::Table, Cases::Id)
+                               .on_delete(ForeignKeyAction::Cascade)
+                       )
+                       .to_owned(),
+               )
+               .await?;
+
+           // Create messages table
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Messages::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Messages::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Messages::ConversationId).integer().not_null())
+                       .col(ColumnDef::new(Messages::Role).string().not_null()) // "user" | "assistant"
+                       .col(ColumnDef::new(Messages::Content).text().not_null())
+                       .col(ColumnDef::new(Messages::IsAiGenerated).boolean().not_null().default(false))
+                       .col(ColumnDef::new(Messages::WasEdited).boolean().not_null().default(false))
+                       .col(ColumnDef::new(Messages::CreatedAt).timestamp().not_null())
+                       .foreign_key(
+                           ForeignKey::create()
+                               .name("fk_message_conversation")
+                               .from(Messages::Table, Messages::ConversationId)
+                               .to(Conversations::Table, Conversations::Id)
+                               .on_delete(ForeignKeyAction::Cascade)
+                       )
+                       .to_owned(),
+               )
+               .await
+       }
+   }
+
+   #[derive(Iden)]
+   enum Cases {
+       Table,
+       Id,
+       Name,
+       ClientName,
+       CaseNumber,
+       Description,
+       Status,
+       CreatedAt,
+       UpdatedAt,
+   }
+
+   #[derive(Iden)]
+   enum Conversations {
+       Table,
+       Id,
+       CaseId,
+       Title,
+       CreatedAt,
+   }
+
+   #[derive(Iden)]
+   enum Messages {
+       Table,
+       Id,
+       ConversationId,
+       Role,
+       Content,
+       IsAiGenerated,
+       WasEdited,
+       CreatedAt,
+   }
+   ```
+
+2. **Case Management UI**:
+   ```typescript
+   // src/pages/Cases.tsx
+   const CasesPage = () => {
+     const [cases, setCases] = useState([]);
+     const [selectedCase, setSelectedCase] = useState(null);
+
+     return (
+       <div className="flex h-full">
+         <CaseList cases={cases} onSelect={setSelectedCase} />
+         {selectedCase && (
+           <CaseDetail case={selectedCase} />
+         )}
+       </div>
+     );
+   };
+
+   // src/components/CaseList.tsx
+   const CaseList = ({ cases, onSelect }) => {
+     return (
+       <div className="w-80 border-r">
+         <div className="p-4">
+           <button className="btn-primary w-full">New Case</button>
+         </div>
+         <div className="divide-y">
+           {cases.map(case => (
+             <div
+               key={case.id}
+               className="p-4 hover:bg-gray-50 cursor-pointer"
+               onClick={() => onSelect(case)}
+             >
+               <h3 className="font-medium">{case.name}</h3>
+               <p className="text-sm text-gray-600">{case.clientName}</p>
+               <p className="text-xs text-gray-500">{case.caseNumber}</p>
+             </div>
+           ))}
+         </div>
+       </div>
+     );
+   };
+   ```
+
+**Why This Matters**:
+- Lawyers organize everything by case/client
+- Ensures GDPR Purpose Limitation from the start
+- Natural data isolation (each case is separate)
+- Prepares for future features (all tied to specific cases)
+
+**Success Criteria**:
+- Can create, view, and select cases
+- Database enforces case-based organization
+- All conversations tied to specific cases
+- UI clearly shows which case is active
+
+---
+
+### Step 0.9: Human-in-the-Loop Review UI Pattern
+**Priority**: High | **Effort**: Low | **Risk**: Low
+
+**What**: Implement the preview/review/approve workflow UI pattern that will be used for all AI operations (even though we don't have AI yet).
+
+**Implementation**:
+
+```typescript
+// src/components/ReviewModal.tsx
+interface ReviewModalProps {
+  title: string;
+  content: string;
+  metadata?: {
+    source?: 'ai' | 'user';
+    model?: string;
+    timestamp?: string;
+  };
+  onApprove: (edited: string) => void;
+  onReject: () => void;
+  onEdit: (edited: string) => void;
+}
+
+const ReviewModal: React.FC<ReviewModalProps> = ({
+  title,
+  content,
+  metadata,
+  onApprove,
+  onReject,
+  onEdit,
+}) => {
+  const [editedContent, setEditedContent] = useState(content);
+  const [isEditing, setIsEditing] = useState(false);
+
+  return (
+    <Dialog>
+      <div className="max-w-4xl p-6">
+        <h2 className="text-xl font-bold mb-4">{title}</h2>
+
+        {/* Show AI badge if applicable */}
+        {metadata?.source === 'ai' && (
+          <AIBadge model={metadata.model} />
+        )}
+
+        {/* Preview mode */}
+        {!isEditing ? (
+          <div className="prose max-w-none mb-6 p-4 bg-gray-50 rounded">
+            {editedContent}
+          </div>
+        ) : (
+          <textarea
+            className="w-full h-64 p-4 border rounded mb-6"
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+          />
+        )}
+
+        {/* Action buttons */}
+        <div className="flex gap-3 justify-end">
+          <button
+            className="btn-secondary"
+            onClick={onReject}
+          >
+            Reject
+          </button>
+
+          {!isEditing ? (
+            <>
+              <button
+                className="btn-secondary"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => onApprove(editedContent)}
+              >
+                Approve
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="btn-secondary"
+                onClick={() => {
+                  setEditedContent(content);
+                  setIsEditing(false);
+                }}
+              >
+                Cancel Edit
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  onEdit(editedContent);
+                  setIsEditing(false);
+                }}
+              >
+                Save Changes
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </Dialog>
+  );
+};
+```
+
+**Why This Matters**:
+- AI Act requires human-in-the-loop for all AI outputs
+- Establish the pattern NOW (in wireframe)
+- When AI is added in Phase 3, just plug into existing workflow
+- Users get familiar with review process early
+
+**Success Criteria**:
+- Review modal can display content
+- Edit functionality works
+- Approve/Reject/Edit actions trigger callbacks
+- UI pattern is established for future AI integration
+
+---
+
+### Step 0.10: AI Transparency Components (Placeholder)
+**Priority**: Medium | **Effort**: Low | **Risk**: Low
+
+**What**: Create AI badge and labeling components (even though there's no AI yet). These will be ready when AI is integrated.
+
+**Implementation**:
+
+```typescript
+// src/components/AIBadge.tsx
+interface AIBadgeProps {
+  model?: string;
+  timestamp?: string;
+  wasEdited?: boolean;
+  className?: string;
+}
+
+export const AIBadge: React.FC<AIBadgeProps> = ({
+  model,
+  timestamp,
+  wasEdited,
+  className,
+}) => {
+  return (
+    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm ${className}`}>
+      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/>
+      </svg>
+
+      <span className="font-medium">
+        AI Generated
+        {wasEdited && " (Edited)"}
+      </span>
+
+      {model && (
+        <span className="text-xs opacity-75">
+          {model}
+        </span>
+      )}
+
+      {timestamp && (
+        <span className="text-xs opacity-75">
+          {new Date(timestamp).toLocaleString()}
+        </span>
+      )}
+    </div>
+  );
+};
+
+// Different badge variants
+export const AIAssistedBadge = () => (
+  <span className="px-2 py-1 rounded bg-purple-100 text-purple-800 text-xs">
+    AI-Assisted
+  </span>
+);
+
+export const HumanContentBadge = () => (
+  <span className="px-2 py-1 rounded bg-gray-100 text-gray-800 text-xs">
+    Human Written
+  </span>
+);
+
+// Message component with AI badge
+const Message = ({ role, content, isAiGenerated, wasEdited }) => {
+  return (
+    <div className={`message ${role === 'user' ? 'user' : 'assistant'}`}>
+      {isAiGenerated && <AIBadge wasEdited={wasEdited} />}
+      <div className="content">{content}</div>
+    </div>
+  );
+};
+```
+
+**Why This Matters**:
+- AI Act Article 52 requires clear AI content labeling
+- Components are ready when AI is integrated
+- Designers can see the intended UX now
+- Compliance pattern established early
+
+**Success Criteria**:
+- AI badges render correctly (with placeholder data)
+- Different badge variants for different scenarios
+- Ready to use when AI is integrated in Phase 3
+
+---
+
+### Step 0.11: Basic Audit Log Structure
+**Priority**: Medium | **Effort**: Low | **Risk**: Low
+
+**What**: Create audit log database table and basic logging infrastructure (for future compliance).
+
+**Implementation**:
+
+```rust
+// src-tauri/migration/src/m20250101_000003_create_audit_log.rs
+use sea_orm_migration::prelude::*;
+
+#[async_trait::async_trait]
+impl MigrationTrait for Migration {
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .create_table(
+                Table::create()
+                    .table(AuditLog::Table)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(AuditLog::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(AuditLog::Action).string().not_null())
+                    .col(ColumnDef::new(AuditLog::CaseId).integer())
+                    .col(ColumnDef::new(AuditLog::EntityType).string())
+                    .col(ColumnDef::new(AuditLog::EntityId).integer())
+                    .col(ColumnDef::new(AuditLog::Details).json())
+                    .col(ColumnDef::new(AuditLog::Timestamp).timestamp().not_null())
+                    .to_owned(),
+            )
+            .await
+    }
+}
+
+// src-tauri/src/services/audit.rs
+use sea_orm::*;
+use serde_json::Value;
+
+pub struct AuditService;
+
+impl AuditService {
+    pub async fn log(
+        db: &DatabaseConnection,
+        action: &str,
+        case_id: Option<i32>,
+        entity_type: Option<&str>,
+        entity_id: Option<i32>,
+        details: Value,
+    ) -> Result<(), DbErr> {
+        // Insert audit log entry
+        // For now, just structure - actual logging added in Phase 1
+        Ok(())
+    }
+}
+```
+
+**Why This Matters**:
+- GDPR Article 30 requires processing records
+- Structure in place for Phase 1 compliance features
+- All future operations can log to this table
+- Foundation for compliance audits
+
+**Success Criteria**:
+- Audit log table created
+- Basic logging infrastructure in place
+- Ready for Phase 1 implementation
+- Database schema supports all audit requirements
+
+---
+
 ### Phase 0 Summary
 
 **Deliverables**:
 - ✅ Tauri + React + TypeScript project initialized
 - ✅ Basic UI wireframe with navigation
 - ✅ SQLite database with migrations
+- ✅ **Case/Matter organization structure** (lawyers work by case)
+- ✅ **Human-in-the-loop review UI pattern** (compliance foundation)
+- ✅ **AI transparency label components** (ready for AI integration)
+- ✅ **Basic audit log structure** (compliance foundation)
 - ✅ i18n framework (EN/NL/DE support)
 - ✅ Basic Tauri commands working
 - ✅ Build and packaging verified
@@ -732,14 +1206,46 @@ This roadmap provides a complete development path from initial project setup thr
 - i18n: i18next + react-i18next
 - Testing: Jest + React Testing Library + Cargo test
 
+**Compliance Patterns Established** (UI only, no AI yet):
+- ✅ Preview/Review/Approve workflow UI
+- ✅ AI badge components (placeholder for future AI features)
+- ✅ Audit log table structure
+- ✅ Case/matter isolation
+
 **What's NOT Implemented Yet**:
 - AI features (coming in Phase 3)
-- Compliance features (coming in Phase 1-2)
+- Full GDPR compliance (coming in Phase 1)
 - Encryption (coming in Phase 1)
 - PII detection (coming in Phase 4)
-- Any actual legal assistant functionality
+- Legal research / RAG (coming in Phase 7 - for multi-client reuse)
+- Any actual AI-powered legal assistance
 
-**Next**: Phase 1 - GDPR Compliance
+**Next**: Phase 1 - GDPR Compliance (build on established patterns)
+
+---
+
+## 🏛️ Lawyer-Centric Architecture Note
+
+**This application is designed around how lawyers actually work:**
+
+### Client Work (Case/Matter-Specific)
+**Phases 0-6**: Everything is organized by case/matter
+- Each case is isolated (GDPR Purpose Limitation)
+- Documents, conversations, and analysis tied to specific clients
+- Privacy is paramount - no mixing of client data
+- **Use case**: "Help me draft a confidentiality clause for the Johnson case"
+
+### Legal Research (Multi-Client Reusable Knowledge)
+**Phase 7+**: General legal knowledge for reuse
+- NOT tied to specific clients
+- Searchable across all your firm's knowledge
+- Can be cited in multiple cases
+- **Use case**: "What are the GDPR precedents for cookie consent?"
+- **Implementation**: RAG (Retrieval-Augmented Generation) with vector database
+
+**The distinction is clear:**
+- **Before Phase 7**: All work is case-specific, client-confidential
+- **Phase 7+**: Add capability for general legal research (still 100% local)
 
 ---
 
@@ -2396,9 +2902,9 @@ The goal is not to replace lawyers or just make law firms more profitable. The g
 
 ## Implementation Priorities
 
-### Phase 0 (Critical - Week 1-2)
-**Focus**: Foundation & Wireframe
-**Timeline**: 1-2 weeks
+### Phase 0 (Critical - Week 1-3)
+**Focus**: Foundation & Wireframe + Compliance Patterns
+**Timeline**: 2-3 weeks
 - Step 0.1: Project initialization & setup
 - Step 0.2: Basic UI wireframe
 - Step 0.3: Database setup & migrations
@@ -2406,8 +2912,12 @@ The goal is not to replace lawyers or just make law firms more profitable. The g
 - Step 0.5: Basic Tauri commands
 - Step 0.6: Build & package verification
 - Step 0.7: Testing setup
-- **Deliverable**: Working wireframe application (no AI, no features, just foundation)
-- **Success Metric**: App builds, runs, and can be packaged for distribution
+- **Step 0.8: Case/Matter organization** (lawyer-centric architecture) ⭐
+- **Step 0.9: Human-in-the-loop review UI** (compliance pattern) ⭐
+- **Step 0.10: AI transparency components** (ready for AI integration) ⭐
+- **Step 0.11: Basic audit log structure** (compliance foundation) ⭐
+- **Deliverable**: Working wireframe with case organization and compliance patterns
+- **Success Metric**: App works case-by-case, review workflow functional, compliance UI ready
 
 ### Phase 1 (Critical - Q1 2025)
 **Focus**: Legal Compliance - GDPR
