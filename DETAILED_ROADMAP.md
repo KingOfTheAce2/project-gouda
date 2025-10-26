@@ -1,8 +1,12 @@
-# BEAR LLM AI - Detailed Development Roadmap
+# BEAR LLM AI - Complete Development Roadmap
 
-**Organized by Priority: Legal Compliance First, Then Features**
+**From Zero to Production: Building a Privacy-First Legal AI Assistant**
 
-This roadmap prioritizes **GDPR compliance** (mandatory for EU operations), followed by **AI Act compliance**, then technical features in order of importance for a privacy-first, locally-run legal AI assistant.
+This roadmap provides a complete development path from initial project setup through full production deployment. It prioritizes:
+1. **Phase 0**: Initial application setup and wireframe (foundation)
+2. **Phase 1-2**: Legal compliance (GDPR & AI Act) - mandatory for EU operations
+3. **Phase 3-4**: Local AI infrastructure and PII protection
+4. **Phase 5+**: Advanced features and strategic paths
 
 ---
 
@@ -14,6 +18,1234 @@ This roadmap prioritizes **GDPR compliance** (mandatory for EU operations), foll
 | 0.2 | **Add full Dutch and German i18n coverage** | ✅ Complete |
 
 **Achievement**: All operations are 100% local with no network callbacks or telemetry. Full localization for Dutch and German markets.
+
+---
+
+## Phase 0: Foundation & Wireframe Application (Priority: CRITICAL)
+**Building the Skeleton - Verify Everything Works**
+
+**Objective**: Create a minimal but functional application skeleton to verify the technology stack works correctly before adding compliance and AI features. This phase ensures the foundation is solid.
+
+### Step 0.1: Project Initialization & Setup
+**Priority**: Critical | **Effort**: Low | **Risk**: Low
+
+**What**: Set up the basic Tauri + React + TypeScript project structure.
+
+**Implementation**:
+1. **Initialize Tauri Project**:
+   ```bash
+   # Create new Tauri project (if starting from scratch)
+   npm create tauri-app@latest bear-llm-ai
+
+   # Select options:
+   # - Package manager: npm
+   # - UI template: React + TypeScript
+   # - UI framework: React with Vite
+   ```
+
+2. **Configure Project Structure**:
+   ```
+   bear-llm-ai/
+   ├── src/                    # React frontend
+   │   ├── components/         # React components
+   │   ├── hooks/              # Custom React hooks
+   │   ├── pages/              # Page components
+   │   ├── services/           # API/service layers
+   │   ├── styles/             # CSS/styling
+   │   ├── types/              # TypeScript types
+   │   ├── App.tsx             # Main app component
+   │   └── main.tsx            # Entry point
+   ├── src-tauri/              # Rust backend
+   │   ├── src/
+   │   │   ├── commands/       # Tauri commands
+   │   │   ├── models/         # Data models
+   │   │   ├── services/       # Business logic
+   │   │   ├── utils/          # Utilities
+   │   │   └── main.rs         # Entry point
+   │   ├── Cargo.toml          # Rust dependencies
+   │   └── tauri.conf.json     # Tauri configuration
+   ├── public/                 # Static assets
+   ├── package.json            # Node dependencies
+   └── tsconfig.json           # TypeScript config
+   ```
+
+3. **Install Core Dependencies**:
+   ```bash
+   # Frontend dependencies
+   npm install react-router-dom
+   npm install @radix-ui/react-dialog @radix-ui/react-select
+   npm install tailwindcss @tailwindcss/typography
+   npm install i18next react-i18next
+   npm install zustand  # State management
+
+   # Dev dependencies
+   npm install -D @types/react @types/react-dom
+   npm install -D typescript
+   npm install -D eslint @typescript-eslint/parser
+   npm install -D prettier
+   ```
+
+4. **Configure Tauri**:
+   ```json
+   // src-tauri/tauri.conf.json
+   {
+     "build": {
+       "beforeDevCommand": "npm run dev",
+       "beforeBuildCommand": "npm run build",
+       "devPath": "http://localhost:5173",
+       "distDir": "../dist"
+     },
+     "package": {
+       "productName": "BEAR LLM AI",
+       "version": "0.0.20"
+     },
+     "tauri": {
+       "allowlist": {
+         "all": false,
+         "fs": {
+           "all": false,
+           "readFile": true,
+           "writeFile": true,
+           "createDir": true,
+           "scope": ["$APPDATA/*", "$APPDATA/**"]
+         },
+         "dialog": {
+           "all": true
+         }
+       },
+       "windows": [{
+         "title": "BEAR LLM AI",
+         "width": 1200,
+         "height": 800,
+         "minWidth": 800,
+         "minHeight": 600,
+         "resizable": true,
+         "fullscreen": false
+       }]
+     }
+   }
+   ```
+
+**Success Criteria**:
+- Project structure created and organized
+- All dependencies installed without errors
+- TypeScript compilation successful
+- Development server starts without errors
+
+---
+
+### Step 0.2: Basic UI Wireframe
+**Priority**: Critical | **Effort**: Low | **Risk**: Low
+
+**What**: Create a minimal UI wireframe to verify rendering and navigation.
+
+**Implementation**:
+
+1. **Main Application Shell**:
+   ```typescript
+   // src/App.tsx
+   import React from 'react';
+   import { BrowserRouter, Routes, Route } from 'react-router-dom';
+   import Sidebar from './components/Sidebar';
+   import HomePage from './pages/Home';
+   import SettingsPage from './pages/Settings';
+   import AboutPage from './pages/About';
+
+   function App() {
+     return (
+       <BrowserRouter>
+         <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+           <Sidebar />
+           <main className="flex-1 overflow-auto">
+             <Routes>
+               <Route path="/" element={<HomePage />} />
+               <Route path="/settings" element={<SettingsPage />} />
+               <Route path="/about" element={<AboutPage />} />
+             </Routes>
+           </main>
+         </div>
+       </BrowserRouter>
+     );
+   }
+
+   export default App;
+   ```
+
+2. **Sidebar Navigation**:
+   ```typescript
+   // src/components/Sidebar.tsx
+   import React from 'react';
+   import { Link } from 'react-router-dom';
+
+   const Sidebar: React.FC = () => {
+     return (
+       <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+         <div className="p-4">
+           <h1 className="text-xl font-bold">BEAR LLM AI</h1>
+           <p className="text-sm text-gray-500">v0.0.20</p>
+         </div>
+
+         <nav className="mt-4">
+           <Link to="/" className="block px-4 py-2 hover:bg-gray-100">
+             Home
+           </Link>
+           <Link to="/settings" className="block px-4 py-2 hover:bg-gray-100">
+             Settings
+           </Link>
+           <Link to="/about" className="block px-4 py-2 hover:bg-gray-100">
+             About
+           </Link>
+         </nav>
+       </aside>
+     );
+   };
+
+   export default Sidebar;
+   ```
+
+3. **Placeholder Pages**:
+   ```typescript
+   // src/pages/Home.tsx
+   const HomePage = () => {
+     return (
+       <div className="p-8">
+         <h2 className="text-2xl font-bold mb-4">Welcome to BEAR LLM AI</h2>
+         <p className="text-gray-600">
+           This is a wireframe. Features will be added in subsequent phases.
+         </p>
+       </div>
+     );
+   };
+
+   // src/pages/Settings.tsx
+   const SettingsPage = () => {
+     return (
+       <div className="p-8">
+         <h2 className="text-2xl font-bold mb-4">Settings</h2>
+         <p className="text-gray-600">Settings UI will be implemented here.</p>
+       </div>
+     );
+   };
+
+   // src/pages/About.tsx
+   const AboutPage = () => {
+     return (
+       <div className="p-8">
+         <h2 className="text-2xl font-bold mb-4">About BEAR LLM AI</h2>
+         <p className="text-gray-600">
+           Version: 0.0.20<br />
+           Privacy-first legal AI assistant<br />
+           100% local processing
+         </p>
+       </div>
+     );
+   };
+   ```
+
+**Success Criteria**:
+- Application window opens and displays
+- Navigation between pages works
+- UI is responsive and styled correctly
+- No console errors
+
+---
+
+### Step 0.3: Database Setup & Migrations
+**Priority**: Critical | **Effort**: Medium | **Risk**: Medium
+
+**What**: Set up SQLite database with migration system.
+
+**Implementation**:
+
+1. **Add Database Dependencies**:
+   ```toml
+   # src-tauri/Cargo.toml
+   [dependencies]
+   sea-orm = { version = "0.12", features = ["sqlx-sqlite", "runtime-tokio-native-tls", "macros"] }
+   sea-orm-migration = "0.12"
+   sqlx = { version = "0.7", features = ["sqlite", "runtime-tokio"] }
+   tokio = { version = "1.36", features = ["full"] }
+   ```
+
+2. **Database Connection Manager**:
+   ```rust
+   // src-tauri/src/database/mod.rs
+   use sea_orm::{Database, DatabaseConnection, DbErr};
+   use std::sync::Arc;
+   use tokio::sync::Mutex;
+
+   pub struct DatabaseManager {
+       connection: Arc<Mutex<Option<DatabaseConnection>>>,
+   }
+
+   impl DatabaseManager {
+       pub fn new() -> Self {
+           Self {
+               connection: Arc::new(Mutex::new(None)),
+           }
+       }
+
+       pub async fn initialize(&self, db_path: &str) -> Result<(), DbErr> {
+           let db_url = format!("sqlite://{}?mode=rwc", db_path);
+           let conn = Database::connect(&db_url).await?;
+
+           // Run migrations
+           migration::Migrator::up(&conn, None).await?;
+
+           *self.connection.lock().await = Some(conn);
+           Ok(())
+       }
+
+       pub async fn get_connection(&self) -> Option<DatabaseConnection> {
+           self.connection.lock().await.clone()
+       }
+   }
+   ```
+
+3. **Initial Migration**:
+   ```rust
+   // src-tauri/migration/src/m20250101_000001_create_settings.rs
+   use sea_orm_migration::prelude::*;
+
+   #[derive(DeriveMigrationName)]
+   pub struct Migration;
+
+   #[async_trait::async_trait]
+   impl MigrationTrait for Migration {
+       async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Settings::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Settings::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Settings::Key).string().not_null().unique_key())
+                       .col(ColumnDef::new(Settings::Value).string().not_null())
+                       .col(
+                           ColumnDef::new(Settings::CreatedAt)
+                               .timestamp()
+                               .not_null()
+                               .default(Expr::current_timestamp()),
+                       )
+                       .col(
+                           ColumnDef::new(Settings::UpdatedAt)
+                               .timestamp()
+                               .not_null()
+                               .default(Expr::current_timestamp()),
+                       )
+                       .to_owned(),
+               )
+               .await
+       }
+
+       async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+           manager
+               .drop_table(Table::drop().table(Settings::Table).to_owned())
+               .await
+       }
+   }
+
+   #[derive(Iden)]
+   enum Settings {
+       Table,
+       Id,
+       Key,
+       Value,
+       CreatedAt,
+       UpdatedAt,
+   }
+   ```
+
+4. **Database Initialization in main.rs**:
+   ```rust
+   // src-tauri/src/main.rs
+   use tauri::Manager;
+   mod database;
+
+   #[tokio::main]
+   async fn main() {
+       let db_manager = database::DatabaseManager::new();
+
+       tauri::Builder::default()
+           .setup(|app| {
+               let app_dir = app.path_resolver()
+                   .app_data_dir()
+                   .expect("Failed to get app data directory");
+
+               std::fs::create_dir_all(&app_dir)?;
+
+               let db_path = app_dir.join("bear_llm.db");
+
+               tauri::async_runtime::block_on(async {
+                   db_manager.initialize(db_path.to_str().unwrap())
+                       .await
+                       .expect("Failed to initialize database");
+               });
+
+               app.manage(db_manager);
+               Ok(())
+           })
+           .run(tauri::generate_context!())
+           .expect("error while running tauri application");
+   }
+   ```
+
+**Success Criteria**:
+- Database file created in app data directory
+- Migrations run successfully
+- Settings table created
+- Database connection available to Tauri commands
+
+---
+
+### Step 0.4: i18n Framework Setup
+**Priority**: High | **Effort**: Low | **Risk**: Low
+
+**What**: Set up internationalization framework for multilingual support.
+
+**Implementation**:
+
+1. **i18n Configuration**:
+   ```typescript
+   // src/i18n/config.ts
+   import i18n from 'i18next';
+   import { initReactI18next } from 'react-i18next';
+   import en from './locales/en.json';
+   import nl from './locales/nl.json';
+   import de from './locales/de.json';
+
+   i18n
+     .use(initReactI18next)
+     .init({
+       resources: {
+         en: { translation: en },
+         nl: { translation: nl },
+         de: { translation: de },
+       },
+       lng: 'en',
+       fallbackLng: 'en',
+       interpolation: {
+         escapeValue: false,
+       },
+     });
+
+   export default i18n;
+   ```
+
+2. **Translation Files**:
+   ```json
+   // src/i18n/locales/en.json
+   {
+     "app": {
+       "title": "BEAR LLM AI",
+       "subtitle": "Privacy-First Legal Assistant"
+     },
+     "nav": {
+       "home": "Home",
+       "settings": "Settings",
+       "about": "About"
+     },
+     "settings": {
+       "title": "Settings",
+       "language": "Language",
+       "theme": "Theme"
+     }
+   }
+   ```
+
+3. **Language Selector Component**:
+   ```typescript
+   // src/components/LanguageSelector.tsx
+   import React from 'react';
+   import { useTranslation } from 'react-i18next';
+
+   const LanguageSelector: React.FC = () => {
+     const { i18n } = useTranslation();
+
+     return (
+       <select
+         value={i18n.language}
+         onChange={(e) => i18n.changeLanguage(e.target.value)}
+         className="border rounded px-2 py-1"
+       >
+         <option value="en">English</option>
+         <option value="nl">Nederlands</option>
+         <option value="de">Deutsch</option>
+       </select>
+     );
+   };
+   ```
+
+**Success Criteria**:
+- Language can be switched between EN/NL/DE
+- All UI text updates when language changes
+- Language preference persists across app restarts
+
+---
+
+### Step 0.5: Basic Tauri Commands
+**Priority**: High | **Effort**: Low | **Risk**: Low
+
+**What**: Implement basic Tauri commands for frontend-backend communication.
+
+**Implementation**:
+
+1. **Settings Commands**:
+   ```rust
+   // src-tauri/src/commands/settings.rs
+   use tauri::State;
+   use crate::database::DatabaseManager;
+
+   #[tauri::command]
+   pub async fn get_setting(
+       key: String,
+       db: State<'_, DatabaseManager>,
+   ) -> Result<Option<String>, String> {
+       let conn = db.get_connection().await
+           .ok_or("Database not initialized")?;
+
+       // Query setting from database
+       // Implementation details...
+
+       Ok(Some("value".to_string()))
+   }
+
+   #[tauri::command]
+   pub async fn set_setting(
+       key: String,
+       value: String,
+       db: State<'_, DatabaseManager>,
+   ) -> Result<(), String> {
+       let conn = db.get_connection().await
+           .ok_or("Database not initialized")?;
+
+       // Save setting to database
+       // Implementation details...
+
+       Ok(())
+   }
+
+   #[tauri::command]
+   pub fn get_app_version() -> String {
+       env!("CARGO_PKG_VERSION").to_string()
+   }
+   ```
+
+2. **Register Commands**:
+   ```rust
+   // src-tauri/src/main.rs
+   mod commands;
+
+   #[tokio::main]
+   async fn main() {
+       // ... database setup ...
+
+       tauri::Builder::default()
+           .setup(|app| {
+               // ... setup code ...
+               Ok(())
+           })
+           .invoke_handler(tauri::generate_handler![
+               commands::settings::get_setting,
+               commands::settings::set_setting,
+               commands::settings::get_app_version,
+           ])
+           .run(tauri::generate_context!())
+           .expect("error while running tauri application");
+   }
+   ```
+
+3. **Frontend Service Layer**:
+   ```typescript
+   // src/services/settings.ts
+   import { invoke } from '@tauri-apps/api/tauri';
+
+   export const settingsService = {
+     async getSetting(key: string): Promise<string | null> {
+       return await invoke('get_setting', { key });
+     },
+
+     async setSetting(key: string, value: string): Promise<void> {
+       await invoke('set_setting', { key, value });
+     },
+
+     async getAppVersion(): Promise<string> {
+       return await invoke('get_app_version');
+     },
+   };
+   ```
+
+**Success Criteria**:
+- Frontend can call Rust backend commands
+- Settings can be saved and retrieved
+- App version displays correctly
+- Error handling works properly
+
+---
+
+### Step 0.6: Build & Package Verification
+**Priority**: Critical | **Effort**: Low | **Risk**: Low
+
+**What**: Verify the application can be built and packaged for distribution.
+
+**Implementation**:
+
+1. **Development Build**:
+   ```bash
+   # Run in development mode
+   npm run tauri dev
+
+   # Verify:
+   # - App window opens
+   # - Navigation works
+   # - No console errors
+   # - Database created
+   # - Settings persist
+   ```
+
+2. **Production Build**:
+   ```bash
+   # Build for production
+   npm run tauri build
+
+   # Verify output in src-tauri/target/release/:
+   # - Executable binary
+   # - Installer packages (.msi for Windows, .dmg for macOS, .deb/.AppImage for Linux)
+   ```
+
+3. **Test Installation**:
+   - Install from generated package
+   - Run installed application
+   - Verify all features work
+   - Check app data directory location
+   - Verify uninstall works cleanly
+
+**Success Criteria**:
+- Development build runs without errors
+- Production build completes successfully
+- Installer packages generated for target platforms
+- Installed app runs correctly
+- App data stored in correct location
+
+---
+
+### Step 0.7: Testing Setup
+**Priority**: Medium | **Effort**: Low | **Risk**: Low
+
+**What**: Set up testing infrastructure for both frontend and backend.
+
+**Implementation**:
+
+1. **Frontend Testing (Jest + React Testing Library)**:
+   ```bash
+   npm install -D jest @testing-library/react @testing-library/jest-dom
+   npm install -D @testing-library/user-event
+   npm install -D ts-jest @types/jest
+   ```
+
+   ```typescript
+   // jest.config.js
+   module.exports = {
+     preset: 'ts-jest',
+     testEnvironment: 'jsdom',
+     setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+     moduleNameMapper: {
+       '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+     },
+   };
+   ```
+
+2. **Example Frontend Test**:
+   ```typescript
+   // src/components/__tests__/Sidebar.test.tsx
+   import { render, screen } from '@testing-library/react';
+   import { BrowserRouter } from 'react-router-dom';
+   import Sidebar from '../Sidebar';
+
+   test('renders navigation links', () => {
+     render(
+       <BrowserRouter>
+         <Sidebar />
+       </BrowserRouter>
+     );
+
+     expect(screen.getByText('Home')).toBeInTheDocument();
+     expect(screen.getByText('Settings')).toBeInTheDocument();
+     expect(screen.getByText('About')).toBeInTheDocument();
+   });
+   ```
+
+3. **Backend Testing (Rust)**:
+   ```rust
+   // src-tauri/src/commands/settings.rs
+   #[cfg(test)]
+   mod tests {
+       use super::*;
+
+       #[test]
+       fn test_get_app_version() {
+           let version = get_app_version();
+           assert!(!version.is_empty());
+       }
+   }
+   ```
+
+4. **Run Tests**:
+   ```bash
+   # Frontend tests
+   npm test
+
+   # Backend tests
+   cd src-tauri && cargo test
+   ```
+
+**Success Criteria**:
+- Test frameworks configured
+- Example tests pass
+- Tests can be run from command line
+- CI/CD can run tests automatically
+
+---
+
+### Step 0.8: Case/Matter Organization (Lawyer-Centric Architecture)
+**Priority**: Critical | **Effort**: Medium | **Risk**: Low
+
+**What**: Implement case/matter-based data organization from the start - this is how lawyers actually work.
+
+**Implementation**:
+
+1. **Database Schema for Cases/Matters**:
+   ```rust
+   // src-tauri/migration/src/m20250101_000002_create_cases.rs
+   use sea_orm_migration::prelude::*;
+
+   #[async_trait::async_trait]
+   impl MigrationTrait for Migration {
+       async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Cases::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Cases::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Cases::Name).string().not_null())
+                       .col(ColumnDef::new(Cases::ClientName).string().not_null())
+                       .col(ColumnDef::new(Cases::CaseNumber).string().unique_key())
+                       .col(ColumnDef::new(Cases::Description).text())
+                       .col(ColumnDef::new(Cases::Status).string().not_null().default("active"))
+                       .col(ColumnDef::new(Cases::CreatedAt).timestamp().not_null())
+                       .col(ColumnDef::new(Cases::UpdatedAt).timestamp().not_null())
+                       .to_owned(),
+               )
+               .await?;
+
+           // Create conversations table linked to cases
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Conversations::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Conversations::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Conversations::CaseId).integer().not_null())
+                       .col(ColumnDef::new(Conversations::Title).string().not_null())
+                       .col(ColumnDef::new(Conversations::CreatedAt).timestamp().not_null())
+                       .foreign_key(
+                           ForeignKey::create()
+                               .name("fk_conversation_case")
+                               .from(Conversations::Table, Conversations::CaseId)
+                               .to(Cases::Table, Cases::Id)
+                               .on_delete(ForeignKeyAction::Cascade)
+                       )
+                       .to_owned(),
+               )
+               .await?;
+
+           // Create messages table
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Messages::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Messages::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Messages::ConversationId).integer().not_null())
+                       .col(ColumnDef::new(Messages::Role).string().not_null()) // "user" | "assistant"
+                       .col(ColumnDef::new(Messages::Content).text().not_null())
+                       .col(ColumnDef::new(Messages::IsAiGenerated).boolean().not_null().default(false))
+                       .col(ColumnDef::new(Messages::WasEdited).boolean().not_null().default(false))
+                       .col(ColumnDef::new(Messages::CreatedAt).timestamp().not_null())
+                       .foreign_key(
+                           ForeignKey::create()
+                               .name("fk_message_conversation")
+                               .from(Messages::Table, Messages::ConversationId)
+                               .to(Conversations::Table, Conversations::Id)
+                               .on_delete(ForeignKeyAction::Cascade)
+                       )
+                       .to_owned(),
+               )
+               .await
+       }
+   }
+
+   #[derive(Iden)]
+   enum Cases {
+       Table,
+       Id,
+       Name,
+       ClientName,
+       CaseNumber,
+       Description,
+       Status,
+       CreatedAt,
+       UpdatedAt,
+   }
+
+   #[derive(Iden)]
+   enum Conversations {
+       Table,
+       Id,
+       CaseId,
+       Title,
+       CreatedAt,
+   }
+
+   #[derive(Iden)]
+   enum Messages {
+       Table,
+       Id,
+       ConversationId,
+       Role,
+       Content,
+       IsAiGenerated,
+       WasEdited,
+       CreatedAt,
+   }
+   ```
+
+2. **Case Management UI**:
+   ```typescript
+   // src/pages/Cases.tsx
+   const CasesPage = () => {
+     const [cases, setCases] = useState([]);
+     const [selectedCase, setSelectedCase] = useState(null);
+
+     return (
+       <div className="flex h-full">
+         <CaseList cases={cases} onSelect={setSelectedCase} />
+         {selectedCase && (
+           <CaseDetail case={selectedCase} />
+         )}
+       </div>
+     );
+   };
+
+   // src/components/CaseList.tsx
+   const CaseList = ({ cases, onSelect }) => {
+     return (
+       <div className="w-80 border-r">
+         <div className="p-4">
+           <button className="btn-primary w-full">New Case</button>
+         </div>
+         <div className="divide-y">
+           {cases.map(case => (
+             <div
+               key={case.id}
+               className="p-4 hover:bg-gray-50 cursor-pointer"
+               onClick={() => onSelect(case)}
+             >
+               <h3 className="font-medium">{case.name}</h3>
+               <p className="text-sm text-gray-600">{case.clientName}</p>
+               <p className="text-xs text-gray-500">{case.caseNumber}</p>
+             </div>
+           ))}
+         </div>
+       </div>
+     );
+   };
+   ```
+
+**Why This Matters**:
+- Lawyers organize everything by case/client
+- Ensures GDPR Purpose Limitation from the start
+- Natural data isolation (each case is separate)
+- Prepares for future features (all tied to specific cases)
+
+**Success Criteria**:
+- Can create, view, and select cases
+- Database enforces case-based organization
+- All conversations tied to specific cases
+- UI clearly shows which case is active
+
+---
+
+### Step 0.9: Human-in-the-Loop Review UI Pattern
+**Priority**: High | **Effort**: Low | **Risk**: Low
+
+**What**: Implement the preview/review/approve workflow UI pattern that will be used for all AI operations (even though we don't have AI yet).
+
+**Implementation**:
+
+```typescript
+// src/components/ReviewModal.tsx
+interface ReviewModalProps {
+  title: string;
+  content: string;
+  metadata?: {
+    source?: 'ai' | 'user';
+    model?: string;
+    timestamp?: string;
+  };
+  onApprove: (edited: string) => void;
+  onReject: () => void;
+  onEdit: (edited: string) => void;
+}
+
+const ReviewModal: React.FC<ReviewModalProps> = ({
+  title,
+  content,
+  metadata,
+  onApprove,
+  onReject,
+  onEdit,
+}) => {
+  const [editedContent, setEditedContent] = useState(content);
+  const [isEditing, setIsEditing] = useState(false);
+
+  return (
+    <Dialog>
+      <div className="max-w-4xl p-6">
+        <h2 className="text-xl font-bold mb-4">{title}</h2>
+
+        {/* Show AI badge if applicable */}
+        {metadata?.source === 'ai' && (
+          <AIBadge model={metadata.model} />
+        )}
+
+        {/* Preview mode */}
+        {!isEditing ? (
+          <div className="prose max-w-none mb-6 p-4 bg-gray-50 rounded">
+            {editedContent}
+          </div>
+        ) : (
+          <textarea
+            className="w-full h-64 p-4 border rounded mb-6"
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+          />
+        )}
+
+        {/* Action buttons */}
+        <div className="flex gap-3 justify-end">
+          <button
+            className="btn-secondary"
+            onClick={onReject}
+          >
+            Reject
+          </button>
+
+          {!isEditing ? (
+            <>
+              <button
+                className="btn-secondary"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => onApprove(editedContent)}
+              >
+                Approve
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="btn-secondary"
+                onClick={() => {
+                  setEditedContent(content);
+                  setIsEditing(false);
+                }}
+              >
+                Cancel Edit
+              </button>
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  onEdit(editedContent);
+                  setIsEditing(false);
+                }}
+              >
+                Save Changes
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </Dialog>
+  );
+};
+```
+
+**Why This Matters**:
+- AI Act requires human-in-the-loop for all AI outputs
+- Establish the pattern NOW (in wireframe)
+- When AI is added in Phase 3, just plug into existing workflow
+- Users get familiar with review process early
+
+**Success Criteria**:
+- Review modal can display content
+- Edit functionality works
+- Approve/Reject/Edit actions trigger callbacks
+- UI pattern is established for future AI integration
+
+---
+
+### Step 0.10: AI Transparency Components (Placeholder)
+**Priority**: Medium | **Effort**: Low | **Risk**: Low
+
+**What**: Create AI badge and labeling components (even though there's no AI yet). These will be ready when AI is integrated.
+
+**Implementation**:
+
+```typescript
+// src/components/AIBadge.tsx
+interface AIBadgeProps {
+  model?: string;
+  timestamp?: string;
+  wasEdited?: boolean;
+  className?: string;
+}
+
+export const AIBadge: React.FC<AIBadgeProps> = ({
+  model,
+  timestamp,
+  wasEdited,
+  className,
+}) => {
+  return (
+    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm ${className}`}>
+      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/>
+      </svg>
+
+      <span className="font-medium">
+        AI Generated
+        {wasEdited && " (Edited)"}
+      </span>
+
+      {model && (
+        <span className="text-xs opacity-75">
+          {model}
+        </span>
+      )}
+
+      {timestamp && (
+        <span className="text-xs opacity-75">
+          {new Date(timestamp).toLocaleString()}
+        </span>
+      )}
+    </div>
+  );
+};
+
+// Different badge variants
+export const AIAssistedBadge = () => (
+  <span className="px-2 py-1 rounded bg-purple-100 text-purple-800 text-xs">
+    AI-Assisted
+  </span>
+);
+
+export const HumanContentBadge = () => (
+  <span className="px-2 py-1 rounded bg-gray-100 text-gray-800 text-xs">
+    Human Written
+  </span>
+);
+
+// Message component with AI badge
+const Message = ({ role, content, isAiGenerated, wasEdited }) => {
+  return (
+    <div className={`message ${role === 'user' ? 'user' : 'assistant'}`}>
+      {isAiGenerated && <AIBadge wasEdited={wasEdited} />}
+      <div className="content">{content}</div>
+    </div>
+  );
+};
+```
+
+**Why This Matters**:
+- AI Act Article 52 requires clear AI content labeling
+- Components are ready when AI is integrated
+- Designers can see the intended UX now
+- Compliance pattern established early
+
+**Success Criteria**:
+- AI badges render correctly (with placeholder data)
+- Different badge variants for different scenarios
+- Ready to use when AI is integrated in Phase 3
+
+---
+
+### Step 0.11: Basic Audit Log Structure
+**Priority**: Medium | **Effort**: Low | **Risk**: Low
+
+**What**: Create audit log database table and basic logging infrastructure (for future compliance).
+
+**Implementation**:
+
+```rust
+// src-tauri/migration/src/m20250101_000003_create_audit_log.rs
+use sea_orm_migration::prelude::*;
+
+#[async_trait::async_trait]
+impl MigrationTrait for Migration {
+    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .create_table(
+                Table::create()
+                    .table(AuditLog::Table)
+                    .if_not_exists()
+                    .col(
+                        ColumnDef::new(AuditLog::Id)
+                            .integer()
+                            .not_null()
+                            .auto_increment()
+                            .primary_key(),
+                    )
+                    .col(ColumnDef::new(AuditLog::Action).string().not_null())
+                    .col(ColumnDef::new(AuditLog::CaseId).integer())
+                    .col(ColumnDef::new(AuditLog::EntityType).string())
+                    .col(ColumnDef::new(AuditLog::EntityId).integer())
+                    .col(ColumnDef::new(AuditLog::Details).json())
+                    .col(ColumnDef::new(AuditLog::Timestamp).timestamp().not_null())
+                    .to_owned(),
+            )
+            .await
+    }
+}
+
+// src-tauri/src/services/audit.rs
+use sea_orm::*;
+use serde_json::Value;
+
+pub struct AuditService;
+
+impl AuditService {
+    pub async fn log(
+        db: &DatabaseConnection,
+        action: &str,
+        case_id: Option<i32>,
+        entity_type: Option<&str>,
+        entity_id: Option<i32>,
+        details: Value,
+    ) -> Result<(), DbErr> {
+        // Insert audit log entry
+        // For now, just structure - actual logging added in Phase 1
+        Ok(())
+    }
+}
+```
+
+**Why This Matters**:
+- GDPR Article 30 requires processing records
+- Structure in place for Phase 1 compliance features
+- All future operations can log to this table
+- Foundation for compliance audits
+
+**Success Criteria**:
+- Audit log table created
+- Basic logging infrastructure in place
+- Ready for Phase 1 implementation
+- Database schema supports all audit requirements
+
+---
+
+### Phase 0 Summary
+
+**Deliverables**:
+- ✅ Tauri + React + TypeScript project initialized
+- ✅ Basic UI wireframe with navigation
+- ✅ SQLite database with migrations
+- ✅ **Case/Matter organization structure** (lawyers work by case)
+- ✅ **Human-in-the-loop review UI pattern** (compliance foundation)
+- ✅ **AI transparency label components** (ready for AI integration)
+- ✅ **Basic audit log structure** (compliance foundation)
+- ✅ i18n framework (EN/NL/DE support)
+- ✅ Basic Tauri commands working
+- ✅ Build and packaging verified
+- ✅ Testing infrastructure in place
+
+**Technology Stack Verified**:
+- Frontend: React 18 + TypeScript + Vite
+- Backend: Rust + Tauri 2.0
+- Database: SQLite + Sea-ORM
+- Styling: Tailwind CSS
+- i18n: i18next + react-i18next
+- Testing: Jest + React Testing Library + Cargo test
+
+**Compliance Patterns Established** (UI only, no AI yet):
+- ✅ Preview/Review/Approve workflow UI
+- ✅ AI badge components (placeholder for future AI features)
+- ✅ Audit log table structure
+- ✅ Case/matter isolation
+
+**What's NOT Implemented Yet**:
+- AI features (coming in Phase 3)
+- Full GDPR compliance (coming in Phase 1)
+- Encryption (coming in Phase 1)
+- PII detection (coming in Phase 4)
+- Legal research / RAG (coming in Phase 7 - for multi-client reuse)
+- Any actual AI-powered legal assistance
+
+**Next**: Phase 1 - GDPR Compliance (build on established patterns)
+
+---
+
+## 🏛️ Lawyer-Centric Architecture Note
+
+**This application is designed around how lawyers actually work:**
+
+### Client Work (Case/Matter-Specific)
+**Phases 0-6**: Everything is organized by case/matter
+- Each case is isolated (GDPR Purpose Limitation)
+- Documents, conversations, and analysis tied to specific clients
+- Privacy is paramount - no mixing of client data
+- **Use case**: "Help me draft a confidentiality clause for the Johnson case"
+
+### Legal Research (Multi-Client Reusable Knowledge)
+**Phase 7+**: General legal knowledge for reuse
+- NOT tied to specific clients
+- Searchable across all your firm's knowledge
+- Can be cited in multiple cases
+- **Use case**: "What are the GDPR precedents for cookie consent?"
+- **Implementation**: RAG (Retrieval-Augmented Generation) with vector database
+
+**The distinction is clear:**
+- **Before Phase 7**: All work is case-specific, client-confidential
+- **Phase 7+**: Add capability for general legal research (still 100% local)
 
 ---
 
@@ -888,15 +2120,234 @@ Note: "Article 6 GDPR" preserved as legal reference
 
 ---
 
-## Beyond MVP: Vision for the Future
+## STRATEGIC DECISION POINT: Choose Your Path 🔀
 
-**Building the Technologically Independent Law Firm**
+**After completing GDPR compliance, AI Act compliance, and basic PII protection (Phases 1-5), you face a critical architectural decision that will shape the future of your legal AI system.**
 
-The future of legal AI is not about replacing lawyers with cloud services, but about **empowering lawyers with local, private, and controllable AI tools**. This vision is inspired by the principle that **independence required from lawyers means technological independence**.
+### The Fork in the Road
+
+Both paths lead to a **technologically independent, privacy-first legal AI system**, but they differ fundamentally in their approach to document workflows and integration philosophy.
 
 ---
 
-### Phase 6: Making Your Firm "Legible" to AI
+### Path A: Markdown-First Architecture 📝
+**The Plaintext Philosophy**
+
+**Vision**: Make your entire legal practice "legible" to AI through plaintext formats, enabling unprecedented levels of AI assistance while maintaining complete control and future-proofing your data.
+
+**Core Principles**:
+- Everything in plaintext (Markdown, YAML, JSON, CSV, mbox)
+- Future-proof formats that will never become obsolete
+- Git version control for all legal work
+- Full-text search and grep across entire practice
+- AI can read and understand all firm data
+- Complete independence from proprietary formats
+
+**Key Benefits**:
+- ✅ Maximum AI accessibility to all firm data
+- ✅ Version control with Git (perfect audit trail)
+- ✅ Future-proof (plaintext never obsolete)
+- ✅ Powerful search (grep, semantic search)
+- ✅ Easy backup, migration, archival
+- ✅ No vendor lock-in
+- ✅ Works perfectly offline
+
+**Key Challenges**:
+- ❌ Steeper learning curve for non-technical users
+- ❌ Different from traditional legal workflows
+- ❌ Requires custom PDF generation for professional output
+- ❌ May face resistance from staff/clients expecting .docx
+
+**Use Cases**:
+- Law firms ready to embrace modern, tech-forward workflows
+- Solo practitioners who control their entire workflow
+- Tech-savvy legal professionals
+- Firms prioritizing long-term data independence
+- Teams comfortable with version control concepts
+
+**→ Continue to Phase 6A for detailed Markdown-First implementation**
+
+---
+
+### Path B: Microsoft Word Integration with Advanced AI 📄
+**The Familiar Workflow, AI-Enhanced**
+
+**Vision**: Keep familiar Microsoft Word workflows while adding powerful local AI capabilities through a Word Add-in, agent-based automation, and multi-modal intelligence - all running locally for complete privacy.
+
+**Core Principles**:
+- Work stays in familiar Microsoft Word environment
+- Local Word Add-in brings AnythingLLM-style AI into Word
+- AI agents assist without disrupting existing workflows
+- Multi-modal support (text, images, documents)
+- Agentic workflows automate repetitive tasks
+- All AI processing remains 100% local
+
+**Key Features**:
+
+#### 1. **Microsoft Word Add-in for Local LLM**
+   - AnythingLLM-style interface embedded in Word
+   - AI sidebar for conversational assistance while drafting
+   - Context-aware suggestions based on current document
+   - Local LLM integration (Mistral, Llama, etc.)
+   - Multi-modal support (analyze images, tables, charts)
+   - All processing 100% local and private
+
+#### 2. **🦾 Workspace Agents**
+   - **Web Research Agent**: Browse the web for legal research (with privacy controls)
+   - **Document Analysis Agent**: Extract insights from multiple documents
+   - **Citation Agent**: Find and verify legal citations
+   - **Compliance Agent**: Check documents against regulatory requirements
+   - **Translation Agent**: Multi-language document translation
+   - **Summary Agent**: Generate executive summaries
+
+#### 3. **🔄 Agentic Workflows (Zapier-like Automation)**
+   - No-code workflow builder for legal tasks
+   - Example workflows:
+     - **Email → Document**: Auto-file client emails to correct matter folders
+     - **Contract Review**: Extract clauses → Flag risks → Generate review memo
+     - **Time Entry**: Track work → Generate descriptions → Create billing entries
+     - **Document Assembly**: Template + Data → Generate → Review → Export
+   - Trigger-action chains with AI decision points
+   - All workflows run locally with privacy guarantees
+
+#### 4. **🆕 Full MCP-Compatibility**
+   - Model Context Protocol integration
+   - Connect to local MCP servers (file systems, databases, tools)
+   - Extensible architecture for custom integrations
+   - AI agents can use MCP tools to access data sources
+   - Privacy-preserving tool use (all local)
+
+#### 5. **🆕 No-Code AI Agent Builder**
+   - Visual interface for creating custom AI agents
+   - Two approaches:
+     - **Agent Flows** (No-code): Drag-and-drop workflow builder
+       - Visual node editor
+       - Pre-built components (prompts, conditions, actions)
+       - Built for everyone - no coding required
+       - Template library for common legal tasks
+     - **Agent Skills** (Code-based): For power users
+       - Write custom skills in JavaScript/TypeScript
+       - Full API access to application features
+       - Advanced customization and control
+       - Community skill sharing (optional)
+
+#### 6. **🖼️ Multi-Modal Support**
+   - **Text**: All document formats (DOCX, PDF, TXT, etc.)
+   - **Images**: Analyze diagrams, signatures, exhibits
+   - **Tables**: Extract and analyze data from tables
+   - **Scanned Documents**: OCR with local processing
+   - **Audio**: Transcription and analysis (meetings, depositions)
+   - Support for both:
+     - **Closed-source models**: GPT-4V-equivalent (if available locally via Ollama/LM Studio)
+     - **Open-source models**: Llama 3.2 Vision, BakLLaVA, etc.
+
+#### 7. **Custom AI Agents**
+   - **Agent Flows** (No-code approach):
+     ```
+     Workflow: Contract Risk Analysis
+     ┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+     │ Load        │────▶│ Extract      │────▶│ Risk        │
+     │ Contract    │     │ Clauses      │     │ Scoring     │
+     └─────────────┘     └──────────────┘     └─────────────┘
+                                                      │
+                                                      ▼
+     ┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+     │ Generate    │◀────│ Flag High    │◀────│ Categorize  │
+     │ Report      │     │ Risk Items   │     │ by Type     │
+     └─────────────┘     └──────────────┘     └─────────────┘
+     ```
+
+   - **Agent Skills** (Code-based approach):
+     ```javascript
+     // Example custom skill for clause extraction
+     export const extractNonCompeteClauses = {
+       name: "Extract Non-Compete Clauses",
+       description: "Find and analyze non-compete clauses in employment contracts",
+       async execute(document) {
+         const clauses = await ai.extract({
+           type: "non-compete",
+           document: document,
+           analyze: ["duration", "geography", "scope"]
+         });
+         return ai.summarize(clauses);
+       }
+     };
+     ```
+
+**Key Benefits**:
+- ✅ Familiar workflow - no retraining needed
+- ✅ Works with existing Word documents
+- ✅ Gradual AI adoption - use as much or as little as needed
+- ✅ Staff acceptance - looks like normal Word
+- ✅ Client compatibility - delivers .docx files
+- ✅ No-code options for non-technical users
+- ✅ Multi-modal capabilities
+
+**Key Challenges**:
+- ❌ Dependency on Microsoft Word (vendor lock-in)
+- ❌ Proprietary .docx format (less future-proof)
+- ❌ More complex to maintain (Word API integration)
+- ❌ Harder to version control (binary format)
+- ❌ Limited to Windows/macOS (Word availability)
+
+**Use Cases**:
+- Established law firms with existing Word-based workflows
+- Teams with staff trained on Microsoft Office
+- Firms that regularly exchange .docx with clients
+- Practices requiring gradual AI adoption
+- Organizations prioritizing familiar tools
+
+**→ Continue to Phase 6B for detailed MS Word Integration implementation**
+
+---
+
+### Decision Matrix
+
+| Factor | Path A: Markdown | Path B: MS Word |
+|--------|------------------|-----------------|
+| **Learning Curve** | Steeper | Minimal |
+| **Future-Proofing** | Excellent | Good |
+| **Version Control** | Native (Git) | Limited |
+| **Staff Adoption** | Challenging | Easy |
+| **Client Compatibility** | Requires PDF export | Native .docx |
+| **AI Accessibility** | Maximum | Very Good |
+| **No-Code Options** | Limited initially | Extensive |
+| **Search Capabilities** | Excellent (grep + semantic) | Good (semantic only) |
+| **Vendor Independence** | Complete | Partial (Word dependency) |
+| **Multi-Modal Support** | Via extensions | Native |
+| **Automation** | Powerful (scripts) | User-friendly (flows) |
+
+---
+
+### Making the Decision
+
+**Choose Path A (Markdown) if:**
+- You're a solo practitioner or small tech-savvy team
+- You value long-term data independence above all
+- You're comfortable with Git and version control
+- You want maximum AI accessibility to all data
+- You're willing to train staff on new workflows
+- You prioritize open formats and future-proofing
+
+**Choose Path B (MS Word) if:**
+- You have existing staff trained on Microsoft Office
+- You regularly exchange .docx files with clients
+- You want gradual, low-friction AI adoption
+- You need visual, no-code workflow builders
+- You prefer familiar tools with AI enhancements
+- You want multi-modal support out of the box
+
+**Or Choose Both (Hybrid Approach):**
+- Internal work in Markdown (drafts, notes, research)
+- Client-facing deliverables in Word (contracts, letters)
+- Best of both worlds with conversion workflows
+- Gradual transition from Word → Markdown over time
+
+---
+
+## Path A: Markdown-First Architecture
+
+### Phase 6A: Making Your Firm "Legible" to AI
 **Foundation for Advanced AI Assistance**
 
 **Objective**: Create a system where AI can access and understand your entire legal practice while maintaining complete privacy and control.
@@ -1451,39 +2902,1109 @@ The goal is not to replace lawyers or just make law firms more profitable. The g
 
 ## Implementation Priorities
 
+### Phase 0 (Critical - Week 1-3)
+**Focus**: Foundation & Wireframe + Compliance Patterns
+**Timeline**: 2-3 weeks
+- Step 0.1: Project initialization & setup
+- Step 0.2: Basic UI wireframe
+- Step 0.3: Database setup & migrations
+- Step 0.4: i18n framework setup
+- Step 0.5: Basic Tauri commands
+- Step 0.6: Build & package verification
+- Step 0.7: Testing setup
+- **Step 0.8: Case/Matter organization** (lawyer-centric architecture) ⭐
+- **Step 0.9: Human-in-the-loop review UI** (compliance pattern) ⭐
+- **Step 0.10: AI transparency components** (ready for AI integration) ⭐
+- **Step 0.11: Basic audit log structure** (compliance foundation) ⭐
+- **Deliverable**: Working wireframe with case organization and compliance patterns
+- **Success Metric**: App works case-by-case, review workflow functional, compliance UI ready
+
 ### Phase 1 (Critical - Q1 2025)
-Focus: Legal Compliance
+**Focus**: Legal Compliance - GDPR
+**Timeline**: 8-10 weeks
 - Steps 1-12: Complete GDPR compliance
+  - Data minimization
+  - Purpose limitation
+  - Transparency & notice
+  - Encryption at rest
+  - PII Layer 1 (regex)
+  - Access control
+  - Data deletion (right to erasure)
+  - Data correction
+  - Storage limitation
+  - Audit logging
+  - Security by design
+  - Privacy notice accessibility
+- **Deliverable**: GDPR-compliant application
+- **Success Metric**: Pass third-party GDPR compliance audit
+
+### Phase 2 (Critical - Q1-Q2 2025)
+**Focus**: Legal Compliance - AI Act
+**Timeline**: 4-6 weeks
 - Steps 13-19: Complete AI Act compliance
-- **Deliverable**: Fully compliant MVP
+  - AI transparency labels
+  - AI use explanation
+  - Output provenance
+  - Human-in-the-loop
+  - Label AI-modified data
+  - Local model default
+  - Low-risk by design classification
+- **Deliverable**: Fully compliant MVP (GDPR + AI Act)
+- **Success Metric**: Legal review confirms compliance with EU AI Act Article 52
 
-### Phase 2 (High - Q2 2025)
-Focus: Local AI Infrastructure
-- Step 20: Local model support (Candle + HF)
-- Step 21: PII Layer 2 (NER)
-- Step 22: PII Layer 3 (optional)
-- **Deliverable**: Privacy-first AI features
+### Phase 3 (High - Q2 2025)
+**Focus**: Local AI Infrastructure
+**Timeline**: 8-12 weeks
+- Step 20: Local model support (Candle + Hugging Face)
+  - Candle inference engine integration
+  - Support for Mistral, Llama, Phi-2 models
+  - Model quantization (4-bit, 8-bit)
+  - GPU acceleration (CUDA, Metal, ROCm)
+  - CPU fallback
+  - Model manager UI
+- **Deliverable**: Working local AI with inference
+- **Success Metric**: 7B model running at >10 tokens/sec on GPU, >2 tokens/sec on CPU
 
-### Phase 3 (Medium - Q3 2025)
-Focus: Workflow Automation
-- Steps 23-28: Plaintext architecture, validated automation
-- **Deliverable**: Efficient legal workflows
+### Phase 4 (High - Q2-Q3 2025)
+**Focus**: Advanced PII Protection
+**Timeline**: 6-8 weeks
+- Step 21: PII Layer 2 (NER - Named Entity Recognition)
+  - Context-aware entity detection
+  - Multi-language NER models
+  - Smart anonymization
+  - Legal citation preservation
+- Step 22: PII Layer 3 (optional advanced anonymization)
+  - Microsoft Presidio integration (local)
+  - Custom compliance rules
+  - Cross-document entity resolution
+- **Deliverable**: Privacy-first AI features with >98% PII detection
+- **Success Metric**: Combined Layer 1+2 detection rate >98%, false positives <2%
 
-### Phase 4 (High - Q4 2025)
-Focus: Knowledge & Security
-- Step 29: Legal RAG and knowledge base
+### Phase 5 (Medium - Q3 2025)
+**Focus**: Strategic Path Selection
+**Timeline**: 2 weeks planning
+- **Decision Point**: Choose Path A (Markdown) or Path B (MS Word) or Hybrid
+- Review decision matrix
+- Assess team capabilities and user needs
+- **Deliverable**: Strategic direction selected
+- **Success Metric**: Clear decision made and documented
+
+### Phase 6A (Medium - Q3-Q4 2025) - If Path A Selected
+**Focus**: Markdown-First Architecture
+**Timeline**: 10-12 weeks
+- Steps 23-28: Plaintext architecture
+  - Markdown workflow implementation
+  - Git integration
+  - PDF generation pipeline
+  - Email integration (mbox/maildir)
+  - Validated automation
+- **Deliverable**: Efficient plaintext legal workflows
+- **Success Metric**: 90% of firm data in plaintext formats, full Git version control
+
+### Phase 6B (High - Q3-Q4 2025) - If Path B Selected
+**Focus**: MS Word Integration with Advanced AI
+**Timeline**: 12-16 weeks
+- Steps 23B-28B: MS Word Add-in & Advanced Features
+  - Microsoft Word Add-in development
+  - Workspace agents (web research, document analysis, citations, compliance)
+  - Agentic workflows (Zapier-like automation)
+  - Full MCP-compatibility
+  - No-code AI agent builder
+  - Multi-modal support (vision, audio, OCR)
+- **Deliverable**: AI-enhanced Word integration
+- **Success Metric**: Word add-in installs successfully, agents complete tasks accurately
+
+### Phase 7 (High - Q4 2025)
+**Focus**: Knowledge Retrieval & Legal RAG
+**Timeline**: 8-10 weeks
+- Step 29: Local legal knowledge base
+  - Document indexing
+  - Vector database (Qdrant embedded)
+  - Semantic search
+  - RAG implementation
+  - Citation system
+- **Deliverable**: Intelligent legal research assistant
+- **Success Metric**: Semantic search finds relevant documents >80% of time in <2 seconds
+
+### Phase 8 (High - Q4 2025 - Q1 2026)
+**Focus**: Privacy, Security & Independence
+**Timeline**: 6-8 weeks
 - Steps 30-31: Complete isolation and security
-- **Deliverable**: Intelligent legal research
+  - Air-gapped operation support
+  - Trust nothing architecture
+  - Model isolation (sandboxing)
+  - Zero-trust networking
+  - Security audit and penetration testing
+- **Deliverable**: Fortress-level security
+- **Success Metric**: Pass security audit, confirmed isolation, can operate with internet completely disabled
 
-### Phase 5 (Future - 2026+)
-Focus: Social Impact
+### Phase 9 (Future - 2026+)
+**Focus**: Social Impact & Accessibility
+**Timeline**: Ongoing
 - Step 32: Accessibility and social justice
+  - Tiered service model (premium/standard/pro bono)
+  - AI-assisted pro bono work
+  - Self-service legal tools
+  - Access to justice metrics
 - Expand to other legal markets
 - **Deliverable**: Accessible legal AI for all
+- **Success Metric**: 30%+ increase in pro bono capacity, 20% cost reduction for standard services
 
 ---
 
-## Technology Stack Summary
+## Complete Development Timeline
+
+**Total Time to MVP (Phase 0-2)**: ~4-5 months
+**Total Time to Full Features (Phase 0-8)**: ~18-24 months
+
+**Milestones**:
+- ✅ **v0.0.20** (Current): Wireframe + basic features
+- 🎯 **v0.1.0** (Phase 0 complete): Working foundation
+- 🎯 **v0.2.0** (Phase 1 complete): GDPR compliant
+- 🎯 **v0.3.0** (Phase 2 complete): AI Act compliant - **MVP READY**
+- 🎯 **v0.4.0** (Phase 3 complete): Local AI working
+- 🎯 **v0.5.0** (Phase 4 complete): Advanced PII protection
+- 🎯 **v0.6.0** (Phase 5-6 complete): Strategic path implemented
+- 🎯 **v1.0.0** (Phase 7-8 complete): **PRODUCTION READY**
+- 🎯 **v2.0.0** (Phase 9+): Social impact features
+
+---
+
+## Path B: Microsoft Word Integration with Advanced AI
+
+### Phase 6B: MS Word Add-in with Local LLM
+**Bringing AI into Familiar Workflows**
+
+**Objective**: Embed powerful local AI capabilities directly into Microsoft Word, enabling lawyers to work in familiar environments while benefiting from advanced AI assistance.
+
+#### Step 23B: Microsoft Word Add-in Development
+**Priority**: Critical | **Effort**: Very High | **Architecture**: Hybrid
+
+**What**: Build a Microsoft Word Add-in that integrates local LLM processing with AnythingLLM-style interface.
+
+**Implementation**:
+
+1. **Add-in Architecture**:
+   - **Technology Stack**:
+     - Office Add-ins framework (JavaScript API)
+     - Task pane for AI interface
+     - Local backend server (Rust/Node.js) for LLM processing
+     - WebSocket communication between Word and local AI server
+
+   - **Components**:
+     ```
+     Microsoft Word ←→ Word Add-in (Task Pane) ←→ Local AI Server ←→ Local LLM
+                           ↑
+                      React UI (AI Chat Interface)
+     ```
+
+2. **AnythingLLM-Style Interface**:
+   - Sidebar chat interface within Word
+   - Context-aware suggestions based on active document
+   - Multi-turn conversations with document context
+   - Quick actions: Summarize, Analyze, Rephrase, Extract
+   - Template library for common legal tasks
+   - Document-wide or selection-specific analysis
+
+3. **Core Features**:
+   - **Document Analysis**:
+     - "Analyze this contract for risk clauses"
+     - "Extract all defined terms"
+     - "Summarize key obligations"
+
+   - **Drafting Assistance**:
+     - "Draft a confidentiality clause"
+     - "Rephrase this paragraph in plain language"
+     - "Add a force majeure provision"
+
+   - **Review & Editing**:
+     - "Check for inconsistent terminology"
+     - "Flag ambiguous language"
+     - "Suggest improvements to clause 3"
+
+4. **Technical Implementation**:
+   ```javascript
+   // Word Add-in manifest.xml
+   <Host Name="Document">
+     <DesktopFormFactor>
+       <GetStarted>
+         <Title>BEAR LLM AI Assistant</Title>
+         <Description>Local AI assistance for legal drafting</Description>
+       </GetStarted>
+       <FunctionFile>functions.html</FunctionFile>
+       <ExtensionPoint xsi:type="PrimaryCommandSurface">
+         <CustomTab id="BearAI.Tab">
+           <Group id="BearAI.Group">
+             <Label>AI Assistant</Label>
+             <Control xsi:type="Button" id="BearAI.ShowTaskpane">
+               <Label>Open AI Assistant</Label>
+               <Supertip>
+                 <Title>BEAR AI Assistant</Title>
+                 <Description>Get AI help with your document</Description>
+               </Supertip>
+               <Icon>
+                 <bt:Image size="16" resid="Icon.16x16"/>
+                 <bt:Image size="32" resid="Icon.32x32"/>
+                 <bt:Image size="80" resid="Icon.80x80"/>
+               </Icon>
+               <Action xsi:type="ShowTaskpane">
+                 <TaskpaneId>BearAI.Taskpane</TaskpaneId>
+                 <SourceLocation resid="BearAI.Url"/>
+               </Action>
+             </Control>
+           </Group>
+         </CustomTab>
+       </ExtensionPoint>
+     </DesktopFormFactor>
+   </Host>
+   ```
+
+   ```javascript
+   // React component for AI task pane
+   const AITaskPane = () => {
+     const [messages, setMessages] = useState([]);
+     const [context, setContext] = useState(null);
+
+     useEffect(() => {
+       // Get current document context
+       Word.run(async (context) => {
+         const selection = context.document.getSelection();
+         selection.load('text');
+         await context.sync();
+         setContext({
+           selectedText: selection.text,
+           hasSelection: selection.text.length > 0
+         });
+       });
+     }, []);
+
+     const sendToAI = async (prompt) => {
+       // Send to local AI server via WebSocket
+       const response = await fetch('http://localhost:8765/api/chat', {
+         method: 'POST',
+         body: JSON.stringify({
+           prompt,
+           context: context.selectedText,
+           documentType: 'legal'
+         })
+       });
+
+       const aiResponse = await response.json();
+       setMessages([...messages, { role: 'user', content: prompt }, aiResponse]);
+     };
+
+     return (
+       <div className="ai-taskpane">
+         <ChatInterface
+           messages={messages}
+           onSend={sendToAI}
+           context={context}
+         />
+         <QuickActions
+           onAction={(action) => handleQuickAction(action)}
+         />
+       </div>
+     );
+   };
+   ```
+
+5. **Local AI Server**:
+   ```rust
+   // Rust backend for LLM processing
+   use actix_web::{web, App, HttpServer};
+   use candle_core::{Device, Tensor};
+   use candle_transformers::models::mistral;
+
+   struct AIState {
+       model: mistral::Model,
+       tokenizer: Tokenizer,
+   }
+
+   async fn chat_endpoint(
+       data: web::Json<ChatRequest>,
+       state: web::Data<AIState>,
+   ) -> impl Responder {
+       let prompt = format!(
+           "You are a legal AI assistant. Context: {}\n\nUser: {}\n\nAssistant:",
+           data.context, data.prompt
+       );
+
+       let tokens = state.tokenizer.encode(&prompt, true)?;
+       let response = state.model.generate(tokens, 512)?;
+
+       Ok(web::Json(ChatResponse {
+           content: response,
+           model: "mistral-7b-instruct",
+           timestamp: Utc::now(),
+       }))
+   }
+
+   #[actix_web::main]
+   async fn main() -> std::io::Result<()> {
+       HttpServer::new(|| {
+           App::new()
+               .route("/api/chat", web::post().to(chat_endpoint))
+               .route("/api/health", web::get().to(health_check))
+       })
+       .bind("127.0.0.1:8765")?  // Localhost only!
+       .run()
+       .await
+   }
+   ```
+
+**Success Criteria**:
+- Add-in installs and runs in Word 2016+
+- Task pane opens and displays AI interface
+- Local AI server processes requests in <2 seconds
+- Document context correctly passed to AI
+- Responses inserted back into Word document
+- Works completely offline after model download
+- No data sent to external servers
+
+---
+
+#### Step 24B: Workspace Agents Implementation
+**Priority**: High | **Effort**: High
+
+**What**: Implement specialized AI agents that can perform specific tasks within your legal workspace.
+
+**Agent Types**:
+
+1. **Web Research Agent** 🌐:
+   ```javascript
+   const WebResearchAgent = {
+     name: "Web Research",
+     description: "Search the web for legal information and precedents",
+
+     async execute(query, privacyLevel = "strict") {
+       // Use local privacy-preserving search
+       const results = await search({
+         query,
+         filter: privacyLevel === "strict" ? "no-tracking" : "standard",
+         localFirst: true  // Check local legal DB first
+       });
+
+       return {
+         findings: results,
+         sources: results.map(r => r.url),
+         summary: await summarize(results)
+       };
+     },
+
+     privacyOptions: {
+       strict: "No tracking, VPN required, local cache",
+       moderate: "Minimal tracking, encrypted",
+       standard: "Normal web search"
+     }
+   };
+   ```
+
+2. **Document Analysis Agent** 📄:
+   ```javascript
+   const DocumentAnalysisAgent = {
+     name: "Document Analyzer",
+     description: "Deep analysis of legal documents",
+
+     async execute(documents) {
+       const analysis = {
+         keyTerms: await extractKeyTerms(documents),
+         clauses: await identifyClauses(documents),
+         risks: await assessRisks(documents),
+         comparisons: await compareDocuments(documents),
+         timeline: await extractTimeline(documents)
+       };
+
+       return generateAnalysisReport(analysis);
+     }
+   };
+   ```
+
+3. **Citation Agent** 📚:
+   ```javascript
+   const CitationAgent = {
+     name: "Citation Finder",
+     description: "Find and verify legal citations",
+
+     async execute(text) {
+       const citations = await extractCitations(text);
+
+       const verified = await Promise.all(
+         citations.map(async (cite) => ({
+           citation: cite,
+           valid: await verifyCitation(cite),
+           fullText: await fetchCitationText(cite, { localDB: true }),
+           context: await getCitationContext(cite)
+         }))
+       );
+
+       return {
+         citations: verified,
+         missing: verified.filter(v => !v.valid),
+         recommendations: await suggestCitations(text)
+       };
+     }
+   };
+   ```
+
+4. **Compliance Agent** ✅:
+   ```javascript
+   const ComplianceAgent = {
+     name: "Compliance Checker",
+     description: "Check documents against regulatory requirements",
+
+     async execute(document, regulations = ["GDPR", "AI_ACT"]) {
+       const checks = await Promise.all(
+         regulations.map(async (reg) => ({
+           regulation: reg,
+           compliant: await checkCompliance(document, reg),
+           issues: await findIssues(document, reg),
+           suggestions: await generateComplianceSuggestions(document, reg)
+         }))
+       );
+
+       return {
+         overallCompliance: checks.every(c => c.compliant),
+         detailedChecks: checks,
+         actionItems: checks.flatMap(c => c.suggestions)
+       };
+     }
+   };
+   ```
+
+**Success Criteria**:
+- Each agent completes tasks in <30 seconds
+- Agents can run in parallel when needed
+- Privacy controls prevent data leakage
+- Results are actionable and accurate
+- Agents work offline with local data
+
+---
+
+#### Step 25B: Agentic Workflows (No-Code Automation)
+**Priority**: High | **Effort**: Very High
+
+**What**: Build a visual workflow builder for creating Zapier-like automation chains for legal tasks.
+
+**Workflow Builder Architecture**:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Visual Workflow Builder (React Flow)           │
+├─────────────────────────────────────────────────────────────┤
+│  Triggers    │  Conditions  │  Actions    │  AI Decisions   │
+│  - Email     │  - If/Else   │  - File     │  - Classify     │
+│  - File      │  - Contains  │  - Email    │  - Extract      │
+│  - Schedule  │  - Matches   │  - Generate │  - Summarize    │
+│  - Manual    │  - Compare   │  - Alert    │  - Decide       │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│              Workflow Execution Engine (Rust)               │
+│         - State management                                  │
+│         - Error handling & retry                            │
+│         - Audit logging                                     │
+│         - Privacy validation                                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Example Workflows**:
+
+1. **Email Auto-Filing**:
+   ```yaml
+   name: "Auto-File Client Emails"
+   trigger:
+     type: email_received
+     filter: from_client
+
+   steps:
+     - ai_classify:
+         prompt: "Which matter does this email belong to?"
+         context: { email_content, subject, sender }
+         output: matter_id
+
+     - condition:
+         if: confidence > 0.8
+         then: auto_file
+         else: suggest_to_user
+
+     - file_document:
+         destination: "matters/{{ matter_id }}/emails/"
+         format: markdown
+
+     - create_time_entry:
+         matter: "{{ matter_id }}"
+         description: "{{ ai_summary }}"
+         duration: 0.1  # 6 minutes
+
+     - notify_user:
+         message: "Email filed to {{ matter_name }}"
+   ```
+
+2. **Contract Review Workflow**:
+   ```yaml
+   name: "Contract Risk Analysis"
+   trigger:
+     type: file_upload
+     filter: "*.docx, *.pdf"
+     folder: "contracts/review"
+
+   steps:
+     - extract_text:
+         file: "{{ trigger.file }}"
+         ocr_if_needed: true
+
+     - ai_extract_clauses:
+         types:
+           - liability
+           - termination
+           - confidentiality
+           - indemnification
+           - arbitration
+
+     - parallel:
+         - ai_risk_score:
+             clauses: "{{ extracted_clauses }}"
+         - ai_missing_clauses:
+             document: "{{ extracted_text }}"
+         - ai_unusual_terms:
+             document: "{{ extracted_text }}"
+
+     - generate_review_memo:
+         template: "contract_review_template.md"
+         data:
+           clauses: "{{ extracted_clauses }}"
+           risks: "{{ risk_scores }}"
+           missing: "{{ missing_clauses }}"
+           unusual: "{{ unusual_terms }}"
+
+     - human_review:
+         reviewers: ["primary_attorney"]
+         deadline: "+2 days"
+
+     - on_approval:
+         - file_final_memo
+         - notify_client
+         - create_time_entries
+   ```
+
+3. **Document Assembly Workflow**:
+   ```yaml
+   name: "NDA Generator"
+   trigger:
+     type: manual
+     form:
+       - field: client_name
+       - field: counterparty_name
+       - field: jurisdiction
+         options: [NL, DE, US, UK]
+       - field: mutual
+         type: boolean
+
+   steps:
+     - load_template:
+         template: "templates/nda_{{ jurisdiction }}.md"
+
+     - ai_customize:
+         template: "{{ loaded_template }}"
+         variables: "{{ form_data }}"
+         instructions: "Customize for {{ client_name }}"
+
+     - ai_check_consistency:
+         document: "{{ customized_doc }}"
+         fix_pronouns: true
+         fix_definitions: true
+
+     - preview_to_user:
+         format: pdf
+         allow_edit: true
+
+     - on_user_approval:
+         - convert_to_pdf
+         - save_to_matter
+         - create_signature_request
+         - log_completion
+   ```
+
+**Workflow Builder UI**:
+```javascript
+const WorkflowBuilder = () => {
+  const [nodes, setNodes] = useState([]);
+  const [edges, setEdges] = useState([]);
+
+  const nodeTypes = {
+    trigger: TriggerNode,
+    ai_action: AIActionNode,
+    condition: ConditionNode,
+    action: ActionNode,
+    parallel: ParallelNode,
+    human_review: HumanReviewNode,
+  };
+
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      onNodesChange={setNodes}
+      onEdgesChange={setEdges}
+    >
+      <Background />
+      <Controls />
+      <MiniMap />
+      <Panel position="top-right">
+        <WorkflowToolbox />
+      </Panel>
+    </ReactFlow>
+  );
+};
+```
+
+**Success Criteria**:
+- Visual workflow builder is intuitive (usable within 30 minutes)
+- Library of 10+ pre-built workflow templates
+- Workflows execute reliably with <1% failure rate
+- Error handling and retry mechanisms work
+- Audit logs capture all workflow executions
+- Privacy validation prevents data leakage
+- Human review steps cannot be bypassed
+
+---
+
+#### Step 26B: MCP Integration & No-Code Agent Builder
+**Priority**: High | **Effort**: Very High
+
+**What**: Implement Model Context Protocol support and build visual no-code agent builder.
+
+**1. MCP Integration**:
+
+```javascript
+// MCP Server Configuration
+const mcpServers = {
+  filesystem: {
+    type: "filesystem",
+    path: "./legal-workspace",
+    permissions: ["read", "write"],
+    exclude: ["*.tmp", "*.lock"]
+  },
+
+  database: {
+    type: "sqlite",
+    path: "./data/legal.db",
+    readonly: false,
+    schema: "legal_schema.sql"
+  },
+
+  calendar: {
+    type: "calendar",
+    provider: "local",  // No cloud sync
+    path: "./calendar.ics"
+  },
+
+  email: {
+    type: "email",
+    provider: "local",  // mbox/maildir
+    path: "./email-archive"
+  }
+};
+
+// MCP Tool Registry
+const mcpTools = {
+  "files:read": async (path) => readFile(path),
+  "files:write": async (path, content) => writeFile(path, content),
+  "files:search": async (query) => searchFiles(query),
+  "db:query": async (sql) => executeQuery(sql),
+  "calendar:events": async (date) => getEvents(date),
+  "email:search": async (query) => searchEmails(query),
+};
+
+// AI Agent with MCP Access
+const aiAgent = {
+  async processRequest(userRequest) {
+    const plan = await llm.plan({
+      request: userRequest,
+      availableTools: Object.keys(mcpTools)
+    });
+
+    const results = await executePlan(plan, mcpTools);
+    return results;
+  }
+};
+```
+
+**2. No-Code Agent Builder**:
+
+```javascript
+// Agent Flow Builder (No-Code)
+const AgentFlowBuilder = () => {
+  const [flow, setFlow] = useState({
+    name: "New Agent Flow",
+    nodes: [],
+    connections: []
+  });
+
+  const nodeLibrary = {
+    inputs: [
+      { type: "user_prompt", icon: "💬", name: "User Input" },
+      { type: "document", icon: "📄", name: "Load Document" },
+      { type: "selection", icon: "✂️", name: "Text Selection" }
+    ],
+
+    ai_operations: [
+      { type: "summarize", icon: "📝", name: "Summarize" },
+      { type: "extract", icon: "🔍", name: "Extract Info" },
+      { type: "classify", icon: "🏷️", name: "Classify" },
+      { type: "generate", icon: "✨", name: "Generate Text" },
+      { type: "analyze", icon: "🔬", name: "Analyze" }
+    ],
+
+    logic: [
+      { type: "if_condition", icon: "❓", name: "If/Else" },
+      { type: "loop", icon: "🔄", name: "Loop" },
+      { type: "parallel", icon: "⚡", name: "Parallel" }
+    ],
+
+    outputs: [
+      { type: "insert_text", icon: "➕", name: "Insert to Doc" },
+      { type: "show_result", icon: "👁️", name: "Show to User" },
+      { type: "save_file", icon: "💾", name: "Save File" }
+    ]
+  };
+
+  return (
+    <div className="agent-flow-builder">
+      <Toolbox nodeLibrary={nodeLibrary} />
+      <Canvas flow={flow} onChange={setFlow} />
+      <PropertiesPanel selectedNode={selectedNode} />
+      <PreviewPanel flow={flow} />
+    </div>
+  );
+};
+
+// Example Agent Flow (Visual Representation)
+const contractAnalysisFlow = {
+  name: "Contract Risk Analyzer",
+  nodes: [
+    {
+      id: "1",
+      type: "document",
+      config: { source: "current_document" }
+    },
+    {
+      id: "2",
+      type: "extract",
+      config: {
+        prompt: "Extract all liability and indemnification clauses",
+        format: "structured"
+      }
+    },
+    {
+      id: "3",
+      type: "analyze",
+      config: {
+        prompt: "Assess risk level for each clause (1-10)",
+        factors: ["ambiguity", "one-sided", "unusual"]
+      }
+    },
+    {
+      id: "4",
+      type: "if_condition",
+      config: {
+        condition: "any_risk > 7",
+        true_path: "5",
+        false_path: "6"
+      }
+    },
+    {
+      id: "5",
+      type: "generate",
+      config: {
+        prompt: "Generate detailed risk report with recommendations"
+      }
+    },
+    {
+      id: "6",
+      type: "generate",
+      config: {
+        prompt: "Generate summary: No high-risk clauses found"
+      }
+    },
+    {
+      id: "7",
+      type: "show_result",
+      config: {
+        format: "markdown",
+        allow_edit: true
+      }
+    }
+  ],
+  connections: [
+    { from: "1", to: "2" },
+    { from: "2", to: "3" },
+    { from: "3", to: "4" },
+    { from: "4", to: "5", condition: "true" },
+    { from: "4", to: "6", condition: "false" },
+    { from: "5", to: "7" },
+    { from: "6", to: "7" }
+  ]
+};
+```
+
+**3. Agent Skills (Code-Based)**:
+
+```typescript
+// TypeScript SDK for Custom Agent Skills
+import { AgentSkill, Document, AIContext } from '@bear-ai/sdk';
+
+// Example: Custom Skill for GDPR Compliance Check
+export class GDPRComplianceSkill implements AgentSkill {
+  name = "GDPR Compliance Checker";
+  description = "Checks documents for GDPR compliance requirements";
+  version = "1.0.0";
+
+  async execute(doc: Document, context: AIContext): Promise<SkillResult> {
+    // Load GDPR requirements
+    const requirements = await this.loadGDPRRequirements();
+
+    // Extract relevant sections
+    const sections = await context.ai.extract({
+      document: doc,
+      schema: {
+        privacy_policy: "string",
+        data_processing: "string[]",
+        user_rights: "string[]",
+        retention: "string"
+      }
+    });
+
+    // Check each requirement
+    const checks = await Promise.all(
+      requirements.map(async (req) => ({
+        requirement: req.name,
+        article: req.article,
+        compliant: await this.checkRequirement(sections, req),
+        evidence: await this.findEvidence(sections, req),
+        suggestions: await this.generateSuggestions(sections, req)
+      }))
+    );
+
+    // Generate report
+    return {
+      overallCompliant: checks.every(c => c.compliant),
+      checks: checks,
+      report: await context.ai.generate({
+        template: "gdpr_compliance_report",
+        data: { checks, document: doc.name }
+      })
+    };
+  }
+
+  private async loadGDPRRequirements() {
+    // Load from local knowledge base
+    return await db.query('SELECT * FROM gdpr_requirements');
+  }
+
+  private async checkRequirement(sections, requirement) {
+    return await ai.evaluate({
+      prompt: `Does this document satisfy ${requirement.description}?`,
+      context: sections,
+      requirement: requirement
+    });
+  }
+}
+
+// Register skill
+AgentSkillRegistry.register(new GDPRComplianceSkill());
+```
+
+**Success Criteria**:
+- MCP servers connect and provide tools to AI
+- No-code flow builder creates working agents
+- Code-based skills can be developed and deployed
+- Agent marketplace/library with 20+ pre-built agents
+- Skills can be shared within firm (not externally)
+- All agent execution logged for audit
+
+---
+
+#### Step 27B: Multi-Modal Support Implementation
+**Priority**: High | **Effort**: Very High
+
+**What**: Enable AI to process text, images, audio, and mixed-modality documents.
+
+**Implementation**:
+
+1. **Vision Models**:
+   ```rust
+   // Local vision model integration
+   use candle_transformers::models::llava;
+
+   async fn analyze_image(image_path: &str, question: &str) -> Result<String> {
+       let model = llava::Model::load_local("models/bakllava-v1")?;
+       let image = image::open(image_path)?;
+
+       let response = model.generate_from_image(
+           &image,
+           &format!("User: {}\nAssistant:", question),
+           512  // max tokens
+       )?;
+
+       Ok(response)
+   }
+   ```
+
+2. **Multi-Modal Use Cases**:
+
+   **A. Document with Diagrams**:
+   ```javascript
+   const analyzeContractWithDiagrams = async (docPath) => {
+     const pages = await extractPages(docPath);
+
+     const results = await Promise.all(
+       pages.map(async (page) => {
+         if (page.hasImages) {
+           const imageAnalysis = await ai.vision({
+             image: page.images,
+             prompt: "Describe this diagram in the context of a legal contract"
+           });
+
+           return {
+             pageNum: page.number,
+             text: page.text,
+             diagrams: imageAnalysis
+           };
+         }
+         return { pageNum: page.number, text: page.text };
+       })
+     );
+
+     return results;
+   };
+   ```
+
+   **B. Signature Verification**:
+   ```javascript
+   const verifySignature = async (signatureImage) => {
+     const analysis = await ai.vision({
+       image: signatureImage,
+       prompt: "Analyze this signature. Is it handwritten? Are there any anomalies?"
+     });
+
+     return {
+       isHandwritten: analysis.handwritten,
+       confidence: analysis.confidence,
+       anomalies: analysis.anomalies,
+       recommendation: analysis.confidence > 0.8 ? "accept" : "manual_review"
+     };
+   };
+   ```
+
+   **C. Exhibit Analysis**:
+   ```javascript
+   const analyzeExhibit = async (exhibitPath) => {
+     const type = await detectDocumentType(exhibitPath);
+
+     if (type === "image") {
+       return await ai.vision({
+         image: exhibitPath,
+         prompt: "Describe this exhibit. What legal relevance might it have?"
+       });
+     } else if (type === "pdf") {
+       const pages = await extractPages(exhibitPath);
+       return await Promise.all(
+         pages.map(page => analyzeContractWithDiagrams(page))
+       );
+     }
+   };
+   ```
+
+3. **Audio Transcription**:
+   ```rust
+   // Local Whisper model for transcription
+   use whisper_rs::{WhisperContext, FullParams};
+
+   async fn transcribe_deposition(audio_path: &str) -> Result<Transcript> {
+       let ctx = WhisperContext::new("models/whisper-large-v3")?;
+       let params = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
+
+       let audio = load_audio(audio_path)?;
+       let transcript = ctx.full(params, &audio)?;
+
+       // Post-process for legal terminology
+       let corrected = correct_legal_terms(&transcript)?;
+
+       // Add speaker diarization
+       let with_speakers = identify_speakers(&corrected)?;
+
+       Ok(Transcript {
+           text: with_speakers,
+           speakers: extract_speakers(&with_speakers),
+           timestamps: extract_timestamps(&transcript),
+           confidence: calculate_confidence(&transcript),
+       })
+   }
+   ```
+
+4. **Table Extraction**:
+   ```javascript
+   const extractTables = async (documentPath) => {
+     const tables = await ai.vision({
+       image: documentPath,
+       prompt: "Extract all tables with their structure and data",
+       outputFormat: "json"
+     });
+
+     return tables.map(table => ({
+       headers: table.headers,
+       rows: table.rows,
+       analysis: ai.analyze({
+         data: table.rows,
+         prompt: "Summarize key insights from this table data"
+       })
+     }));
+   };
+   ```
+
+**Supported Models**:
+- **Vision**: BakLLaVA, Llama 3.2 Vision, Moondream
+- **Audio**: Whisper Large V3 (local)
+- **OCR**: Tesseract, PaddleOCR (local)
+- **Table**: TableTransformer, LayoutLM
+
+**Success Criteria**:
+- Vision models process images in <5 seconds
+- OCR accuracy >95% on legal documents
+- Audio transcription accuracy >90%
+- Table extraction preserves structure
+- All processing 100% local
+- Multi-modal workflows work end-to-end
+
+---
+
+### Phase 7B: Integration & Polish
+**Final Steps for MS Word Path**
+
+#### Step 28B: Unified Experience
+**Priority**: High | **Effort**: Medium
+
+**What**: Ensure all features work together seamlessly.
+
+**Integration Points**:
+1. Word Add-in ↔ Workspace Agents
+2. Workflow Builder ↔ MCP Tools
+3. Agent Flows ↔ Multi-Modal Processing
+4. All features ↔ Audit Logging
+5. All features ↔ Privacy Controls
+
+**Success Criteria**:
+- Features compose naturally
+- No conflicts between systems
+- Unified audit trail
+- Consistent UI/UX
+- Performance remains acceptable
+
+---
+
+## Technology Stack Summary (Both Paths)
 
 ### Core Technologies
 - **Backend**: Rust (Tauri 2.0)
