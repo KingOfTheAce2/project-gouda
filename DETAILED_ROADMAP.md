@@ -16,8 +16,9 @@ This roadmap provides a complete development path from initial project setup thr
 |------|---------|--------|
 | 0.1 | **Remove HTTPS callbacks** | ✅ Complete |
 | 0.2 | **Add full Dutch and German i18n coverage** | ✅ Complete |
+| 0.3 | **Add French and Chinese i18n coverage** | ✅ Complete |
 
-**Achievement**: All operations are 100% local with no network callbacks or telemetry. Full localization for Dutch and German markets.
+**Achievement**: All operations are 100% local with no network callbacks or telemetry. Full localization for Dutch, German, French, and Chinese markets.
 
 ---
 
@@ -25,6 +26,43 @@ This roadmap provides a complete development path from initial project setup thr
 **Building the Skeleton - Verify Everything Works**
 
 **Objective**: Create a minimal but functional application skeleton to verify the technology stack works correctly before adding compliance and AI features. This phase ensures the foundation is solid.
+
+**UI/UX Design Reference**:
+This application draws inspiration from leading local LLM UI clients:
+- **Kaas** (https://github.com/0xfrankz/Kaas) - Cross-platform desktop LLM client with privacy focus
+  - Clean sidebar navigation with chat history
+  - Main chat interface with message bubbles
+  - Settings panel with provider configuration
+  - Model selection dropdown
+  - Light/dark theme toggle
+- **LM Studio** - Professional desktop interface for local models
+- **Ollama Desktop** - Minimalist chat interface
+- **Jan AI** - Modern, user-friendly design
+
+**Core UI Components**:
+1. **Left Sidebar** (240-280px):
+   - Logo and app version
+   - New chat/case button
+   - Chat/case history list
+   - Settings button (bottom)
+   - Theme toggle (bottom)
+
+2. **Main Chat Area**:
+   - Message history with role indicators (User/AI)
+   - Input field with send button
+   - Attachment/file upload button
+   - Case/matter context indicator
+
+3. **Right Panel** (collapsible):
+   - Model settings
+   - Temperature/parameters
+   - Case metadata
+   - Compliance indicators
+
+4. **Top Bar**:
+   - Current case/matter name
+   - Language selector
+   - User menu/profile
 
 ### Step 0.1: Project Initialization & Setup
 **Priority**: Critical | **Effort**: Low | **Risk**: Low
@@ -402,6 +440,19 @@ This roadmap provides a complete development path from initial project setup thr
 - Settings table created
 - Database connection available to Tauri commands
 
+**Rust Files**:
+- `src-tauri/src/database/mod.rs` - Database connection manager
+- `src-tauri/src/database/models.rs` - SeaORM entity models
+- `src-tauri/migration/src/lib.rs` - Migration runner
+- `src-tauri/migration/src/m20250101_000001_create_settings.rs` - Settings table migration
+- `src-tauri/migration/src/m20250102_000002_create_chats.rs` - Chats table migration
+- `src-tauri/migration/src/m20250103_000003_create_messages.rs` - Messages table migration
+- `src-tauri/migration/src/m20250104_000004_create_cases.rs` - Cases/matters table migration
+- `src-tauri/entity/src/settings.rs` - Settings entity
+- `src-tauri/entity/src/chats.rs` - Chats entity
+- `src-tauri/entity/src/messages.rs` - Messages entity
+- `src-tauri/entity/src/cases.rs` - Cases entity
+
 ---
 
 ### Step 0.4: i18n Framework Setup
@@ -419,6 +470,8 @@ This roadmap provides a complete development path from initial project setup thr
    import en from './locales/en.json';
    import nl from './locales/nl.json';
    import de from './locales/de.json';
+   import fr from './locales/fr.json';
+   import zh from './locales/zh.json';
 
    i18n
      .use(initReactI18next)
@@ -427,6 +480,8 @@ This roadmap provides a complete development path from initial project setup thr
          en: { translation: en },
          nl: { translation: nl },
          de: { translation: de },
+         fr: { translation: fr },
+         zh: { translation: zh },
        },
        lng: 'en',
        fallbackLng: 'en',
@@ -449,12 +504,81 @@ This roadmap provides a complete development path from initial project setup thr
      "nav": {
        "home": "Home",
        "settings": "Settings",
-       "about": "About"
+       "about": "About",
+       "newChat": "New Chat",
+       "newCase": "New Case"
      },
      "settings": {
        "title": "Settings",
        "language": "Language",
-       "theme": "Theme"
+       "theme": "Theme",
+       "darkMode": "Dark Mode",
+       "lightMode": "Light Mode",
+       "systemTheme": "System Default"
+     },
+     "chat": {
+       "inputPlaceholder": "Type your message...",
+       "send": "Send",
+       "attachFile": "Attach File",
+       "processing": "Processing..."
+     }
+   }
+
+   // src/i18n/locales/fr.json
+   {
+     "app": {
+       "title": "BEAR LLM AI",
+       "subtitle": "Assistant Juridique Respectueux de la Vie Privée"
+     },
+     "nav": {
+       "home": "Accueil",
+       "settings": "Paramètres",
+       "about": "À propos",
+       "newChat": "Nouvelle Discussion",
+       "newCase": "Nouveau Dossier"
+     },
+     "settings": {
+       "title": "Paramètres",
+       "language": "Langue",
+       "theme": "Thème",
+       "darkMode": "Mode Sombre",
+       "lightMode": "Mode Clair",
+       "systemTheme": "Système par Défaut"
+     },
+     "chat": {
+       "inputPlaceholder": "Saisissez votre message...",
+       "send": "Envoyer",
+       "attachFile": "Joindre un Fichier",
+       "processing": "Traitement en cours..."
+     }
+   }
+
+   // src/i18n/locales/zh.json
+   {
+     "app": {
+       "title": "BEAR LLM AI",
+       "subtitle": "隐私优先法律助手"
+     },
+     "nav": {
+       "home": "主页",
+       "settings": "设置",
+       "about": "关于",
+       "newChat": "新对话",
+       "newCase": "新案例"
+     },
+     "settings": {
+       "title": "设置",
+       "language": "语言",
+       "theme": "主题",
+       "darkMode": "深色模式",
+       "lightMode": "浅色模式",
+       "systemTheme": "系统默认"
+     },
+     "chat": {
+       "inputPlaceholder": "输入您的消息...",
+       "send": "发送",
+       "attachFile": "附加文件",
+       "processing": "处理中..."
      }
    }
    ```
@@ -477,15 +601,228 @@ This roadmap provides a complete development path from initial project setup thr
          <option value="en">English</option>
          <option value="nl">Nederlands</option>
          <option value="de">Deutsch</option>
+         <option value="fr">Français</option>
+         <option value="zh">中文</option>
        </select>
      );
    };
    ```
 
 **Success Criteria**:
-- Language can be switched between EN/NL/DE
+- Language can be switched between EN/NL/DE/FR/ZH
 - All UI text updates when language changes
 - Language preference persists across app restarts
+- All five languages fully translated
+
+**Rust Files**:
+- N/A (frontend-only feature)
+
+---
+
+### Step 0.4a: Theme Toggle (Dark/Light Mode)
+**Priority**: High | **Effort**: Low | **Risk**: Low
+
+**What**: Implement dark mode and light mode toggle with system preference detection.
+
+**Implementation**:
+
+1. **Theme Provider Setup**:
+   ```typescript
+   // src/contexts/ThemeContext.tsx
+   import React, { createContext, useContext, useEffect, useState } from 'react';
+
+   type Theme = 'light' | 'dark' | 'system';
+
+   interface ThemeContextType {
+     theme: Theme;
+     setTheme: (theme: Theme) => void;
+     effectiveTheme: 'light' | 'dark';
+   }
+
+   const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+   export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+     const [theme, setTheme] = useState<Theme>('system');
+     const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>('light');
+
+     useEffect(() => {
+       // Load saved theme preference
+       const savedTheme = localStorage.getItem('theme') as Theme;
+       if (savedTheme) setTheme(savedTheme);
+     }, []);
+
+     useEffect(() => {
+       // Save theme preference
+       localStorage.setItem('theme', theme);
+
+       // Determine effective theme
+       if (theme === 'system') {
+         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+         setEffectiveTheme(systemPrefersDark ? 'dark' : 'light');
+       } else {
+         setEffectiveTheme(theme);
+       }
+     }, [theme]);
+
+     useEffect(() => {
+       // Apply theme to document
+       if (effectiveTheme === 'dark') {
+         document.documentElement.classList.add('dark');
+       } else {
+         document.documentElement.classList.remove('dark');
+       }
+     }, [effectiveTheme]);
+
+     return (
+       <ThemeContext.Provider value={{ theme, setTheme, effectiveTheme }}>
+         {children}
+       </ThemeContext.Provider>
+     );
+   };
+
+   export const useTheme = () => {
+     const context = useContext(ThemeContext);
+     if (!context) throw new Error('useTheme must be used within ThemeProvider');
+     return context;
+   };
+   ```
+
+2. **Theme Toggle Component**:
+   ```typescript
+   // src/components/ThemeToggle.tsx
+   import React from 'react';
+   import { useTheme } from '../contexts/ThemeContext';
+   import { useTranslation } from 'react-i18next';
+
+   const ThemeToggle: React.FC = () => {
+     const { theme, setTheme } = useTheme();
+     const { t } = useTranslation();
+
+     return (
+       <div className="flex items-center gap-2">
+         <label className="text-sm font-medium">{t('settings.theme')}</label>
+         <select
+           value={theme}
+           onChange={(e) => setTheme(e.target.value as any)}
+           className="border rounded px-2 py-1 dark:bg-gray-800 dark:border-gray-600"
+         >
+           <option value="light">{t('settings.lightMode')}</option>
+           <option value="dark">{t('settings.darkMode')}</option>
+           <option value="system">{t('settings.systemTheme')}</option>
+         </select>
+       </div>
+     );
+   };
+
+   export default ThemeToggle;
+   ```
+
+3. **Quick Theme Toggle Button** (for sidebar):
+   ```typescript
+   // src/components/QuickThemeToggle.tsx
+   import React from 'react';
+   import { useTheme } from '../contexts/ThemeContext';
+
+   const QuickThemeToggle: React.FC = () => {
+     const { effectiveTheme, setTheme } = useTheme();
+
+     const toggleTheme = () => {
+       setTheme(effectiveTheme === 'dark' ? 'light' : 'dark');
+     };
+
+     return (
+       <button
+         onClick={toggleTheme}
+         className="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+         aria-label="Toggle theme"
+       >
+         {effectiveTheme === 'dark' ? (
+           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+             <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+           </svg>
+         ) : (
+           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+           </svg>
+         )}
+       </button>
+     );
+   };
+
+   export default QuickThemeToggle;
+   ```
+
+4. **Tailwind Dark Mode Configuration**:
+   ```javascript
+   // tailwind.config.ts
+   export default {
+     darkMode: 'class', // Enable class-based dark mode
+     content: [
+       './index.html',
+       './src/**/*.{js,ts,jsx,tsx}',
+     ],
+     theme: {
+       extend: {
+         colors: {
+           // Custom color palette for legal theme
+           primary: {
+             light: '#3b82f6',
+             dark: '#60a5fa',
+           },
+           background: {
+             light: '#ffffff',
+             dark: '#111827',
+           },
+           surface: {
+             light: '#f9fafb',
+             dark: '#1f2937',
+           },
+         },
+       },
+     },
+   };
+   ```
+
+5. **Persist Theme in Rust Backend**:
+   ```rust
+   // src-tauri/src/commands/settings.rs
+   use serde::{Deserialize, Serialize};
+
+   #[derive(Debug, Serialize, Deserialize)]
+   pub struct ThemeSettings {
+       pub theme: String, // "light", "dark", or "system"
+   }
+
+   #[tauri::command]
+   pub async fn get_theme_setting() -> Result<String, String> {
+       // Load from database or config file
+       // For now, return default
+       Ok("system".to_string())
+   }
+
+   #[tauri::command]
+   pub async fn save_theme_setting(theme: String) -> Result<(), String> {
+       // Save to database or config file
+       // Validate theme value
+       if !["light", "dark", "system"].contains(&theme.as_str()) {
+           return Err("Invalid theme value".to_string());
+       }
+
+       // TODO: Save to database
+       Ok(())
+   }
+   ```
+
+**Success Criteria**:
+- Theme toggle works in settings
+- Quick toggle button in sidebar functions correctly
+- Theme persists across app restarts
+- System theme preference detected and applied
+- All UI components properly styled in both light and dark modes
+- Smooth transitions between themes
+
+**Rust Files**:
+- `src-tauri/src/commands/settings.rs` - Theme settings persistence
 
 ---
 
@@ -1187,13 +1524,14 @@ impl AuditService {
 
 **Deliverables**:
 - ✅ Tauri + React + TypeScript project initialized
-- ✅ Basic UI wireframe with navigation
+- ✅ Basic UI wireframe with navigation (inspired by Kaas, LM Studio, Jan AI)
 - ✅ SQLite database with migrations
 - ✅ **Case/Matter organization structure** (lawyers work by case)
 - ✅ **Human-in-the-loop review UI pattern** (compliance foundation)
 - ✅ **AI transparency label components** (ready for AI integration)
 - ✅ **Basic audit log structure** (compliance foundation)
-- ✅ i18n framework (EN/NL/DE support)
+- ✅ i18n framework (EN/NL/DE/FR/ZH support)
+- ✅ **Theme toggle (Dark/Light mode with system detection)**
 - ✅ Basic Tauri commands working
 - ✅ Build and packaging verified
 - ✅ Testing infrastructure in place
@@ -1202,8 +1540,8 @@ impl AuditService {
 - Frontend: React 18 + TypeScript + Vite
 - Backend: Rust + Tauri 2.0
 - Database: SQLite + Sea-ORM
-- Styling: Tailwind CSS
-- i18n: i18next + react-i18next
+- Styling: Tailwind CSS (with dark mode support)
+- i18n: i18next + react-i18next (5 languages)
 - Testing: Jest + React Testing Library + Cargo test
 
 **Compliance Patterns Established** (UI only, no AI yet):
@@ -1211,6 +1549,70 @@ impl AuditService {
 - ✅ AI badge components (placeholder for future AI features)
 - ✅ Audit log table structure
 - ✅ Case/matter isolation
+
+**Complete Rust File Structure (Phase 0)**:
+```
+src-tauri/
+├── src/
+│   ├── main.rs                          # Application entry point
+│   ├── lib.rs                           # Library exports
+│   ├── commands/
+│   │   ├── mod.rs                       # Command module exports
+│   │   ├── settings.rs                  # Settings commands (theme, language)
+│   │   ├── chat.rs                      # Chat management commands
+│   │   ├── case.rs                      # Case/matter management commands
+│   │   └── audit.rs                     # Audit logging commands
+│   ├── database/
+│   │   ├── mod.rs                       # Database manager
+│   │   └── models.rs                    # SeaORM models
+│   ├── services/
+│   │   ├── mod.rs                       # Service exports
+│   │   ├── db.rs                        # Database service
+│   │   ├── cache.rs                     # Caching service
+│   │   └── llm/                         # LLM services (Phase 3)
+│   │       ├── mod.rs
+│   │       ├── client.rs
+│   │       ├── chat.rs
+│   │       ├── models.rs
+│   │       ├── types.rs
+│   │       ├── utils.rs
+│   │       └── providers/
+│   │           ├── mod.rs
+│   │           ├── types.rs
+│   │           └── ollama/
+│   │               ├── mod.rs
+│   │               ├── config.rs
+│   │               ├── chat.rs
+│   │               └── models.rs
+│   ├── core/
+│   │   ├── mod.rs                       # Core exports
+│   │   └── handle.rs                    # App handle management
+│   ├── utils.rs                         # Utility functions
+│   ├── errors.rs                        # Error types
+│   ├── init.rs                          # Initialization logic
+│   ├── log_utils.rs                     # Logging utilities
+│   ├── process_helper.rs                # Process management
+│   └── crash_handler.rs                 # Crash handling
+├── migration/
+│   ├── Cargo.toml                       # Migration dependencies
+│   └── src/
+│       ├── lib.rs                       # Migration runner
+│       ├── m20250101_000001_create_settings.rs
+│       ├── m20250102_000002_create_chats.rs
+│       ├── m20250103_000003_create_messages.rs
+│       ├── m20250104_000004_create_cases.rs
+│       └── m20250105_000005_create_audit_logs.rs
+├── entity/
+│   ├── Cargo.toml                       # Entity dependencies
+│   └── src/
+│       ├── settings.rs                  # Settings entity
+│       ├── chats.rs                     # Chats entity
+│       ├── messages.rs                  # Messages entity
+│       ├── cases.rs                     # Cases entity
+│       └── audit_logs.rs                # Audit logs entity
+├── Cargo.toml                           # Main dependencies
+└── tauri.conf.json                      # Tauri configuration
+```
 
 **What's NOT Implemented Yet**:
 - AI features (coming in Phase 3)
@@ -1657,9 +2059,41 @@ r"(\+\d{1,3}[- ]?)?\(?\d{1,4}\)?[- ]?\d{1,4}[- ]?\d{1,9}"
 **Success Criteria**:
 - Privacy information accessible within 2 clicks
 - Written in plain language (8th grade level)
-- Available in Dutch, German, and English
+- Available in Dutch, German, French, Chinese, and English
 - Covers all GDPR rights
 - Updated with each significant feature addition
+
+**Rust Files (Phase 1 - GDPR)**:
+```
+src-tauri/src/
+├── gdpr/
+│   ├── mod.rs                           # GDPR module exports
+│   ├── data_minimization.rs             # Auto-cleanup, temp file management
+│   ├── encryption.rs                    # AES-256-GCM encryption
+│   ├── access_control.rs                # OS-level auth, session management
+│   ├── data_deletion.rs                 # Right to erasure implementation
+│   ├── audit.rs                         # Audit logging (Art. 30)
+│   └── export.rs                        # Data portability (Art. 20)
+├── pii/
+│   ├── mod.rs                           # PII module exports
+│   ├── regex_detector.rs                # Layer 1: Regex-based PII detection
+│   ├── patterns.rs                      # PII regex patterns (email, phone, etc.)
+│   └── redactor.rs                      # Redaction engine
+├── encryption/
+│   ├── mod.rs                           # Encryption module
+│   ├── aes.rs                           # AES-256-GCM implementation
+│   ├── key_manager.rs                   # Key derivation and storage
+│   └── db_encryption.rs                 # Database encryption wrapper
+└── commands/
+    ├── gdpr.rs                          # GDPR-related commands
+    ├── encryption.rs                    # Encryption commands
+    └── privacy.rs                       # Privacy settings commands
+
+migration/src/
+├── m20250106_000006_add_encryption.rs   # Add encryption columns
+├── m20250107_000007_add_pii_logs.rs     # PII detection logs
+└── m20250108_000008_add_gdpr_exports.rs # GDPR export tracking
+```
 
 ---
 
@@ -1996,6 +2430,54 @@ tokenizers = "0.15"
 - User-friendly model management interface
 - Response quality suitable for legal drafting assistance
 
+**Rust Files (Phase 3 - Local AI with Candle)**:
+```
+src-tauri/src/
+├── ai/
+│   ├── mod.rs                           # AI module exports
+│   ├── candle_engine.rs                 # Candle inference engine
+│   ├── model_loader.rs                  # Model loading and caching
+│   ├── tokenizer.rs                     # Tokenization
+│   ├── inference.rs                     # Inference pipeline
+│   ├── streaming.rs                     # Response streaming
+│   ├── context.rs                       # Context management
+│   └── gpu.rs                           # GPU acceleration (CUDA/Metal/ROCm)
+├── models/
+│   ├── mod.rs                           # Model management
+│   ├── downloader.rs                    # Model download manager
+│   ├── registry.rs                      # Model registry
+│   ├── quantization.rs                  # GGUF quantization support
+│   └── validator.rs                     # Checksum verification
+├── services/llm/                        # Already exists in codebase
+│   ├── mod.rs
+│   ├── client.rs                        # LLM client interface
+│   ├── chat.rs                          # Chat management
+│   ├── models.rs                        # Model definitions
+│   ├── types.rs                         # Type definitions
+│   ├── utils.rs                         # Utility functions
+│   └── providers/
+│       ├── mod.rs
+│       ├── types.rs
+│       ├── candle.rs                    # Candle provider (NEW)
+│       └── ollama/                      # Existing Ollama support
+│           ├── mod.rs
+│           ├── config.rs
+│           ├── chat.rs
+│           └── models.rs
+└── commands/
+    ├── ai.rs                            # AI commands
+    ├── model.rs                         # Model management commands
+    └── inference.rs                     # Inference commands
+
+migration/src/
+├── m20250109_000009_add_models.rs       # Model registry table
+└── m20250110_000010_add_ai_settings.rs  # AI configuration
+
+entity/src/
+├── models.rs                            # Model entity
+└── ai_sessions.rs                       # AI session tracking
+```
+
 ---
 
 ## Phase 4: Advanced PII Protection (Priority: HIGH)
@@ -2059,6 +2541,40 @@ Note: "Article 6 GDPR" preserved as legal reference
 - Multi-language support
 - Combined Layer 1 + Layer 2 detection rate >98%
 - False positive rate <2%
+
+**Rust Files (Phase 4 - Advanced PII with NER)**:
+```
+src-tauri/src/
+├── pii/                                 # PII detection (expanded from Phase 1)
+│   ├── mod.rs                           # PII module exports
+│   ├── regex_detector.rs                # Layer 1: Regex patterns
+│   ├── patterns.rs                      # Regex patterns library
+│   ├── ner_detector.rs                  # Layer 2: NER detection (NEW)
+│   ├── ner_models.rs                    # NER model management (NEW)
+│   ├── entity_linker.rs                 # Cross-reference entities (NEW)
+│   ├── redactor.rs                      # Redaction engine
+│   ├── anonymizer.rs                    # Smart anonymization (NEW)
+│   ├── whitelist.rs                     # Legal term whitelist (NEW)
+│   └── multi_language.rs                # Multi-language support (NEW)
+├── ml/
+│   ├── mod.rs                           # ML module exports
+│   ├── onnx_runtime.rs                  # ONNX runtime integration
+│   ├── model_inference.rs               # ML inference
+│   └── embeddings.rs                    # Text embeddings
+└── commands/
+    ├── pii.rs                           # PII detection commands (expanded)
+    └── anonymization.rs                 # Anonymization commands (NEW)
+
+migration/src/
+├── m20250111_000011_add_ner_logs.rs     # NER detection logs
+├── m20250112_000012_add_entity_map.rs   # Entity mapping table
+└── m20250113_000013_add_whitelists.rs   # Legal term whitelists
+
+entity/src/
+├── pii_detections.rs                    # PII detection results
+├── entities.rs                          # Detected entities
+└── anonymization_maps.rs                # Anonymization mappings
+```
 
 ---
 
