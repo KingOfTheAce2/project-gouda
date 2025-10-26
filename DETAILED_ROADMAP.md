@@ -1,8 +1,12 @@
-# BEAR LLM AI - Detailed Development Roadmap
+# BEAR LLM AI - Complete Development Roadmap
 
-**Organized by Priority: Legal Compliance First, Then Features**
+**From Zero to Production: Building a Privacy-First Legal AI Assistant**
 
-This roadmap prioritizes **GDPR compliance** (mandatory for EU operations), followed by **AI Act compliance**, then technical features in order of importance for a privacy-first, locally-run legal AI assistant.
+This roadmap provides a complete development path from initial project setup through full production deployment. It prioritizes:
+1. **Phase 0**: Initial application setup and wireframe (foundation)
+2. **Phase 1-2**: Legal compliance (GDPR & AI Act) - mandatory for EU operations
+3. **Phase 3-4**: Local AI infrastructure and PII protection
+4. **Phase 5+**: Advanced features and strategic paths
 
 ---
 
@@ -14,6 +18,728 @@ This roadmap prioritizes **GDPR compliance** (mandatory for EU operations), foll
 | 0.2 | **Add full Dutch and German i18n coverage** | ✅ Complete |
 
 **Achievement**: All operations are 100% local with no network callbacks or telemetry. Full localization for Dutch and German markets.
+
+---
+
+## Phase 0: Foundation & Wireframe Application (Priority: CRITICAL)
+**Building the Skeleton - Verify Everything Works**
+
+**Objective**: Create a minimal but functional application skeleton to verify the technology stack works correctly before adding compliance and AI features. This phase ensures the foundation is solid.
+
+### Step 0.1: Project Initialization & Setup
+**Priority**: Critical | **Effort**: Low | **Risk**: Low
+
+**What**: Set up the basic Tauri + React + TypeScript project structure.
+
+**Implementation**:
+1. **Initialize Tauri Project**:
+   ```bash
+   # Create new Tauri project (if starting from scratch)
+   npm create tauri-app@latest bear-llm-ai
+
+   # Select options:
+   # - Package manager: npm
+   # - UI template: React + TypeScript
+   # - UI framework: React with Vite
+   ```
+
+2. **Configure Project Structure**:
+   ```
+   bear-llm-ai/
+   ├── src/                    # React frontend
+   │   ├── components/         # React components
+   │   ├── hooks/              # Custom React hooks
+   │   ├── pages/              # Page components
+   │   ├── services/           # API/service layers
+   │   ├── styles/             # CSS/styling
+   │   ├── types/              # TypeScript types
+   │   ├── App.tsx             # Main app component
+   │   └── main.tsx            # Entry point
+   ├── src-tauri/              # Rust backend
+   │   ├── src/
+   │   │   ├── commands/       # Tauri commands
+   │   │   ├── models/         # Data models
+   │   │   ├── services/       # Business logic
+   │   │   ├── utils/          # Utilities
+   │   │   └── main.rs         # Entry point
+   │   ├── Cargo.toml          # Rust dependencies
+   │   └── tauri.conf.json     # Tauri configuration
+   ├── public/                 # Static assets
+   ├── package.json            # Node dependencies
+   └── tsconfig.json           # TypeScript config
+   ```
+
+3. **Install Core Dependencies**:
+   ```bash
+   # Frontend dependencies
+   npm install react-router-dom
+   npm install @radix-ui/react-dialog @radix-ui/react-select
+   npm install tailwindcss @tailwindcss/typography
+   npm install i18next react-i18next
+   npm install zustand  # State management
+
+   # Dev dependencies
+   npm install -D @types/react @types/react-dom
+   npm install -D typescript
+   npm install -D eslint @typescript-eslint/parser
+   npm install -D prettier
+   ```
+
+4. **Configure Tauri**:
+   ```json
+   // src-tauri/tauri.conf.json
+   {
+     "build": {
+       "beforeDevCommand": "npm run dev",
+       "beforeBuildCommand": "npm run build",
+       "devPath": "http://localhost:5173",
+       "distDir": "../dist"
+     },
+     "package": {
+       "productName": "BEAR LLM AI",
+       "version": "0.0.20"
+     },
+     "tauri": {
+       "allowlist": {
+         "all": false,
+         "fs": {
+           "all": false,
+           "readFile": true,
+           "writeFile": true,
+           "createDir": true,
+           "scope": ["$APPDATA/*", "$APPDATA/**"]
+         },
+         "dialog": {
+           "all": true
+         }
+       },
+       "windows": [{
+         "title": "BEAR LLM AI",
+         "width": 1200,
+         "height": 800,
+         "minWidth": 800,
+         "minHeight": 600,
+         "resizable": true,
+         "fullscreen": false
+       }]
+     }
+   }
+   ```
+
+**Success Criteria**:
+- Project structure created and organized
+- All dependencies installed without errors
+- TypeScript compilation successful
+- Development server starts without errors
+
+---
+
+### Step 0.2: Basic UI Wireframe
+**Priority**: Critical | **Effort**: Low | **Risk**: Low
+
+**What**: Create a minimal UI wireframe to verify rendering and navigation.
+
+**Implementation**:
+
+1. **Main Application Shell**:
+   ```typescript
+   // src/App.tsx
+   import React from 'react';
+   import { BrowserRouter, Routes, Route } from 'react-router-dom';
+   import Sidebar from './components/Sidebar';
+   import HomePage from './pages/Home';
+   import SettingsPage from './pages/Settings';
+   import AboutPage from './pages/About';
+
+   function App() {
+     return (
+       <BrowserRouter>
+         <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+           <Sidebar />
+           <main className="flex-1 overflow-auto">
+             <Routes>
+               <Route path="/" element={<HomePage />} />
+               <Route path="/settings" element={<SettingsPage />} />
+               <Route path="/about" element={<AboutPage />} />
+             </Routes>
+           </main>
+         </div>
+       </BrowserRouter>
+     );
+   }
+
+   export default App;
+   ```
+
+2. **Sidebar Navigation**:
+   ```typescript
+   // src/components/Sidebar.tsx
+   import React from 'react';
+   import { Link } from 'react-router-dom';
+
+   const Sidebar: React.FC = () => {
+     return (
+       <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+         <div className="p-4">
+           <h1 className="text-xl font-bold">BEAR LLM AI</h1>
+           <p className="text-sm text-gray-500">v0.0.20</p>
+         </div>
+
+         <nav className="mt-4">
+           <Link to="/" className="block px-4 py-2 hover:bg-gray-100">
+             Home
+           </Link>
+           <Link to="/settings" className="block px-4 py-2 hover:bg-gray-100">
+             Settings
+           </Link>
+           <Link to="/about" className="block px-4 py-2 hover:bg-gray-100">
+             About
+           </Link>
+         </nav>
+       </aside>
+     );
+   };
+
+   export default Sidebar;
+   ```
+
+3. **Placeholder Pages**:
+   ```typescript
+   // src/pages/Home.tsx
+   const HomePage = () => {
+     return (
+       <div className="p-8">
+         <h2 className="text-2xl font-bold mb-4">Welcome to BEAR LLM AI</h2>
+         <p className="text-gray-600">
+           This is a wireframe. Features will be added in subsequent phases.
+         </p>
+       </div>
+     );
+   };
+
+   // src/pages/Settings.tsx
+   const SettingsPage = () => {
+     return (
+       <div className="p-8">
+         <h2 className="text-2xl font-bold mb-4">Settings</h2>
+         <p className="text-gray-600">Settings UI will be implemented here.</p>
+       </div>
+     );
+   };
+
+   // src/pages/About.tsx
+   const AboutPage = () => {
+     return (
+       <div className="p-8">
+         <h2 className="text-2xl font-bold mb-4">About BEAR LLM AI</h2>
+         <p className="text-gray-600">
+           Version: 0.0.20<br />
+           Privacy-first legal AI assistant<br />
+           100% local processing
+         </p>
+       </div>
+     );
+   };
+   ```
+
+**Success Criteria**:
+- Application window opens and displays
+- Navigation between pages works
+- UI is responsive and styled correctly
+- No console errors
+
+---
+
+### Step 0.3: Database Setup & Migrations
+**Priority**: Critical | **Effort**: Medium | **Risk**: Medium
+
+**What**: Set up SQLite database with migration system.
+
+**Implementation**:
+
+1. **Add Database Dependencies**:
+   ```toml
+   # src-tauri/Cargo.toml
+   [dependencies]
+   sea-orm = { version = "0.12", features = ["sqlx-sqlite", "runtime-tokio-native-tls", "macros"] }
+   sea-orm-migration = "0.12"
+   sqlx = { version = "0.7", features = ["sqlite", "runtime-tokio"] }
+   tokio = { version = "1.36", features = ["full"] }
+   ```
+
+2. **Database Connection Manager**:
+   ```rust
+   // src-tauri/src/database/mod.rs
+   use sea_orm::{Database, DatabaseConnection, DbErr};
+   use std::sync::Arc;
+   use tokio::sync::Mutex;
+
+   pub struct DatabaseManager {
+       connection: Arc<Mutex<Option<DatabaseConnection>>>,
+   }
+
+   impl DatabaseManager {
+       pub fn new() -> Self {
+           Self {
+               connection: Arc::new(Mutex::new(None)),
+           }
+       }
+
+       pub async fn initialize(&self, db_path: &str) -> Result<(), DbErr> {
+           let db_url = format!("sqlite://{}?mode=rwc", db_path);
+           let conn = Database::connect(&db_url).await?;
+
+           // Run migrations
+           migration::Migrator::up(&conn, None).await?;
+
+           *self.connection.lock().await = Some(conn);
+           Ok(())
+       }
+
+       pub async fn get_connection(&self) -> Option<DatabaseConnection> {
+           self.connection.lock().await.clone()
+       }
+   }
+   ```
+
+3. **Initial Migration**:
+   ```rust
+   // src-tauri/migration/src/m20250101_000001_create_settings.rs
+   use sea_orm_migration::prelude::*;
+
+   #[derive(DeriveMigrationName)]
+   pub struct Migration;
+
+   #[async_trait::async_trait]
+   impl MigrationTrait for Migration {
+       async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+           manager
+               .create_table(
+                   Table::create()
+                       .table(Settings::Table)
+                       .if_not_exists()
+                       .col(
+                           ColumnDef::new(Settings::Id)
+                               .integer()
+                               .not_null()
+                               .auto_increment()
+                               .primary_key(),
+                       )
+                       .col(ColumnDef::new(Settings::Key).string().not_null().unique_key())
+                       .col(ColumnDef::new(Settings::Value).string().not_null())
+                       .col(
+                           ColumnDef::new(Settings::CreatedAt)
+                               .timestamp()
+                               .not_null()
+                               .default(Expr::current_timestamp()),
+                       )
+                       .col(
+                           ColumnDef::new(Settings::UpdatedAt)
+                               .timestamp()
+                               .not_null()
+                               .default(Expr::current_timestamp()),
+                       )
+                       .to_owned(),
+               )
+               .await
+       }
+
+       async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+           manager
+               .drop_table(Table::drop().table(Settings::Table).to_owned())
+               .await
+       }
+   }
+
+   #[derive(Iden)]
+   enum Settings {
+       Table,
+       Id,
+       Key,
+       Value,
+       CreatedAt,
+       UpdatedAt,
+   }
+   ```
+
+4. **Database Initialization in main.rs**:
+   ```rust
+   // src-tauri/src/main.rs
+   use tauri::Manager;
+   mod database;
+
+   #[tokio::main]
+   async fn main() {
+       let db_manager = database::DatabaseManager::new();
+
+       tauri::Builder::default()
+           .setup(|app| {
+               let app_dir = app.path_resolver()
+                   .app_data_dir()
+                   .expect("Failed to get app data directory");
+
+               std::fs::create_dir_all(&app_dir)?;
+
+               let db_path = app_dir.join("bear_llm.db");
+
+               tauri::async_runtime::block_on(async {
+                   db_manager.initialize(db_path.to_str().unwrap())
+                       .await
+                       .expect("Failed to initialize database");
+               });
+
+               app.manage(db_manager);
+               Ok(())
+           })
+           .run(tauri::generate_context!())
+           .expect("error while running tauri application");
+   }
+   ```
+
+**Success Criteria**:
+- Database file created in app data directory
+- Migrations run successfully
+- Settings table created
+- Database connection available to Tauri commands
+
+---
+
+### Step 0.4: i18n Framework Setup
+**Priority**: High | **Effort**: Low | **Risk**: Low
+
+**What**: Set up internationalization framework for multilingual support.
+
+**Implementation**:
+
+1. **i18n Configuration**:
+   ```typescript
+   // src/i18n/config.ts
+   import i18n from 'i18next';
+   import { initReactI18next } from 'react-i18next';
+   import en from './locales/en.json';
+   import nl from './locales/nl.json';
+   import de from './locales/de.json';
+
+   i18n
+     .use(initReactI18next)
+     .init({
+       resources: {
+         en: { translation: en },
+         nl: { translation: nl },
+         de: { translation: de },
+       },
+       lng: 'en',
+       fallbackLng: 'en',
+       interpolation: {
+         escapeValue: false,
+       },
+     });
+
+   export default i18n;
+   ```
+
+2. **Translation Files**:
+   ```json
+   // src/i18n/locales/en.json
+   {
+     "app": {
+       "title": "BEAR LLM AI",
+       "subtitle": "Privacy-First Legal Assistant"
+     },
+     "nav": {
+       "home": "Home",
+       "settings": "Settings",
+       "about": "About"
+     },
+     "settings": {
+       "title": "Settings",
+       "language": "Language",
+       "theme": "Theme"
+     }
+   }
+   ```
+
+3. **Language Selector Component**:
+   ```typescript
+   // src/components/LanguageSelector.tsx
+   import React from 'react';
+   import { useTranslation } from 'react-i18next';
+
+   const LanguageSelector: React.FC = () => {
+     const { i18n } = useTranslation();
+
+     return (
+       <select
+         value={i18n.language}
+         onChange={(e) => i18n.changeLanguage(e.target.value)}
+         className="border rounded px-2 py-1"
+       >
+         <option value="en">English</option>
+         <option value="nl">Nederlands</option>
+         <option value="de">Deutsch</option>
+       </select>
+     );
+   };
+   ```
+
+**Success Criteria**:
+- Language can be switched between EN/NL/DE
+- All UI text updates when language changes
+- Language preference persists across app restarts
+
+---
+
+### Step 0.5: Basic Tauri Commands
+**Priority**: High | **Effort**: Low | **Risk**: Low
+
+**What**: Implement basic Tauri commands for frontend-backend communication.
+
+**Implementation**:
+
+1. **Settings Commands**:
+   ```rust
+   // src-tauri/src/commands/settings.rs
+   use tauri::State;
+   use crate::database::DatabaseManager;
+
+   #[tauri::command]
+   pub async fn get_setting(
+       key: String,
+       db: State<'_, DatabaseManager>,
+   ) -> Result<Option<String>, String> {
+       let conn = db.get_connection().await
+           .ok_or("Database not initialized")?;
+
+       // Query setting from database
+       // Implementation details...
+
+       Ok(Some("value".to_string()))
+   }
+
+   #[tauri::command]
+   pub async fn set_setting(
+       key: String,
+       value: String,
+       db: State<'_, DatabaseManager>,
+   ) -> Result<(), String> {
+       let conn = db.get_connection().await
+           .ok_or("Database not initialized")?;
+
+       // Save setting to database
+       // Implementation details...
+
+       Ok(())
+   }
+
+   #[tauri::command]
+   pub fn get_app_version() -> String {
+       env!("CARGO_PKG_VERSION").to_string()
+   }
+   ```
+
+2. **Register Commands**:
+   ```rust
+   // src-tauri/src/main.rs
+   mod commands;
+
+   #[tokio::main]
+   async fn main() {
+       // ... database setup ...
+
+       tauri::Builder::default()
+           .setup(|app| {
+               // ... setup code ...
+               Ok(())
+           })
+           .invoke_handler(tauri::generate_handler![
+               commands::settings::get_setting,
+               commands::settings::set_setting,
+               commands::settings::get_app_version,
+           ])
+           .run(tauri::generate_context!())
+           .expect("error while running tauri application");
+   }
+   ```
+
+3. **Frontend Service Layer**:
+   ```typescript
+   // src/services/settings.ts
+   import { invoke } from '@tauri-apps/api/tauri';
+
+   export const settingsService = {
+     async getSetting(key: string): Promise<string | null> {
+       return await invoke('get_setting', { key });
+     },
+
+     async setSetting(key: string, value: string): Promise<void> {
+       await invoke('set_setting', { key, value });
+     },
+
+     async getAppVersion(): Promise<string> {
+       return await invoke('get_app_version');
+     },
+   };
+   ```
+
+**Success Criteria**:
+- Frontend can call Rust backend commands
+- Settings can be saved and retrieved
+- App version displays correctly
+- Error handling works properly
+
+---
+
+### Step 0.6: Build & Package Verification
+**Priority**: Critical | **Effort**: Low | **Risk**: Low
+
+**What**: Verify the application can be built and packaged for distribution.
+
+**Implementation**:
+
+1. **Development Build**:
+   ```bash
+   # Run in development mode
+   npm run tauri dev
+
+   # Verify:
+   # - App window opens
+   # - Navigation works
+   # - No console errors
+   # - Database created
+   # - Settings persist
+   ```
+
+2. **Production Build**:
+   ```bash
+   # Build for production
+   npm run tauri build
+
+   # Verify output in src-tauri/target/release/:
+   # - Executable binary
+   # - Installer packages (.msi for Windows, .dmg for macOS, .deb/.AppImage for Linux)
+   ```
+
+3. **Test Installation**:
+   - Install from generated package
+   - Run installed application
+   - Verify all features work
+   - Check app data directory location
+   - Verify uninstall works cleanly
+
+**Success Criteria**:
+- Development build runs without errors
+- Production build completes successfully
+- Installer packages generated for target platforms
+- Installed app runs correctly
+- App data stored in correct location
+
+---
+
+### Step 0.7: Testing Setup
+**Priority**: Medium | **Effort**: Low | **Risk**: Low
+
+**What**: Set up testing infrastructure for both frontend and backend.
+
+**Implementation**:
+
+1. **Frontend Testing (Jest + React Testing Library)**:
+   ```bash
+   npm install -D jest @testing-library/react @testing-library/jest-dom
+   npm install -D @testing-library/user-event
+   npm install -D ts-jest @types/jest
+   ```
+
+   ```typescript
+   // jest.config.js
+   module.exports = {
+     preset: 'ts-jest',
+     testEnvironment: 'jsdom',
+     setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
+     moduleNameMapper: {
+       '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+     },
+   };
+   ```
+
+2. **Example Frontend Test**:
+   ```typescript
+   // src/components/__tests__/Sidebar.test.tsx
+   import { render, screen } from '@testing-library/react';
+   import { BrowserRouter } from 'react-router-dom';
+   import Sidebar from '../Sidebar';
+
+   test('renders navigation links', () => {
+     render(
+       <BrowserRouter>
+         <Sidebar />
+       </BrowserRouter>
+     );
+
+     expect(screen.getByText('Home')).toBeInTheDocument();
+     expect(screen.getByText('Settings')).toBeInTheDocument();
+     expect(screen.getByText('About')).toBeInTheDocument();
+   });
+   ```
+
+3. **Backend Testing (Rust)**:
+   ```rust
+   // src-tauri/src/commands/settings.rs
+   #[cfg(test)]
+   mod tests {
+       use super::*;
+
+       #[test]
+       fn test_get_app_version() {
+           let version = get_app_version();
+           assert!(!version.is_empty());
+       }
+   }
+   ```
+
+4. **Run Tests**:
+   ```bash
+   # Frontend tests
+   npm test
+
+   # Backend tests
+   cd src-tauri && cargo test
+   ```
+
+**Success Criteria**:
+- Test frameworks configured
+- Example tests pass
+- Tests can be run from command line
+- CI/CD can run tests automatically
+
+---
+
+### Phase 0 Summary
+
+**Deliverables**:
+- ✅ Tauri + React + TypeScript project initialized
+- ✅ Basic UI wireframe with navigation
+- ✅ SQLite database with migrations
+- ✅ i18n framework (EN/NL/DE support)
+- ✅ Basic Tauri commands working
+- ✅ Build and packaging verified
+- ✅ Testing infrastructure in place
+
+**Technology Stack Verified**:
+- Frontend: React 18 + TypeScript + Vite
+- Backend: Rust + Tauri 2.0
+- Database: SQLite + Sea-ORM
+- Styling: Tailwind CSS
+- i18n: i18next + react-i18next
+- Testing: Jest + React Testing Library + Cargo test
+
+**What's NOT Implemented Yet**:
+- AI features (coming in Phase 3)
+- Compliance features (coming in Phase 1-2)
+- Encryption (coming in Phase 1)
+- PII detection (coming in Phase 4)
+- Any actual legal assistant functionality
+
+**Next**: Phase 1 - GDPR Compliance
 
 ---
 
@@ -1670,35 +2396,167 @@ The goal is not to replace lawyers or just make law firms more profitable. The g
 
 ## Implementation Priorities
 
+### Phase 0 (Critical - Week 1-2)
+**Focus**: Foundation & Wireframe
+**Timeline**: 1-2 weeks
+- Step 0.1: Project initialization & setup
+- Step 0.2: Basic UI wireframe
+- Step 0.3: Database setup & migrations
+- Step 0.4: i18n framework setup
+- Step 0.5: Basic Tauri commands
+- Step 0.6: Build & package verification
+- Step 0.7: Testing setup
+- **Deliverable**: Working wireframe application (no AI, no features, just foundation)
+- **Success Metric**: App builds, runs, and can be packaged for distribution
+
 ### Phase 1 (Critical - Q1 2025)
-Focus: Legal Compliance
+**Focus**: Legal Compliance - GDPR
+**Timeline**: 8-10 weeks
 - Steps 1-12: Complete GDPR compliance
+  - Data minimization
+  - Purpose limitation
+  - Transparency & notice
+  - Encryption at rest
+  - PII Layer 1 (regex)
+  - Access control
+  - Data deletion (right to erasure)
+  - Data correction
+  - Storage limitation
+  - Audit logging
+  - Security by design
+  - Privacy notice accessibility
+- **Deliverable**: GDPR-compliant application
+- **Success Metric**: Pass third-party GDPR compliance audit
+
+### Phase 2 (Critical - Q1-Q2 2025)
+**Focus**: Legal Compliance - AI Act
+**Timeline**: 4-6 weeks
 - Steps 13-19: Complete AI Act compliance
-- **Deliverable**: Fully compliant MVP
+  - AI transparency labels
+  - AI use explanation
+  - Output provenance
+  - Human-in-the-loop
+  - Label AI-modified data
+  - Local model default
+  - Low-risk by design classification
+- **Deliverable**: Fully compliant MVP (GDPR + AI Act)
+- **Success Metric**: Legal review confirms compliance with EU AI Act Article 52
 
-### Phase 2 (High - Q2 2025)
-Focus: Local AI Infrastructure
-- Step 20: Local model support (Candle + HF)
-- Step 21: PII Layer 2 (NER)
-- Step 22: PII Layer 3 (optional)
-- **Deliverable**: Privacy-first AI features
+### Phase 3 (High - Q2 2025)
+**Focus**: Local AI Infrastructure
+**Timeline**: 8-12 weeks
+- Step 20: Local model support (Candle + Hugging Face)
+  - Candle inference engine integration
+  - Support for Mistral, Llama, Phi-2 models
+  - Model quantization (4-bit, 8-bit)
+  - GPU acceleration (CUDA, Metal, ROCm)
+  - CPU fallback
+  - Model manager UI
+- **Deliverable**: Working local AI with inference
+- **Success Metric**: 7B model running at >10 tokens/sec on GPU, >2 tokens/sec on CPU
 
-### Phase 3 (Medium - Q3 2025)
-Focus: Workflow Automation
-- Steps 23-28: Plaintext architecture, validated automation
-- **Deliverable**: Efficient legal workflows
+### Phase 4 (High - Q2-Q3 2025)
+**Focus**: Advanced PII Protection
+**Timeline**: 6-8 weeks
+- Step 21: PII Layer 2 (NER - Named Entity Recognition)
+  - Context-aware entity detection
+  - Multi-language NER models
+  - Smart anonymization
+  - Legal citation preservation
+- Step 22: PII Layer 3 (optional advanced anonymization)
+  - Microsoft Presidio integration (local)
+  - Custom compliance rules
+  - Cross-document entity resolution
+- **Deliverable**: Privacy-first AI features with >98% PII detection
+- **Success Metric**: Combined Layer 1+2 detection rate >98%, false positives <2%
 
-### Phase 4 (High - Q4 2025)
-Focus: Knowledge & Security
-- Step 29: Legal RAG and knowledge base
+### Phase 5 (Medium - Q3 2025)
+**Focus**: Strategic Path Selection
+**Timeline**: 2 weeks planning
+- **Decision Point**: Choose Path A (Markdown) or Path B (MS Word) or Hybrid
+- Review decision matrix
+- Assess team capabilities and user needs
+- **Deliverable**: Strategic direction selected
+- **Success Metric**: Clear decision made and documented
+
+### Phase 6A (Medium - Q3-Q4 2025) - If Path A Selected
+**Focus**: Markdown-First Architecture
+**Timeline**: 10-12 weeks
+- Steps 23-28: Plaintext architecture
+  - Markdown workflow implementation
+  - Git integration
+  - PDF generation pipeline
+  - Email integration (mbox/maildir)
+  - Validated automation
+- **Deliverable**: Efficient plaintext legal workflows
+- **Success Metric**: 90% of firm data in plaintext formats, full Git version control
+
+### Phase 6B (High - Q3-Q4 2025) - If Path B Selected
+**Focus**: MS Word Integration with Advanced AI
+**Timeline**: 12-16 weeks
+- Steps 23B-28B: MS Word Add-in & Advanced Features
+  - Microsoft Word Add-in development
+  - Workspace agents (web research, document analysis, citations, compliance)
+  - Agentic workflows (Zapier-like automation)
+  - Full MCP-compatibility
+  - No-code AI agent builder
+  - Multi-modal support (vision, audio, OCR)
+- **Deliverable**: AI-enhanced Word integration
+- **Success Metric**: Word add-in installs successfully, agents complete tasks accurately
+
+### Phase 7 (High - Q4 2025)
+**Focus**: Knowledge Retrieval & Legal RAG
+**Timeline**: 8-10 weeks
+- Step 29: Local legal knowledge base
+  - Document indexing
+  - Vector database (Qdrant embedded)
+  - Semantic search
+  - RAG implementation
+  - Citation system
+- **Deliverable**: Intelligent legal research assistant
+- **Success Metric**: Semantic search finds relevant documents >80% of time in <2 seconds
+
+### Phase 8 (High - Q4 2025 - Q1 2026)
+**Focus**: Privacy, Security & Independence
+**Timeline**: 6-8 weeks
 - Steps 30-31: Complete isolation and security
-- **Deliverable**: Intelligent legal research
+  - Air-gapped operation support
+  - Trust nothing architecture
+  - Model isolation (sandboxing)
+  - Zero-trust networking
+  - Security audit and penetration testing
+- **Deliverable**: Fortress-level security
+- **Success Metric**: Pass security audit, confirmed isolation, can operate with internet completely disabled
 
-### Phase 5 (Future - 2026+)
-Focus: Social Impact
+### Phase 9 (Future - 2026+)
+**Focus**: Social Impact & Accessibility
+**Timeline**: Ongoing
 - Step 32: Accessibility and social justice
+  - Tiered service model (premium/standard/pro bono)
+  - AI-assisted pro bono work
+  - Self-service legal tools
+  - Access to justice metrics
 - Expand to other legal markets
 - **Deliverable**: Accessible legal AI for all
+- **Success Metric**: 30%+ increase in pro bono capacity, 20% cost reduction for standard services
+
+---
+
+## Complete Development Timeline
+
+**Total Time to MVP (Phase 0-2)**: ~4-5 months
+**Total Time to Full Features (Phase 0-8)**: ~18-24 months
+
+**Milestones**:
+- ✅ **v0.0.20** (Current): Wireframe + basic features
+- 🎯 **v0.1.0** (Phase 0 complete): Working foundation
+- 🎯 **v0.2.0** (Phase 1 complete): GDPR compliant
+- 🎯 **v0.3.0** (Phase 2 complete): AI Act compliant - **MVP READY**
+- 🎯 **v0.4.0** (Phase 3 complete): Local AI working
+- 🎯 **v0.5.0** (Phase 4 complete): Advanced PII protection
+- 🎯 **v0.6.0** (Phase 5-6 complete): Strategic path implemented
+- 🎯 **v1.0.0** (Phase 7-8 complete): **PRODUCTION READY**
+- 🎯 **v2.0.0** (Phase 9+): Social impact features
 
 ---
 
